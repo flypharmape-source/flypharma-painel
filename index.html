@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlyPharma — Painel de Gestão</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--t:#3ECFBF;--td:#2AB5A6;--tl:#E8FAF8;--n:#1E2D3D;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
+body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:var(--tx)}
+#lp{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--n);position:fixed;inset:0;z-index:1000}
+#lp.hide{display:none}
+.lb{background:var(--w);border-radius:20px;padding:40px;width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.llg{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+.lt{font-family:'Nunito';font-weight:800;font-size:22px;color:var(--n)}
+.lt span{color:var(--t)}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+.fg input{width:100%;padding:11px 14px;border:1.5px solid #D0D8E2;border-radius:10px;font-size:14px;color:var(--tx);outline:none}
+.fg input:focus{border-color:var(--t)}
+#lerr{color:var(--r);font-size:12px;text-align:center;display:none;padding:8px;background:rgba(240,69,90,.08);border-radius:6px;margin-top:8px}
+.lbtn{width:100%;height:50px;background:var(--t);color:var(--n);border:none;border-radius:10px;font-family:'Nunito';font-weight:800;font-size:16px;cursor:pointer;margin-top:6px}
+.lbtn:hover{background:var(--td)}
+.ldemo{margin-top:18px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.8}
+.ldemo b{display:block;margin-bottom:2px;font-size:12px;color:var(--tx)}
+.app{display:flex;min-height:100vh}
+.sb{width:var(--sw);background:var(--n);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{height:var(--hh);display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-lt{font-family:'Nunito';font-weight:800;font-size:18px;color:#fff}
+.sb-lt span{color:var(--t)}
+.sb-role{margin:10px 14px;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:700;text-align:center}
+.sb-role.adm{background:rgba(245,166,35,.2);color:var(--a)}
+.sb-role.frm{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-sec{padding:10px 12px 4px}
+.sb-lbl{font-size:10px;font-weight:600;letter-spacing:1.4px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:0 10px;margin-bottom:4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;font-weight:500;user-select:none;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.sb-item.on{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-item svg{width:17px;height:17px;flex-shrink:0}
+.sb-bdg{margin-left:auto;background:var(--r);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.sb-bot{margin-top:auto;padding:14px;flex-shrink:0}
+.sb-usr{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-usr:hover{background:rgba(255,255,255,.12)}
+.sb-av{width:34px;height:34px;border-radius:8px;background:var(--t);display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:14px;color:var(--n);flex-shrink:0}
+.sb-nm{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-sb{font-size:11px;color:rgba(255,255,255,.4)}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
+.topbar{height:var(--hh);background:var(--w);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 28px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.tb-title{font-family:'Nunito';font-weight:700;font-size:17px;color:var(--n);flex:1}
+.ibt{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2)}
+.ibt:hover{background:#D0D8E2}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;white-space:nowrap}
+.btn-p{background:var(--t);color:var(--n)}.btn-p:hover{background:var(--td)}
+.btn-o{background:transparent;border:1.5px solid #D0D8E2;color:var(--t2)}.btn-o:hover{background:var(--bg)}
+.btn-d{background:rgba(240,69,90,.1);color:var(--r);border:1px solid rgba(240,69,90,.25)}.btn-d:hover{background:rgba(240,69,90,.2)}
+.btn-g{background:rgba(34,201,122,.12);color:#18A065;border:1px solid rgba(34,201,122,.25)}
+.page{padding:24px 28px;display:none}
+.page.on{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--w);border:1px solid var(--br);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.si{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.si.t{background:var(--tl);color:var(--td)}.si.g{background:rgba(34,201,122,.12);color:#18A065}.si.a{background:rgba(245,166,35,.12);color:#C98A10}.si.r{background:rgba(240,69,90,.10);color:#D03348}
+.sv{font-family:'Nunito';font-size:26px;font-weight:800;color:var(--n);line-height:1;margin-bottom:4px}
+.sl{font-size:12px;color:var(--t2);margin-bottom:10px}
+.sd{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:20px}
+.sd.up{background:rgba(34,201,122,.12);color:#18A065}.sd.dn{background:rgba(240,69,90,.10);color:#D03348}
+.card{background:var(--w);border:1px solid var(--br);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.ch{padding:14px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:8px}
+.ct{font-family:'Nunito';font-size:14px;font-weight:700;color:var(--n)}
+.ca{font-size:12px;color:var(--t);font-weight:600;cursor:pointer;margin-left:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;border-bottom:1px solid var(--br);background:var(--bg)}
+.tbl td{padding:11px 16px;border-bottom:1px solid var(--br);font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--tl)}
+.oid{font-family:'Nunito';font-weight:700;font-size:12.5px;color:var(--n)}
+.b{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.b::before{content:'';width:5px;height:5px;border-radius:50%}
+.novo::before{background:var(--t)}.novo{background:rgba(62,207,191,.12);color:var(--td)}
+.prep::before{background:var(--a)}.prep{background:rgba(245,166,35,.12);color:#C98A10}
+.entr::before{background:var(--n)}.entr{background:rgba(30,45,61,.10);color:var(--n)}
+.cok::before{background:var(--g)}.cok{background:rgba(34,201,122,.12);color:#18A065}
+.can::before{background:var(--r)}.can{background:rgba(240,69,90,.10);color:#D03348}
+.aberta::before{background:var(--t)}.aberta{background:rgba(62,207,191,.12);color:var(--td)}
+.fechada::before{background:var(--t3)}.fechada{background:rgba(154,170,187,.15);color:var(--t3)}
+.ativo::before{background:var(--g)}.ativo{background:rgba(34,201,122,.12);color:#18A065}
+.inativo::before{background:var(--r)}.inativo{background:rgba(240,69,90,.10);color:#D03348}
+.fb{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.sb2{display:flex;align-items:center;gap:8px;background:var(--w);border:1.5px solid #D0D8E2;border-radius:9px;padding:8px 14px;flex:1;max-width:300px}
+.sb2 input{background:none;border:none;outline:none;color:var(--tx);font-size:13px;flex:1}
+.sb2 input::placeholder{color:var(--t3)}
+.fc{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--br);color:var(--t2);background:var(--w);transition:all .15s}
+.fc.on{background:var(--tl);border-color:var(--t);color:var(--td);font-weight:600}
+.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.fcard{background:var(--w);border:1.5px solid var(--br);border-radius:14px;overflow:hidden;transition:all .15s}
+.fcard:hover{border-color:var(--t);box-shadow:0 2px 12px rgba(30,45,61,.09)}
+.ftop{height:80px;background:linear-gradient(135deg,var(--n),#253647);display:flex;align-items:center;justify-content:center;position:relative}
+.flogo{width:52px;height:52px;border-radius:12px;background:var(--t);display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:22px;color:var(--n)}
+.fbody{padding:14px}
+.fn{font-family:'Nunito';font-weight:700;font-size:15px;color:var(--n);margin-bottom:2px}
+.fc2{font-size:12px;color:var(--t2);margin-bottom:10px}
+.fst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.fstv{font-family:'Nunito';font-weight:700;font-size:16px;color:var(--n)}
+.fstl{font-size:10px;color:var(--t3)}
+.fft{padding:10px 14px;border-top:1px solid var(--br);display:flex;gap:8px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.on{opacity:1;pointer-events:all}
+.modal{background:var(--w);border-radius:14px;width:560px;max-height:90vh;overflow:auto;transform:translateY(16px);transition:transform .2s;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.mo.on .modal{transform:translateY(0)}
+.mh{padding:20px 24px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
+.mt{font-family:'Nunito';font-weight:700;font-size:16px;color:var(--n)}
+.mx{width:30px;height:30px;border-radius:7px;background:var(--bg);border:none;cursor:pointer;font-size:16px;color:var(--t2)}
+.mb{padding:24px}
+.mf{padding:16px 24px;border-top:1px solid var(--br);display:flex;justify-content:flex-end;gap:10px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fc3{display:flex;flex-direction:column;gap:5px}
+.fc3 label{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.fc3 input,.fc3 select,.fc3 textarea{padding:9px 12px;border:1.5px solid #D0D8E2;border-radius:10px;font-size:13px;color:var(--tx);outline:none;width:100%}
+.fc3 input:focus,.fc3 select:focus,.fc3 textarea:focus{border-color:var(--t)}
+.fc3 textarea{resize:vertical;min-height:80px}
+.full{grid-column:1/-1}
+.two{display:grid;grid-template-columns:1fr 330px;gap:14px;margin-bottom:22px}
+.al{padding:4px 0}
+.ai{display:flex;align-items:flex-start;gap:12px;padding:10px 18px}
+.ai:hover{background:var(--tl)}
+.adot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.aT{font-size:13px;color:var(--tx);margin-bottom:2px}
+.aS{font-size:11px;color:var(--t3)}
+.mapA{background:#E8F4F2;height:200px;position:relative;overflow:hidden}
+.mapG{position:absolute;inset:0;background-image:linear-gradient(rgba(30,45,61,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(30,45,61,.05) 1px,transparent 1px);background-size:28px 28px}
+.dpin{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid;transform:translate(-50%,-50%)}
+.ch2{padding:12px 18px 4px;display:flex;align-items:flex-end;gap:5px;height:76px}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.bar{width:100%;border-radius:4px 4px 0 0;background:rgba(62,207,191,.3);transition:height .7s cubic-bezier(.34,1.56,.64,1)}
+.bar.td{background:var(--t)}
+.bL{font-size:9.5px;color:var(--t3)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{padding:48px;text-align:center;color:var(--t2)}
+.empty .ei{font-size:40px;margin-bottom:12px}
+.empty .eT{font-family:'Nunito';font-size:17px;font-weight:700;color:var(--n);margin-bottom:6px}
+.toast-area{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:9998}
+.toast{background:var(--w);border:1.5px solid var(--br);border-radius:10px;padding:13px 16px;display:flex;align-items:flex-start;gap:12px;min-width:280px;max-width:340px;box-shadow:0 2px 12px rgba(30,45,61,.09);animation:ts .3s ease}
+@keyframes ts{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.ti{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ti.s{background:rgba(34,201,122,.12)}.ti.i{background:var(--tl)}.ti.w{background:rgba(245,166,35,.12)}.ti.e{background:rgba(240,69,90,.10)}
+.tT{font-size:13px;font-weight:600;color:var(--n);margin-bottom:2px}
+.tB{font-size:12px;color:var(--t2)}
+@media(max-width:1100px){.sg{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+/* ── RESPONSIVIDADE MOBILE ─────────────────────────────────── */
+@media(max-width:768px){
+  :root{--sw:0px}
+
+  /* Sidebar vira drawer overlay */
+  .sb{
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    width:260px;
+    box-shadow:4px 0 24px rgba(0,0,0,.3);
+    z-index:200;
+  }
+  .sb.open{transform:translateX(0)}
+
+  /* Overlay escuro quando sidebar aberta */
+  .sb-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.5);z-index:199;
+  }
+  .sb-overlay.on{display:block}
+
+  /* Main ocupa tudo */
+  .main{margin-left:0 !important}
+
+  /* Topbar com botão hamburguer */
+  .topbar{padding:0 16px}
+  .hbg{display:flex !important}
+
+  /* Pages com padding menor */
+  .page{padding:16px}
+
+  /* Cards de stats em 2 colunas */
+  .sg{grid-template-columns:repeat(2,1fr);gap:10px}
+  .sc{padding:14px}
+  .sv{font-size:20px}
+
+  /* Tabela scroll horizontal */
+  .card{overflow-x:auto}
+  .tbl{min-width:600px}
+
+  /* Farm cards em 1 coluna */
+  .fg2{grid-template-columns:1fr}
+
+  /* Modal fullscreen */
+  .modal{
+    width:100% !important;
+    max-width:100% !important;
+    max-height:100vh !important;
+    border-radius:16px 16px 0 0 !important;
+    margin-top:auto;
+  }
+  .mo{align-items:flex-end !important}
+
+  /* Form rows em coluna */
+  .fr{flex-direction:column}
+  .fc3{min-width:unset !important;width:100% !important}
+
+  /* Barra de filtros scroll */
+  .fb{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+  .fb::-webkit-scrollbar{display:none}
+
+  /* Toast menor */
+  .toast{min-width:unset;max-width:calc(100vw - 32px)}
+  .toast-area{right:16px;left:16px;bottom:16px}
+
+  /* Login */
+  .lb{width:calc(100vw - 32px);padding:28px 20px;border-radius:14px}
+}
+
+@media(max-width:480px){
+  .sg{grid-template-columns:1fr 1fr}
+  .sc{padding:12px}
+  .sv{font-size:18px}
+  .tb-title{font-size:15px}
+}
+
+/* Hamburguer — escondido no desktop */
+.hbg{
+  display:none;
+  width:36px;height:36px;border-radius:9px;
+  background:var(--bg);border:1px solid var(--br);
+  align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t2);flex-shrink:0;
+  margin-right:4px;
+}
+.hbg svg{pointer-events:none}
+
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="lp">
+  <div class="lb">
+    <div class="llg">
+      <svg width="34" height="34" viewBox="0 0 36 36" fill="none">
+        <path d="M6 16C4 11 3 6 5.5 3 9 4.5 12 8.5 12 14Z" fill="#3ECFBF"/>
+        <path d="M6 20C4 25 4.5 30 7 33 10.5 31 12.5 27 12 21Z" fill="#3ECFBF" opacity=".7"/>
+        <path d="M12 13L24 8Q30 7 31 13L19 18Q13 19 12 13Z" fill="#3ECFBF"/>
+        <path d="M19 18L31 13Q37 14.5 36 21L24 26Q18 27 19 18Z" fill="#1E2D3D"/>
+      </svg>
+      <div class="lt">fly<span>pharma</span></div>
+    </div>
+    <h2 style="font-family:'Nunito';font-weight:800;font-size:20px;color:var(--n);text-align:center;margin-bottom:4px">Entrar no painel</h2>
+    <p style="text-align:center;color:var(--t2);font-size:13px;margin-bottom:24px">Gestão FlyPharma</p>
+    <div class="fg"><label>E-MAIL</label><input type="email" id="lemail" value="admin@flypharma.com" placeholder="seu@email.com"></div>
+    <div class="fg"><label>SENHA</label><input type="password" id="lsenha" value="admin123" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;"></div>
+    <div id="lerr"></div>
+    <button class="lbtn" id="lbtn" onclick="doLogin()">Entrar</button>
+    <div class="ldemo">
+      <b>Contas de demonstracao:</b>
+      Admin: admin@flypharma.com / admin123<br>
+      Farmacia: farmacia@drogasil.com / farm123
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <aside class="sb">
+    <div class="sb-logo">
+      <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+        <path d="M6 16C4 11 3 6 5.5 3 9 4.5 12 8.5 12 14Z" fill="#3ECFBF"/>
+        <path d="M6 20C4 25 4.5 30 7 33 10.5 31 12.5 27 12 21Z" fill="#3ECFBF" opacity=".7"/>
+        <path d="M12 13L24 8Q30 7 31 13L19 18Q13 19 12 13Z" fill="#3ECFBF"/>
+        <path d="M19 18L31 13Q37 14.5 36 21L24 26Q18 27 19 18Z" fill="#1E2D3D"/>
+      </svg>
+      <div class="sb-lt">fly<span>pharma</span></div>
+    </div>
+    <div id="sb-role" class="sb-role adm">Admin Mestre</div>
+    <div id="sb-nav"></div>
+    <div class="sb-bot">
+      <div class="sb-usr" onclick="doLogout()">
+        <div class="sb-av" id="sb-av">A</div>
+        <div style="flex:1;min-width:0">
+          <div class="sb-nm" id="sb-nm">Admin</div>
+          <div class="sb-sb">Clique para sair</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M9 3H5a1 1 0 00-1 1v12a1 1 0 001 1h4M13 15l4-5-4-5M17 10H7"/></svg>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="hbg" id="hbg-btn" onclick="toggleSidebar()">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 5h14M3 10h14M3 15h14"/>
+        </svg>
+      </div>
+      <div class="tb-title" id="tb-title">Dashboard</div>
+      <div class="ibt" onclick="showToast('i','Notificacoes','Nenhuma nova notificacao')">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 016 6c0 3 1 4.5 1.5 5.5H2.5C3 12.5 4 11 4 8a6 6 0 016-6z"/><path d="M8 16a2 2 0 004 0"/></svg>
+      </div>
+      <button class="btn btn-p" id="act-btn" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 4v12M4 10h12"/></svg>
+        <span id="act-lbl">Novo</span>
+      </button>
+    </header>
+    <div id="page-dash" class="page on"></div>
+    <div id="page-farm" class="page"></div>
+    <div id="page-prod" class="page"></div>
+    <div id="page-ped"  class="page"></div>
+    <div id="page-est"  class="page"></div>
+    <div id="page-usr"  class="page"></div>
+    <div id="page-rel"  class="page"></div>
+    <div id="page-cfg"  class="page"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="m-overlay" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="mh">
+      <span class="mt" id="m-title">Modal</span>
+      <button class="mx" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf">
+      <button class="btn btn-o" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveModal()"><span id="m-save-txt">Salvar</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+// FlyPharma Painel - JavaScript completo
+const API = 'https://web-production-b66cd.up.railway.app/api';
+let CU = null, AT = null, MC = {};
+
+// ── ESTADO DA APLICAÇÃO (carregado da API, nunca hardcoded) ────
+let FARMS = [], PRODS = [], PEDS = [], USRS = [];
+const SL = {pendente:'Novo',confirmado:'Confirmado',preparando:'Preparando',aguardando_entregador:'Aguardando',em_entrega:'Em entrega',entregue:'Entregue',cancelado:'Cancelado'};
+const SC = {pendente:'novo',confirmado:'novo',preparando:'prep',aguardando_entregador:'prep',em_entrega:'entr',entregue:'cok',cancelado:'can'};
+
+// ── HELPER API ────────────────────────────────────────────────
+function apiHeaders() {
+  var h = {'Content-Type':'application/json'};
+  var token = AT || localStorage.getItem('fly_at');
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+function apiFetch(path, opts) {
+  opts = opts || {};
+  opts.headers = apiHeaders();
+  return fetch(API + path, opts).then(function(r) {
+    if (r.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
+    return r.json().then(function(d) { return {ok: r.ok, status: r.status, data: d}; });
+  });
+}
+
+// ── CARREGAR DADOS DA API ─────────────────────────────────────
+function loadFarms() {
+  return apiFetch('/farmacias/admin/todas').then(function(res) {
+    if (res.ok) {
+      FARMS = Array.isArray(res.data) ? res.data : (res.data.farmacias || res.data.data || []);
+      // normaliza campos
+      FARMS = FARMS.map(function(f) {
+        return {
+          id: f.id || f._id,
+          nome: f.nome || f.name || '',
+          cidade: f.cidade || f.city || '',
+          bairro: f.bairro || f.neighborhood || '',
+          logradouro: f.logradouro || f.endereco || '',
+          cnpj: f.cnpj || '',
+          pedidos: f.pedidos || f.total_pedidos || 0,
+          fat: f.faturamento || f.fat || 0,
+          aberta: f.aberta !== undefined ? f.aberta : (f.status === 'aberta'),
+          ativo: f.ativo !== undefined ? f.ativo : (f.status !== 'inativo'),
+          taxa_entrega: f.taxa_entrega || 6.90,
+          raio_entrega_km: f.raio_entrega_km || 5,
+          pedido_minimo: f.pedido_minimo || 0
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadProds() {
+  return apiFetch('/produtos').then(function(res) {
+    if (res.ok) {
+      PRODS = Array.isArray(res.data) ? res.data : (res.data.produtos || res.data.data || []);
+      PRODS = PRODS.map(function(p) {
+        return {
+          id: p.id || p._id,
+          nome: p.nome || p.name || '',
+          lab: p.laboratorio || p.lab || '',
+          cat: p.categoria || p.cat || '',
+          preco: p.preco || p.price || 0,
+          promo: p.preco_promocional || p.promo || null,
+          ctrl: p.controlado || p.ctrl || false,
+          uni: p.unidade || p.uni || 'un',
+          desc: p.descricao || p.desc || '',
+          emoji: p.emoji || '💊',
+          ativo: p.ativo !== undefined ? p.ativo : true,
+          qtd: p.estoque || p.qtd || 0
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadPeds() {
+  return apiFetch('/pedidos/admin/todos').then(function(res) {
+    if (res.ok) {
+      PEDS = Array.isArray(res.data) ? res.data : (res.data.pedidos || res.data.data || []);
+      PEDS = PEDS.map(function(p) {
+        var dt = p.created_at || p.createdAt || '';
+        var hora = dt ? new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '--:--';
+        return {
+          id: p.id || p._id,
+          num: p.numero || p.num || p.id,
+          farm: p.farmacia_nome || p.farmacia || p.farm || '',
+          cli: p.cliente_nome || p.cliente || p.cli || '',
+          itens: p.quantidade_itens || p.itens || 0,
+          total: p.total || p.valor_total || 0,
+          status: p.status || 'pendente',
+          metodo: p.metodo_pagamento || p.metodo || 'PIX',
+          hora: hora
+        };
+      });
+    }
+  }).catch(function() {});
+  // Atualizar badge de pedidos pendentes
+  var pendentes = PEDS.filter(function(p){ return p.status === 'pendente' || p.status === 'confirmado'; }).length;
+  var bdg = document.getElementById('bdg-ped');
+  if (bdg) {
+    if (pendentes > 0) {
+      bdg.textContent = pendentes > 99 ? '99+' : pendentes;
+      bdg.style.display = 'flex';
+    } else {
+      bdg.style.display = 'none';
+    }
+  }
+}
+function loadUsrs() {
+  return apiFetch('/usuarios').then(function(res) {
+    if (res.ok) {
+      USRS = Array.isArray(res.data) ? res.data : (res.data.usuarios || res.data.users || res.data.data || []);
+      USRS = USRS.map(function(u) {
+        var dt = u.created_at || u.createdAt || '';
+        return {
+          id: u.id || u._id,
+          nome: u.nome || u.name || '',
+          email: u.email || '',
+          role: u.role || 'cliente',
+          tel: u.telefone || u.tel || '',
+          dt: dt ? new Date(dt).toLocaleDateString('pt-BR') : '—',
+          ativo: u.ativo !== undefined ? u.ativo : true
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadAll() {
+  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs()]);
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function doLogin() {
+  var email = document.getElementById('lemail').value.trim();
+  var senha = document.getElementById('lsenha').value;
+  var btn = document.getElementById('lbtn');
+  var err = document.getElementById('lerr');
+  if (!email || !senha) { showErr('Preencha e-mail e senha.'); return; }
+  btn.innerHTML = '<span class="spin"></span> Entrando...';
+  btn.disabled = true;
+  err.style.display = 'none';
+  fetch(API + '/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: email, senha: senha})
+  }).then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+  .then(function(res) {
+    if (res.ok && res.data.user && (res.data.user.role === 'admin' || res.data.user.role === 'farmacia')) {
+      AT = res.data.access || res.data.token || res.data.accessToken || null;
+      CU = res.data.user;
+      if (AT) localStorage.setItem('fly_at', AT);
+      localStorage.setItem('fly_cu', JSON.stringify(CU));
+      loadAll().then(function() { startApp(true); });
+    } else {
+      showErr(res.data.error || res.data.message || 'E-mail ou senha inválidos.');
+      btn.innerHTML = 'Entrar'; btn.disabled = false;
+    }
+  }).catch(function() {
+    showErr('Não foi possível conectar ao servidor. Tente novamente.');
+    btn.innerHTML = 'Entrar'; btn.disabled = false;
+  });
+}
+
+function showErr(msg) {
+  var e = document.getElementById('lerr'); e.textContent = msg; e.style.display = 'block';
+  var b = document.getElementById('lbtn'); b.innerHTML = 'Entrar'; b.disabled = false;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !document.getElementById('lp').classList.contains('hide')) doLogin();
+});
+
+// Verifica token salvo
+window.addEventListener('load', function() {
+  var savedAT = localStorage.getItem('fly_at');
+  var savedCU = localStorage.getItem('fly_cu');
+  if (!savedAT || !savedCU) return;
+  try { CU = JSON.parse(savedCU); } catch(e) { localStorage.removeItem('fly_cu'); return; }
+  AT = savedAT;
+  // Valida token com a API e já recarrega os dados
+  fetch(API + '/auth/me', {headers: {Authorization: 'Bearer ' + AT}})
+  .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, status: r.status, data: d}; }); })
+  .then(function(res) {
+    var d = res.data;
+    // Normaliza: suporta {role} direto ou {user: {role}}
+    var user = (d && d.role) ? d : (d && d.user ? d.user : null);
+    if (user && (user.role === 'admin' || user.role === 'farmacia')) {
+      CU = user;
+      AT = AT || res.data.access || res.data.token || AT;
+      localStorage.setItem('fly_cu', JSON.stringify(CU));
+      loadAll().then(function() { startApp(false); });
+    } else if (res.status === 401) {
+      // Token expirado de verdade
+      localStorage.removeItem('fly_at');
+      localStorage.removeItem('fly_cu');
+      AT = null; CU = null;
+    } else {
+      // Outro erro (rede, 500) — usa dados salvos em cache
+      loadAll().then(function() { startApp(false); });
+    }
+  }).catch(function() {
+    // Sem rede: usa dados em cache do localStorage sem limpar sessão
+    loadAll().then(function() { startApp(false); });
+  });
+});
+
+function doLogout() {
+  CU = null; AT = null;
+  localStorage.removeItem('fly_at');
+  localStorage.removeItem('fly_cu');
+  document.getElementById('lp').classList.remove('hide');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('lbtn').innerHTML = 'Entrar';
+  document.getElementById('lbtn').disabled = false;
+  document.getElementById('lemail').value = 'admin@flypharma.com';
+  document.getElementById('lsenha').value = 'admin123';
+  document.getElementById('lerr').style.display = 'none';
+}
+
+// ── INICIAR APP ───────────────────────────────────────────────
+var NAV_ADM = [
+  {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
+  {g:'Plataforma', items:[
+    {id:'farm',lbl:'Farmácias'},
+    {id:'prod',lbl:'Produtos'},
+    {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'usr',lbl:'Usuários'},
+    {id:'rel',lbl:'Relatórios'},
+  ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+];
+var NAV_FRM = [
+  {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
+  {g:'Operações', items:[
+    {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'est',lbl:'Estoque'},
+    {id:'prod',lbl:'Produtos'},
+  ]},
+];
+var NAV_ICS = {
+  dash:'<rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/>',
+  farm:'<path d="M3 9l7-6 7 6v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/><path d="M8 19V13h4v6"/>',
+  prod:'<rect x="2" y="7" width="16" height="11" rx="2"/><path d="M6 7V5a4 4 0 018 0v2"/>',
+  ped:'<path d="M3 3h2l2.5 9h7l2-6H6"/><circle cx="9" cy="16" r="1.2"/><circle cx="14" cy="16" r="1.2"/>',
+  est:'<rect x="2" y="7" width="16" height="11" rx="2"/><path d="M6 7V5a4 4 0 018 0v2"/>',
+  usr:'<circle cx="10" cy="6" r="3"/><path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>',
+  rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
+  cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
+};
+var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações'};
+
+function startApp(novoLogin) {
+  document.getElementById('lp').classList.add('hide');
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('sb-av').textContent = CU.nome[0].toUpperCase();
+  document.getElementById('sb-nm').textContent = CU.nome;
+  var isAdm = CU.role === 'admin';
+  document.getElementById('sb-role').className = 'sb-role ' + (isAdm ? 'adm' : 'frm');
+  document.getElementById('sb-role').textContent = isAdm ? '👑 Admin Mestre' : '🏥 ' + CU.nome;
+  var nav = isAdm ? NAV_ADM : NAV_FRM;
+  var html = '';
+  for (var i = 0; i < nav.length; i++) {
+    html += '<div class="sb-sec"><div class="sb-lbl">' + nav[i].g + '</div>';
+    for (var j = 0; j < nav[i].items.length; j++) {
+      var it = nav[i].items[j];
+      var ic = NAV_ICS[it.id] || NAV_ICS.dash;
+      html += '<div class="sb-item" id="nav-' + it.id + '" onclick="goto(\'' + it.id + '\')">';
+      html += '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + ic + '</svg>';
+      html += it.lbl;
+      if (it.bdg) html += '<span class="sb-bdg" id="bdg-' + it.id + '" style="display:none">0</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('sb-nav').innerHTML = html;
+  goto('dash');
+  if (novoLogin) showToast('s', 'Bem-vindo, ' + CU.nome.split(' ')[0] + '!', 'Login realizado com sucesso.');
+}
+
+function goto(id) {
+  document.querySelectorAll('.sb-item').forEach(function(e) { e.classList.remove('on'); });
+  document.querySelectorAll('.page').forEach(function(e) { e.classList.remove('on'); });
+  var ni = document.getElementById('nav-' + id);
+  if (ni) ni.classList.add('on');
+  var pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('on');
+  document.getElementById('tb-title').textContent = PTL[id] || id;
+  var actMap = {farm:'Nova farmácia',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:''};
+  var lbl = actMap[id] !== undefined ? actMap[id] : '';
+  var ab = document.getElementById('act-btn');
+  ab.style.display = lbl ? 'flex' : 'none';
+  document.getElementById('act-lbl').textContent = lbl;
+  document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
+  // Mostra loading e recarrega dados frescos da API antes de renderizar
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds};
+  if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
+  var loader = loadMap[id];
+  if (loader) {
+    loader().then(function() { renderPage(id); });
+  } else {
+    renderPage(id);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderPage(id) {
+  if (id === 'dash') renderDash();
+  else if (id === 'farm') renderFarm();
+  else if (id === 'prod') renderProd();
+  else if (id === 'ped')  renderPed();
+  else if (id === 'est')  renderEst();
+  else if (id === 'usr')  renderUsr();
+  else if (id === 'rel')  renderRel();
+  else if (id === 'cfg')  renderCfg();
+}
+
+function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
+function svg15(d, c) { c = c || 'var(--t)'; return '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="' + c + '" stroke-width="1.8">' + d + '</svg>'; }
+function sbadge(s) { return '<span class="b ' + (SC[s] || 'novo') + '">' + (SL[s] || s) + '</span>'; }
+function fmtR(v) { return 'R$' + Number(v || 0).toFixed(2); }
+
+// DASHBOARD
+function renderDash() {
+  var el = document.getElementById('page-dash');
+  var isAdm = CU.role === 'admin';
+  var h = '';
+
+  // Stats
+  h += '<div class="sg">';
+  if (isAdm) {
+    h += statCard('t', NAV_ICS.ped, 'R$48.200', 'Faturamento total', '↑ 18% este mês', 'up');
+    h += statCard('g', NAV_ICS.farm, '8', 'Farmácias ativas', '+2 este mês', 'up');
+    h += statCard('a', NAV_ICS.ped, '1.847', 'Pedidos este mês', '↑ 12%', 'up');
+    h += statCard('r', NAV_ICS.usr, '324', 'Novos clientes', '↑ 8%', 'up');
+  } else {
+    h += statCard('t', NAV_ICS.ped, '143', 'Pedidos hoje', '↑ 12%', 'up');
+    h += statCard('g', NAV_ICS.farm, 'R$4.280', 'Faturamento hoje', '↑ 8%', 'up');
+    h += statCard('a', NAV_ICS.cfg, '18 min', 'Tempo médio entrega', '↓ 3 min', 'up');
+    h += statCard('r', NAV_ICS.prod, '5', 'Estoque crítico', '↑ 2 itens', 'dn');
+  }
+  h += '</div>';
+
+  // Two col
+  h += '<div class="two">';
+
+  // Tabela pedidos recentes
+  h += '<div class="card">';
+  h += '<div class="ch">' + svg15(NAV_ICS.ped) + '<span class="ct">Pedidos recentes</span><span class="ca" onclick="goto(\'ped\')">Ver todos →</span></div>';
+  h += '<table class="tbl"><thead><tr><th>ID</th><th>Cliente</th><th>' + (isAdm ? 'Farmácia' : 'Endereço') + '</th><th>Valor</th><th>Status</th></tr></thead><tbody>';
+  for (var i = 0; i < Math.min(5, PEDS.length); i++) {
+    var p = PEDS[i];
+    h += '<tr onclick="openModal(\'ped-view\',\'' + p.id + '\')">';
+    h += '<td><span class="oid">#' + p.num + '</span></td>';
+    h += '<td>' + p.cli + '</td>';
+    h += '<td>' + (isAdm ? p.farm : 'Boa Viagem, 320') + '</td>';
+    h += '<td>' + fmtR(p.total) + '</td>';
+    h += '<td>' + sbadge(p.status) + '</td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  h += '<div class="ch2" id="dash-chart"></div>';
+  h += '</div>';
+
+  // Col direita
+  h += '<div style="display:flex;flex-direction:column;gap:14px">';
+  // Mapa
+  h += '<div class="card"><div class="ch">' + svg15('<path d="M10 2C7.2 2 5 4.2 5 7c0 4 5 11 5 11s5-7 5-11c0-2.8-2.2-5-5-5z"/><circle cx="10" cy="7" r="2"/>') + '<span class="ct">Entregas ativas</span><span style="font-size:12px;color:var(--t3);margin-left:auto">3 em andamento</span></div>';
+  h += '<div class="mapA"><div class="mapG"></div>';
+  h += '<svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 300 200" preserveAspectRatio="none"><path d="M75 120Q120 85 165 95" stroke="#3ECFBF" stroke-width="2" fill="none" stroke-dasharray="6 4" opacity=".6"/></svg>';
+  h += '<div class="dpin" style="background:var(--n);border-color:#253647;top:60%;left:25%"></div>';
+  h += '<div class="dpin" style="background:var(--g);border-color:#4ae89e;top:30%;left:55%"></div>';
+  h += '<div class="dpin" style="background:var(--t);border-color:var(--td);top:45%;left:40%"></div>';
+  h += '</div></div>';
+  // Atividade
+  h += '<div class="card"><div class="ch">' + svg15('<circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 3"/>') + '<span class="ct">Atividade recente</span></div><div class="al">';
+  var ativs = [
+    ['var(--t)','Novo pedido <b>#4821</b> recebido','há 2 min · Carlos M.'],
+    ['var(--n)','Pedido <b>#4819</b> saiu para entrega','há 12 min'],
+    ['var(--g)','Pedido <b>#4818</b> entregue','há 28 min'],
+    ['var(--a)','Estoque baixo: <b>Dipirona</b>','há 45 min'],
+  ];
+  for (var j = 0; j < ativs.length; j++) {
+    h += '<div class="ai"><div class="adot" style="background:' + ativs[j][0] + '"></div><div><div class="aT">' + ativs[j][1] + '</div><div class="aS">' + ativs[j][2] + '</div></div></div>';
+  }
+  h += '</div></div>';
+  h += '</div>';
+  h += '</div>'; // /two
+
+  // Bottom
+  if (isAdm) {
+    h += '<div class="card"><div class="ch">' + svg15(NAV_ICS.farm) + '<span class="ct">Farmácias por faturamento</span><span class="ca" onclick="goto(\'farm\')">Ver todas →</span></div>';
+    h += '<table class="tbl"><thead><tr><th>Farmácia</th><th>Cidade</th><th>Pedidos</th><th>Faturamento</th><th>Status</th></tr></thead><tbody>';
+    for (var fi = 0; fi < Math.min(5, FARMS.length); fi++) {
+      var f = FARMS[fi];
+      h += '<tr><td><b>' + f.nome + '</b></td><td>' + f.cidade + '</td><td>' + f.pedidos + '</td><td>' + fmtR(f.fat) + '</td><td><span class="b ' + (f.aberta ? 'aberta' : 'fechada') + '">' + (f.aberta ? 'Aberta' : 'Fechada') + '</span></td></tr>';
+    }
+    h += '</tbody></table></div>';
+  } else {
+    h += '<div class="card"><div class="ch">' + svg15('<path d="M10 2L2 17h16L10 2z"/><path d="M10 8v4M10 14v1"/>','var(--r)') + '<span class="ct">Estoque crítico</span><span style="font-size:12px;color:var(--r);margin-left:auto">5 itens</span></div>';
+    var estoq = [['💊','Dipirona 500mg',8,16],['💉','Insulina NPH',12,24],['🩹','Curativo G',5,10],['💊','Amoxicilina',15,30]];
+    for (var ei = 0; ei < estoq.length; ei++) {
+      var e = estoq[ei];
+      var cor = e[2] <= e[3]/2 ? 'var(--r)' : 'var(--a)';
+      h += '<div style="padding:10px 18px;display:flex;align-items:center;gap:12px">';
+      h += '<div style="width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px">' + e[0] + '</div>';
+      h += '<div style="flex:1;font-size:13px;font-weight:500">' + e[1] + '</div>';
+      h += '<div style="font-size:12px;color:var(--t2);margin-right:12px">' + e[2] + ' un.</div>';
+      h += '<div style="width:80px;height:5px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + e[3] + '%;background:' + cor + ';border-radius:3px"></div></div>';
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  el.innerHTML = h;
+  buildChart('dash-chart');
+}
+
+function statCard(cls, ic, val, lbl, delta, dir) {
+  return '<div class="sc">' +
+    '<div class="si ' + cls + '">' + svg18(ic) + '</div>' +
+    '<div class="sv">' + val + '</div>' +
+    '<div class="sl">' + lbl + '</div>' +
+    '<span class="sd ' + dir + '">' + delta + '</span>' +
+    '</div>';
+}
+
+// FARMÁCIAS
+function renderFarm() {
+  var el = document.getElementById('page-farm');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar farmácia..." oninput="filterFarm(this.value)"></div>';
+  h += '<div class="fc on" onclick="filterFarmStatus(\'all\',this)">Todas (' + FARMS.length + ')</div>';
+  var atv = FARMS.filter(function(f){return f.ativo;}).length;
+  var inat = FARMS.filter(function(f){return !f.ativo;}).length;
+  h += '<div class="fc" onclick="filterFarmStatus(\'ativa\',this)">Ativas (' + atv + ')</div>';
+  h += '<div class="fc" onclick="filterFarmStatus(\'inativa\',this)">Inativas (' + inat + ')</div>';
+  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'farm-new\')">+ Nova farmácia</button></div>';
+  h += '</div>';
+  h += '<div class="fg2" id="farm-grid">' + FARMS.map(farmCard).join('') + '</div>';
+  el.innerHTML = h;
+}
+
+function farmCard(f) {
+  var isAdm = CU && CU.role === 'admin';
+  return '<div class="fcard" id="fc-' + f.id + '">' +
+    '<div class="ftop"><div class="flogo">' + f.nome[0] + '</div>' +
+    '<div style="position:absolute;top:8px;right:8px"><span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
+    (!f.ativo ? '<div style="position:absolute;top:8px;left:8px"><span class="b inativo">Inativa</span></div>' : '') +
+    '</div>' +
+    '<div class="fbody">' +
+    '<div class="fn">' + f.nome + '</div>' +
+    '<div class="fc2">📍 ' + f.bairro + ', ' + f.cidade + '</div>' +
+    '<div class="fst">' +
+    '<div><div class="fstv">' + f.pedidos + '</div><div class="fstl">Pedidos</div></div>' +
+    '<div><div class="fstv">' + fmtR(f.fat).replace('R$','') + '</div><div class="fstl">Fat.</div></div>' +
+    '<div><div class="fstv">4.8\u2605</div><div class="fstl">Aval.</div></div>' +
+    '</div></div>' +
+    '<div class="fft">' +
+    '<button class="btn btn-o" style="flex:1;justify-content:center;font-size:12px" onclick="openModal(\'farm-edit\',\'' + f.id + '\')">\u270F\uFE0F Editar</button>' +
+    '<button class="btn ' + (f.ativo?'btn-d':'btn-g') + '" style="flex:1;justify-content:center;font-size:12px" onclick="toggleFarm(\'' + f.id + '\')">' + (f.ativo?'🚫 Desativar':'\u2705 Ativar') + '</button>' +
+    (isAdm ? '<button class="btn btn-d" style="justify-content:center;font-size:12px;padding:8px 10px" title="Excluir permanentemente" onclick="delFarm(\'' + f.id + '\')">🗑\uFE0F</button>' : '') +
+    '</div></div>';
+}
+
+function delFarm(id) {
+  var f = FARMS.find(function(x){return x.id===id;});
+  if (!f) return;
+  if (!confirm('\u26A0\uFE0F Excluir a farm\u00E1cia "' + f.nome + '"?\n\nEsta a\u00E7\u00E3o \u00E9 irrevers\u00EDvel.')) return;
+  if (!confirm('Confirmar exclus\u00E3o permanente de "' + f.nome + '"?')) return;
+  apiFetch('/farmacias/' + id, {method: 'DELETE'})
+  .then(function(res) {
+    if (res.ok) {
+      FARMS = FARMS.filter(function(x){return x.id !== id;});
+      var el = document.getElementById('fc-' + id);
+      if (el) {
+        el.style.transition = 'opacity .3s, transform .3s';
+        el.style.opacity = '0'; el.style.transform = 'scale(0.95)';
+        setTimeout(function(){ el.remove(); updateFarmCounters(); }, 300);
+      }
+      showToast('s', 'Farm\u00E1cia exclu\u00EDda', '"' + f.nome + '" foi removida permanentemente.');
+    } else {
+      showToast('e', 'Erro ao excluir', res.data.error || res.data.message || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e', 'Sem conex\u00E3o', 'Verifique a conex\u00E3o.'); });
+}
+
+function updateFarmCounters() {
+  var atv = FARMS.filter(function(x){return x.ativo;}).length;
+  var inat = FARMS.filter(function(x){return !x.ativo;}).length;
+  var fcs = document.querySelectorAll('#page-farm .fc');
+  if (fcs[0]) fcs[0].textContent = 'Todas (' + FARMS.length + ')';
+  if (fcs[1]) fcs[1].textContent = 'Ativas (' + atv + ')';
+  if (fcs[2]) fcs[2].textContent = 'Inativas (' + inat + ')';
+}
+
+function filterFarm(q) {
+  var data = FARMS.filter(function(f){return f.nome.toLowerCase().includes(q.toLowerCase());});
+  document.getElementById('farm-grid').innerHTML = data.length ? data.map(farmCard).join('') : '<div class="empty"><div class="ei">🔍</div><div class="eT">Nenhuma farmácia encontrada</div></div>';
+}
+function filterFarmStatus(s, el) {
+  el.closest('.fb').querySelectorAll('.fc').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  var data = s==='all' ? FARMS : s==='ativa' ? FARMS.filter(function(f){return f.ativo;}) : FARMS.filter(function(f){return !f.ativo;});
+  document.getElementById('farm-grid').innerHTML = data.map(farmCard).join('');
+}
+function toggleFarm(id) {
+  var f = FARMS.find(function(x){return x.id===id;});
+  if (!f) return;
+  var novoAtivo = !f.ativo;
+  // Atualiza visualmente de imediato (optimistic)
+  f.ativo = novoAtivo;
+  var el = document.getElementById('fc-' + id);
+  if (el) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = farmCard(f);
+    el.parentNode.replaceChild(tmp.firstChild, el);
+  }
+  updateFarmCounters();
+  // Salva no banco
+  apiFetch('/farmacias/' + id, {
+    method: 'PATCH',
+    body: JSON.stringify({ativo: novoAtivo})
+  }).then(function(res) {
+    if (res.ok) {
+      showToast(novoAtivo?'s':'w', novoAtivo?'Farmácia ativada':'Farmácia desativada', f.nome);
+    } else {
+      // Reverte se API retornou erro
+      f.ativo = !novoAtivo;
+      renderFarm();
+      showToast('e', 'Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+    }
+  }).catch(function() {
+    f.ativo = !novoAtivo;
+    renderFarm();
+    showToast('e', 'Sem conexão', 'Não foi possível salvar. Verifique a conexão.');
+  });
+}
+
+// PRODUTOS
+function renderProd() {
+  var el = document.getElementById('page-prod');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar produto..." oninput="filterProd(this.value)"></div>';
+  h += '<div class="fc on">Todos (' + PRODS.length + ')</div>';
+  h += '<div style="margin-left:auto;display:flex;gap:8px">' +'<button class="btn btn-o" onclick="openImportCSV()">📥 Importar CSV</button>' +'<button class="btn btn-p" onclick="openModal(\'prod-new\')">+ Novo produto</button>' +'</div>';
+  h += '</div>';
+  h += '<div class="card"><table class="tbl" id="prod-table"><thead><tr><th>Produto</th><th>Laboratório</th><th>Categoria</th><th>Preço</th><th>Promoção</th><th>Controlado</th><th>Status</th><th>Ações</th></tr></thead><tbody id="prod-body">';
+  h += PRODS.map(prodRow).join('');
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+function prodRow(p) {
+  return '<tr id="pr-' + p.id + '">' +
+    '<td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + p.emoji + '</span><div><div style="font-weight:600">' + p.nome + '</div><div style="font-size:11px;color:var(--t3)">' + (p.desc||'') + '</div></div></div></td>' +
+    '<td>' + (p.lab||'—') + '</td>' +
+    '<td>' + (p.cat||'—') + '</td>' +
+    '<td><b>' + fmtR(p.preco) + '</b></td>' +
+    '<td>' + (p.promo ? '<span style="color:var(--g);font-weight:600">' + fmtR(p.promo) + '</span>' : '—') + '</td>' +
+    '<td>' + (p.ctrl ? '<span class="b prep">Sim</span>' : '<span class="b cok">Não</span>') + '</td>' +
+    '<td><span class="b ' + (p.ativo!==false?'ativo':'inativo') + '">' + (p.ativo!==false?'Ativo':'Inativo') + '</span></td>' +
+    '<td><div style="display:flex;gap:6px">' +
+    '<button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'prod-edit\',\'' + p.id + '\')">✏️</button>' +
+    '<button class="btn btn-d" style="padding:4px 10px;font-size:12px" onclick="delProd(\'' + p.id + '\')">🗑️</button>' +
+    '</div></td></tr>';
+}
+function filterProd(q) {
+  var data = PRODS.filter(function(p){return p.nome.toLowerCase().includes(q.toLowerCase());});
+  document.getElementById('prod-body').innerHTML = data.map(prodRow).join('');
+}
+function delProd(id) {
+  if (!confirm('Excluir este produto?')) return;
+  apiFetch('/produtos/' + id, {method:'DELETE'})
+  .then(function(res) {
+    if (res.ok) {
+      PRODS = PRODS.filter(function(p){return p.id!==id;});
+      var el = document.getElementById('pr-' + id);
+      if (el) el.remove();
+      showToast('s','Produto removido','Produto excluído com sucesso.');
+    } else {
+      showToast('e','Erro ao excluir', res.data.error || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
+}
+
+// PEDIDOS
+function renderPed() {
+  var el = document.getElementById('page-ped');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar pedido..."></div>';
+  var tabs = ['Todos','Novos','Preparando','Em entrega','Concluídos','Cancelados'];
+  for (var i=0;i<tabs.length;i++) {
+    h += '<div class="fc' + (i===0?' on':'') + '" onclick="this.closest(\'.fb\').querySelectorAll(\'.fc\').forEach(function(e){e.classList.remove(\'on\')});this.classList.add(\'on\')">' + tabs[i] + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>ID</th><th>Cliente</th>';
+  if (CU.role === 'admin') h += '<th>Farmácia</th>';
+  h += '<th>Itens</th><th>Valor</th><th>Pgto</th><th>Status</th><th>Hora</th><th>Ações</th></tr></thead><tbody>';
+  for (var pi=0;pi<PEDS.length;pi++) {
+    var p = PEDS[pi];
+    h += '<tr><td><span class="oid">#' + p.num + '</span></td>';
+    h += '<td>' + p.cli + '</td>';
+    if (CU.role === 'admin') h += '<td>' + p.farm + '</td>';
+    h += '<td>' + p.itens + '</td>';
+    h += '<td>' + fmtR(p.total) + '</td>';
+    h += '<td>' + p.metodo + '</td>';
+    h += '<td>' + sbadge(p.status) + '</td>';
+    h += '<td>' + p.hora + '</td>';
+    h += '<td><div style="display:flex;gap:6px"><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'ped-view\',\'' + p.id + '\')">👁️</button>';
+    if (['pendente','confirmado','preparando'].indexOf(p.status) >= 0) {
+      h += '<button class="btn btn-p" style="padding:4px 10px;font-size:12px" onclick="avancarPed(\'' + p.id + '\')">▶</button>';
+    }
+    h += '</div></td></tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+var ST_PROX = {pendente:'confirmado',confirmado:'preparando',preparando:'aguardando_entregador',aguardando_entregador:'em_entrega',em_entrega:'entregue'};
+function avancarPed(id) {
+  var p = PEDS.find(function(x){return x.id===id;});
+  if (!p) return;
+  var prox = ST_PROX[p.status];
+  if (!prox) return;
+  apiFetch('/pedidos/' + id, {method:'PATCH', body: JSON.stringify({status: prox})})
+  .then(function(res) {
+    if (res.ok) {
+      p.status = prox;
+      showToast('s','Pedido atualizado!','Status: ' + (SL[prox]||prox));
+      renderPed();
+    } else {
+      showToast('e','Erro ao avançar', res.data.error || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
+}
+
+// ESTOQUE
+function renderEst() {
+  var el = document.getElementById('page-est');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar produto..."></div>';
+  var crit = PRODS.filter(function(p){return p.qtd<=10;}).length;
+  h += '<div class="fc on">Todos (' + PRODS.length + ')</div>';
+  h += '<div class="fc" style="color:var(--r)">Crítico (' + crit + ')</div>';
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>Produto</th><th>Qtd. atual</th><th>Qtd. mínima</th><th>Situação</th><th>Ações</th></tr></thead><tbody>';
+  for (var i=0;i<PRODS.length;i++) {
+    var p = PRODS[i];
+    var q = p.qtd||0, m = 10;
+    var critico = q<=m, baixo = q<=m*2;
+    var cor = critico ? 'var(--r)' : baixo ? 'var(--a)' : 'var(--n)';
+    var cls = critico ? 'can' : baixo ? 'prep' : 'cok';
+    var sit = critico ? 'Crítico' : baixo ? 'Baixo' : 'Normal';
+    h += '<tr><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + p.emoji + '</span><b>' + p.nome + '</b></div></td>';
+    h += '<td><b style="font-size:15px;color:' + cor + '">' + q + '</b> un.</td>';
+    h += '<td>' + m + ' un.</td>';
+    h += '<td><span class="b ' + cls + '">' + sit + '</span></td>';
+    h += '<td><button class="btn btn-p" style="padding:4px 12px;font-size:12px" onclick="openModal(\'est-edit\',\'' + p.id + '\')">📦 Ajustar</button></td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+// USUÁRIOS
+function renderUsr() {
+  var el = document.getElementById('page-usr');
+  var corP = {cliente:'novo',farmacia:'entr',entregador:'prep',admin:'cok'};
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar usuário..."></div>';
+  h += '<div class="fc on">Todos (' + USRS.length + ')</div>';
+  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'usr-new\')">+ Novo usuário</button></div>';
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+  for (var i=0;i<USRS.length;i++) {
+    var u = USRS[i];
+    h += '<tr><td><b>' + u.nome + '</b></td><td>' + u.email + '</td>';
+    h += '<td><span class="b ' + (corP[u.role]||'novo') + '">' + u.role + '</span></td>';
+    h += '<td>' + u.dt + '</td>';
+    h += '<td><span class="b ' + (u.ativo?'ativo':'inativo') + '">' + (u.ativo?'Ativo':'Inativo') + '</span></td>';
+    h += '<td><div style="display:flex;gap:6px"><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'usr-edit\',\'' + u.id + '\')">✏️</button><button class="btn btn-d" style="padding:4px 10px;font-size:12px">🚫</button></div></td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+// RELATÓRIOS
+function renderRel() {
+  var el = document.getElementById('page-rel');
+  var h = '<div class="sg">';
+  h += statCard('t', NAV_ICS.prod, 'R$48.200', 'Faturamento total', '↑ 18%', 'up');
+  h += statCard('g', NAV_ICS.ped, '1.847', 'Pedidos este mês', '↑ 12%', 'up');
+  h += statCard('a', NAV_ICS.usr, '324', 'Novos clientes', '↑ 8%', 'up');
+  h += statCard('r', NAV_ICS.cfg, '2,3%', 'Taxa cancelamento', '↑ 0.2%', 'dn');
+  h += '</div>';
+  h += '<div class="card" style="padding:40px;text-align:center;color:var(--t2)"><div style="font-size:36px;margin-bottom:12px">📊</div><div style="font-family:\'Nunito\';font-size:18px;font-weight:700;color:var(--n);margin-bottom:6px">Relatórios detalhados</div><div>Exportação CSV/Excel disponível em breve</div></div>';
+  el.innerHTML = h;
+}
+
+// CONFIG
+function renderCfg() {
+  var el = document.getElementById('page-cfg');
+  el.innerHTML =
+    '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
+      '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:20px">⚙️ Configurações gerais</div>' +
+      '<div class="fr"><div class="fc3 full"><label>Nome da plataforma</label><input value="FlyPharma"></div>' +
+      '<div class="fc3 full"><label>E-mail de suporte</label><input value="suporte@flypharma.com"></div>' +
+      '<div class="fc3"><label>Taxa plataforma (%)</label><input type="number" value="5"></div>' +
+      '<div class="fc3"><label>Raio padrão (km)</label><input type="number" value="10"></div></div>' +
+      '<button class="btn btn-p" onclick="showToast(\'s\',\'Configurações salvas!\',\'Alterações aplicadas.\')">💾 Salvar configurações</button>' +
+    '</div>' +
+    '<div class="card" style="padding:32px;max-width:500px">' +
+      '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🔑 Alterar minha senha</div>' +
+      '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Válido para o painel e para o app</div>' +
+      '<div class="fr"><div class="fc3 full"><label>Senha atual *</label><input type="password" id="cfg-senha-atual" placeholder="••••••••" autocomplete="current-password"></div></div>' +
+      '<div class="fr">' +
+        '<div class="fc3"><label>Nova senha *</label><input type="password" id="cfg-nova-senha" placeholder="mín. 6 caracteres" autocomplete="new-password"></div>' +
+        '<div class="fc3"><label>Confirmar nova senha *</label><input type="password" id="cfg-conf-senha" placeholder="repita a nova senha" autocomplete="new-password"></div>' +
+      '</div>' +
+      '<div id="cfg-senha-msg" style="font-size:12px;margin-bottom:12px;min-height:18px"></div>' +
+      '<button class="btn btn-p" onclick="salvarNovaSenha()">🔑 Alterar senha</button>' +
+    '</div>';
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(type, id) {
+  MC = {type: type, id: id};
+  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
+  document.getElementById('m-title').textContent = titles[type] || type;
+  document.getElementById('m-save-txt').textContent = type.indexOf('view') >= 0 ? 'Fechar' : 'Salvar';
+  document.getElementById('m-body').innerHTML = buildMBody(type, id);
+  document.getElementById('m-overlay').classList.add('on');
+}
+function closeModal() { document.getElementById('m-overlay').classList.remove('on'); }
+function closeModalOut(e) { if (e.target === document.getElementById('m-overlay')) closeModal(); }
+
+function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+
+function buildMBody(type, id) {
+  var h = '';
+  if (type === 'farm-new' || type === 'farm-edit') {
+    var f = type === 'farm-edit' ? FARMS.find(function(x){return x.id===id;}) : {};
+    f = f || {};
+    h += '<div class="fr"><div class="fc3"><label>Nome da farmácia *</label><input id="mf-nome" value="' + (f.nome||'') + '" placeholder="Ex: Drogasil Boa Viagem"></div><div class="fc3"><label>CNPJ *</label><input id="mf-cnpj" value="' + cnpjMask(f.cnpj||'') + '" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)" onblur="validateCNPJField(this)" style="padding-right:34px"><span id=\"cnpj-ic\" style=\"position:absolute;right:10px;bottom:9px;font-size:15px\"></span></div></div>';
+    if (type === 'csv-import') {
+    // Captura dados antes do modal fechar
+    var farmEl = document.getElementById('csv-farm-id');
+    var farmId = farmEl ? farmEl.value : '';
+    if (!farmId) { showToast('e','Selecione a farmácia','Escolha a farmácia destino antes de importar.'); return; }
+    if (!window._csvData || !window._csvData.rows.length) { showToast('e','Sem dados','Carregue um CSV válido primeiro.'); return; }
+    // Copia os dados localmente antes de fechar modal
+    var csvSnapshot = {header: window._csvData.header.slice(), rows: window._csvData.rows.slice()};
+    closeModal();
+    window._csvData = null;
+    importCSVExecutar(farmId, csvSnapshot);
+    return;
+  }
+  if (type === 'farm-new') {
+      h += '<div class="fr"><div class="fc3"><label>E-mail de acesso *</label><input id="mf-email" type="email" placeholder="farmacia@email.com"></div><div class="fc3"><label>Senha inicial *</label><input id="mf-senha" type="password" placeholder="••••••••"></div></div>';
+    }
+    h += '<div class="fr"><div class="fc3"><label>Cidade</label><input id="mf-cidade" value="' + (f.cidade||'') + '" placeholder="Recife"></div><div class="fc3"><label>Bairro</label><input id="mf-bairro" value="' + (f.bairro||'') + '" placeholder="Boa Viagem"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Logradouro</label><input id="mf-end" value="' + (f.logradouro||'') + '" placeholder="Av. Boa Viagem, 1000"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
+  } else if (type === 'prod-new' || type === 'prod-edit') {
+    var p = type === 'prod-edit' ? PRODS.find(function(x){return x.id===id;}) : {};
+    p = p || {};
+    h += '<div class="fr"><div class="fc3"><label>Nome do produto *</label><input id="mp-nome" value="' + (p.nome||'') + '" placeholder="Ex: Dipirona 500mg"></div><div class="fc3"><label>Laboratório</label><input id="mp-lab" value="' + (p.lab||'') + '" placeholder="EMS, Medley..."></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Preço (R$) *</label><input id="mp-preco" type="number" step="0.01" value="' + (p.preco||'') + '" placeholder="9.90"></div><div class="fc3"><label>Preço promoção (R$)</label><input id="mp-promo" type="number" step="0.01" value="' + (p.promo||'') + '" placeholder="Opcional"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Categoria</label><select id="mp-cat">';
+    var cats = ['Analgésico','Antibiótico','Vitamina','Gástrico','Cardiovascular','Diabetes','Higiene','Infantil','Controlado','Outros'];
+    for (var i=0;i<cats.length;i++) h += '<option' + (p.cat===cats[i]?' selected':'') + '>' + cats[i] + '</option>';
+    h += '</select></div><div class="fc3"><label>Unidade</label><select id="mp-uni">';
+    var unis = ['un','cx','fr','mg','ml'];
+    for (var j=0;j<unis.length;j++) h += '<option' + (p.uni===unis[j]?' selected':'') + '>' + unis[j] + '</option>';
+    h += '</select></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Controlado?</label><select id="mp-ctrl"><option value="false"' + (!p.ctrl?' selected':'') + '>Não</option><option value="true"' + (p.ctrl?' selected':'') + '>Sim — exige receita</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Descrição</label><textarea id="mp-desc" placeholder="Descrição do produto...">' + (p.desc||'') + '</textarea></div></div>';
+  } else if (type === 'usr-new' || type === 'usr-edit') {
+    var u = type === 'usr-edit' ? USRS.find(function(x){return x.id===id;}) : {};
+    u = u || {};
+    h += '<div class="fr"><div class="fc3"><label>Nome completo *</label><input id="mu-nome" value="' + (u.nome||'') + '" placeholder="Nome do usuário"></div><div class="fc3"><label>Telefone</label><input id="mu-tel" value="' + (u.tel||'') + '" placeholder="(81) 9 9999-9999"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>E-mail *</label><input id="mu-email" type="email" value="' + (u.email||'') + '" placeholder="email@exemplo.com"></div><div class="fc3"><label>Perfil *</label><select id="mu-role">';
+    var roles = ['cliente','farmacia','entregador','admin'];
+    for (var ri=0;ri<roles.length;ri++) h += '<option' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri] + '</option>';
+    h += '</select></div></div>';
+    if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
+    if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="new-password"></div></div>';
+  } else if (type === 'est-edit') {
+    var pe = PRODS.find(function(x){return x.id===id;});
+    pe = pe || {};
+    h += '<div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px"><div style="font-weight:600;color:var(--n);margin-bottom:4px">' + (pe.nome||'Produto') + '</div><div style="font-size:12px;color:var(--t2)">Estoque atual: <b>' + (pe.qtd||0) + ' unidades</b></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Nova quantidade</label><input id="me-qtd" type="number" value="' + (pe.qtd||0) + '" min="0"></div><div class="fc3"><label>Qtd. mínima (alerta)</label><input id="me-min" type="number" value="10" min="0"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Observação</label><input id="me-obs" placeholder="Ex: Recebimento NF 001234"></div></div>';
+  } else if (type === 'ped-view') {
+    var pv = PEDS.find(function(x){return x.id===id;}) || PEDS[0];
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">PEDIDO</div><div style="font-family:\'Nunito\';font-weight:700;font-size:16px">#' + pv.num + '</div></div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">STATUS</div>' + sbadge(pv.status) + '</div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">CLIENTE</div><div style="font-weight:600">' + pv.cli + '</div></div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">TOTAL</div><div style="font-family:\'Nunito\';font-weight:700;font-size:16px">' + fmtR(pv.total) + '</div></div>';
+    h += '</div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px">';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">FARMÁCIA: ' + pv.farm + ' · ' + pv.metodo + '</div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">ITENS: ' + pv.itens + ' produto(s) · Hora: ' + pv.hora + '</div>';
+    h += '</div>';
+    if (['pendente','confirmado','preparando','aguardando_entregador'].indexOf(pv.status) >= 0) {
+      h += '<div style="background:var(--tl);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:600;color:var(--td);margin-bottom:8px">Avançar status</div>';
+      h += '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="avancarPed(\'' + pv.id + '\');closeModal()">▶ Próximo status</button>';
+      h += '<button class="btn btn-d" onclick="showToast(\'w\',\'Cancelamento\',\'Pedido marcado para cancelamento\');closeModal()">✕ Cancelar pedido</button></div></div>';
+    }
+  } else {
+    h = '<p style="color:var(--t2)">Em desenvolvimento.</p>';
+  }
+  return h;
+}
+
+function saveModal() {
+  if (MC.type === 'ped-view') { closeModal(); return; }
+  var btn = document.getElementById('m-save-txt');
+  btn.textContent = 'Salvando...';
+  var type = MC.type, id = MC.id;
+
+  if (type === 'farm-new') {
+    var nome = gv('mf-nome'), cnpj = gv('mf-cnpj'), email = gv('mf-email'), senha = gv('mf-senha');
+    if (!nome || !cnpj || !email || !senha) { showToast('e','Campos obrigatórios','Preencha: nome, CNPJ, e-mail e senha'); btn.textContent='Salvar'; return; }
+    var cnpjRaw = cnpj.replace(/\D/g,'');
+    if (!validateCNPJ(cnpjRaw)) { showToast('e','CNPJ inválido','Verifique os dígitos do CNPJ informado.'); btn.textContent='Salvar'; return; }
+    var payload = {
+      nome: nome, cnpj: cnpj, email: email, senha: senha, role: 'farmacia',
+      cidade: gv('mf-cidade'), bairro: gv('mf-bairro'), logradouro: gv('mf-end'),
+      taxa_entrega: Number(gv('mf-taxa'))||6.90,
+      raio_entrega_km: Number(gv('mf-raio'))||5,
+      pedido_minimo: Number(gv('mf-pmin'))||0,
+      aberta: gv('mf-aberta') === 'true'
+    };
+    apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal();
+        showToast('s','Farmácia cadastrada!', nome + ' — login: ' + email);
+        loadFarms().then(function(){ renderFarm(); });
+      } else {
+        showToast('e','Erro ao cadastrar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'farm-edit') {
+    var fe = {
+      nome: gv('mf-nome'), cidade: gv('mf-cidade'), bairro: gv('mf-bairro'),
+      logradouro: gv('mf-end'), taxa_entrega: Number(gv('mf-taxa'))||6.90,
+      raio_entrega_km: Number(gv('mf-raio'))||5,
+      pedido_minimo: Number(gv('mf-pmin'))||0,
+      aberta: gv('mf-aberta') === 'true'
+    };
+    apiFetch('/farmacias/' + id, {method:'PATCH', body: JSON.stringify(fe)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Farmácia atualizada!', fe.nome);
+        loadFarms().then(function(){ renderFarm(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'prod-new') {
+    var pNome = gv('mp-nome'), pPreco = gv('mp-preco');
+    if (!pNome || !pPreco) { showToast('e','Obrigatório','Nome e preço são obrigatórios'); btn.textContent='Salvar'; return; }
+    var pp = {
+      nome: pNome, laboratorio: gv('mp-lab'), categoria: gv('mp-cat'),
+      preco: Number(pPreco), preco_promocional: Number(gv('mp-promo'))||null,
+      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
+    };
+    apiFetch('/produtos', {method:'POST', body: JSON.stringify(pp)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Produto cadastrado!', pNome);
+        loadProds().then(function(){ renderProd(); });
+      } else {
+        showToast('e','Erro ao cadastrar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'prod-edit') {
+    var pe = {
+      nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria: gv('mp-cat'),
+      preco: Number(gv('mp-preco')), preco_promocional: Number(gv('mp-promo'))||null,
+      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
+    };
+    apiFetch('/produtos/' + id, {method:'PATCH', body: JSON.stringify(pe)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Produto atualizado!', pe.nome);
+        loadProds().then(function(){ renderProd(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'usr-new') {
+    var uNome=gv('mu-nome'), uEmail=gv('mu-email'), uSenha=gv('mu-senha'), uRole=gv('mu-role');
+    if (!uNome||!uEmail||!uSenha) { showToast('e','Obrigatório','Nome, e-mail e senha são obrigatórios'); btn.textContent='Salvar'; return; }
+    apiFetch('/auth/register', {method:'POST', body: JSON.stringify({nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel')})})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Usuário criado!', uNome + ' — ' + uRole);
+        loadUsrs().then(function(){ renderUsr(); });
+      } else {
+        showToast('e','Erro ao criar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'usr-edit') {
+    var ue = {nome:gv('mu-nome'), email:gv('mu-email'), role:gv('mu-role'), telefone:gv('mu-tel')};
+    var novaSenhaEdit = gv('mu-nova-senha');
+    if (novaSenhaEdit) {
+      if (novaSenhaEdit.length < 6) { showToast('e','Senha fraca','A senha deve ter pelo menos 6 caracteres.'); btn.textContent='Salvar'; return; }
+    }
+    var patchReqs = [apiFetch('/usuarios/' + id, {method:'PATCH', body: JSON.stringify(ue)})];
+    if (novaSenhaEdit) patchReqs.push(apiFetch('/usuarios/' + id + '/reset-senha', {method:'POST', body: JSON.stringify({nova_senha: novaSenhaEdit})}));
+    Promise.all(patchReqs)
+    .then(function(results) {
+      var res = results[0]; if (res.ok) {
+        closeModal(); showToast('s','Usuário atualizado!', ue.nome);
+        loadUsrs().then(function(){ renderUsr(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'est-edit') {
+    var estId = id;
+    var novaQtd = Number(gv('me-qtd'))||0;
+    apiFetch('/produtos/' + estId, {method:'PATCH', body: JSON.stringify({estoque: novaQtd})})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Estoque atualizado!', 'Nova quantidade: ' + novaQtd + ' un.');
+        loadProds().then(function(){ renderEst(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else {
+    closeModal(); showToast('s','Salvo!','Operação realizada com sucesso.');
+  }
+}
+
+// ── CHART ─────────────────────────────────────────────────────
+function buildChart(id) {
+  var vals=[68,92,78,110,88,131,143], days=['Seg','Ter','Qua','Qui','Sex','Sáb','Hj'];
+  var el = document.getElementById(id); if (!el) return;
+  var mx = Math.max.apply(null, vals); el.innerHTML = '';
+  for (var i=0;i<vals.length;i++) {
+    (function(v,d,last) {
+      var w=document.createElement('div'); w.className='bw';
+      var b=document.createElement('div'); b.className='bar'+(last?' td':'');
+      b.style.height='0'; b.style.flex='1';
+      var l=document.createElement('div'); l.className='bL'; l.textContent=d;
+      w.appendChild(b); w.appendChild(l); el.appendChild(w);
+      setTimeout(function(){b.style.height=Math.round(v/mx*100)+'%';},100+i*60);
+    })(vals[i],days[i],i===vals.length-1);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(type, title, body) {
+  var a = document.getElementById('toast-area');
+  var t = document.createElement('div'); t.className = 'toast';
+  var emo = {s:'✅',i:'ℹ️',w:'⚠️',e:'❌'}[type]||'ℹ️';
+  t.innerHTML = '<div class="ti ' + type + '">' + emo + '</div><div><div class="tT">' + title + '</div><div class="tB">' + body + '</div></div>';
+  a.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove();},400);},4500);
+}
+
+
+
+
+// ── CNPJ — Máscara e Validação ────────────────────────────────
+function cnpjMask(v) {
+  v = (v||'').replace(/\D/g,'').slice(0,14);
+  if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/,'$1.$2.$3/$4-$5');
+  else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/,'$1.$2.$3/$4');
+  else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3}).*/,'$1.$2.$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3}).*/,'$1.$2');
+  return v;
+}
+function maskCNPJ(input) {
+  input.value = cnpjMask(input.value);
+  validateCNPJField(input);
+}
+function validateCNPJ(cnpj) {
+  cnpj = cnpj.replace(/\D/g,'');
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  var calc = function(cnpj, n) {
+    var sum = 0, pos = n - 7;
+    for (var i = n; i >= 1; i--) {
+      sum += parseInt(cnpj.charAt(n - i)) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    var r = sum % 11 < 2 ? 0 : 11 - sum % 11;
+    return r === parseInt(cnpj.charAt(n));
+  };
+  return calc(cnpj, 12) && calc(cnpj, 13);
+}
+function validateCNPJField(input) {
+  var ic = document.getElementById('cnpj-ic');
+  if (!ic) return;
+  var raw = input.value.replace(/\D/g,'');
+  if (raw.length === 0) { ic.textContent=''; input.style.borderColor=''; return; }
+  if (raw.length < 14) { ic.textContent=''; input.style.borderColor='var(--a)'; return; }
+  if (validateCNPJ(raw)) {
+    ic.textContent='✅'; input.style.borderColor='var(--g)';
+    input.dataset.valid='1';
+  } else {
+    ic.textContent='❌'; input.style.borderColor='var(--r)';
+    input.dataset.valid='0';
+  }
+}
+
+// ── IMPORTAÇÃO CSV DE MEDICAMENTOS ────────────────────────────
+function openImportCSV() {
+  MC = {type:'csv-import'};
+  document.getElementById('m-title').textContent = 'Importar medicamentos (CSV)';
+  document.getElementById('m-save-txt').textContent = 'Importar';
+  document.getElementById('m-body').innerHTML = buildImportCSVBody();
+  document.getElementById('m-overlay').classList.add('on');
+}
+
+function buildImportCSVBody() {
+  var farmOpts = '<option value="">Selecione a farmácia...</option>';
+  FARMS.forEach(function(f){ farmOpts += '<option value="' + f.id + '">' + f.nome + '</option>'; });
+
+  return '<div style="margin-bottom:16px">' +
+    '<div class="fc3" style="margin-bottom:12px"><label>Farmácia destino *</label>' +
+    '<select id="csv-farm-id">' + farmOpts + '</select></div>' +
+    '<div class="fc3"><label>Arquivo CSV *</label>' +
+    '<input type="file" id="csv-file" accept=".csv,.txt" onchange="previewCSV(this)" ' +
+    'style="padding:8px;cursor:pointer"></div></div>' +
+    '<div id="csv-info" style="font-size:12px;color:var(--t2);margin-bottom:12px">' +
+    '<b>Formato esperado do CSV:</b> nome, laboratorio, categoria, preco, controlado (sim/nao), unidade, descricao, estoque<br>' +
+    'Primeira linha deve ser o cabeçalho. Separador: vírgula ou ponto-e-vírgula.</div>' +
+    '<div id="csv-preview"></div>';
+}
+
+function previewCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    var rows = parseCSV(text);
+    if (!rows.length) { document.getElementById('csv-preview').innerHTML = '<p style="color:var(--r)">Arquivo vazio ou inválido.</p>'; return; }
+    var header = rows[0].map(function(h){ return h.toLowerCase().trim(); });
+    var data = rows.slice(1).filter(function(r){ return r.some(function(c){ return c.trim(); }); });
+    var h = '<div style="font-size:12px;font-weight:600;color:var(--g);margin-bottom:8px">✅ ' + data.length + ' produto(s) encontrado(s)</div>';
+    h += '<div style="overflow-x:auto;max-height:220px;overflow-y:auto;border:1px solid var(--br);border-radius:8px">';
+    h += '<table class="tbl"><thead><tr>';
+    header.forEach(function(col){ h += '<th>' + col + '</th>'; });
+    h += '</tr></thead><tbody>';
+    data.slice(0,8).forEach(function(row){
+      h += '<tr>';
+      row.forEach(function(cell){ h += '<td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + cell + '">' + cell + '</td>'; });
+      h += '</tr>';
+    });
+    if (data.length > 8) h += '<tr><td colspan="' + header.length + '" style="text-align:center;font-size:11px;color:var(--t3)">... e mais ' + (data.length-8) + ' linha(s)</td></tr>';
+    h += '</tbody></table></div>';
+    document.getElementById('csv-preview').innerHTML = h;
+    window._csvData = {header: header, rows: data};
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text) {
+  // Normalizar quebras de linha (Windows \r\n e Mac \r)
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  // Detectar separador pela primeira linha
+  var firstLine = text.split('\n')[0] || '';
+  var commas = (firstLine.match(/,/g) || []).length;
+  var semis  = (firstLine.match(/;/g) || []).length;
+  var sep = semis > commas ? ';' : ',';
+  console.log('[CSV] sep:', JSON.stringify(sep), 'commas:', commas, 'semis:', semis, 'header:', firstLine.slice(0,80));
+  return text.split('\n').filter(function(l){ return l.trim(); }).map(function(line){
+    var result = [], cur = '', inQ = false;
+    for (var i=0; i<line.length; i++) {
+      var c = line[i];
+      if (c==='"') { inQ=!inQ; continue; }
+      if (c===sep && !inQ) { result.push(cur.trim()); cur=''; continue; }
+      cur += c;
+    }
+    result.push(cur.trim());
+    return result;
+  });
+}
+
+function importCSVExecutar(farmId, csvSnapshot) {
+  var header = csvSnapshot.header;
+  var rows = csvSnapshot.rows;
+  // Toast de progresso
+  showToast('i', 'Importando...', 'Aguarde, enviando ' + rows.length + ' produtos.');
+
+  // Mapear colunas automaticamente
+  var colMap = {
+    nome: findCol(header, ['nome','name','produto','medicamento','descricao_produto']),
+    lab:  findCol(header, ['laboratorio','fabricante','lab','manufacturer']),
+    cat:  findCol(header, ['categoria','category','classe','tipo']),
+    preco: findCol(header, ['preco','price','valor','preco_venda','venda']),
+    ctrl: findCol(header, ['controlado','controlled','receita','tarja']),
+    uni:  findCol(header, ['unidade','unit','uni','apresentacao']),
+    desc: findCol(header, ['descricao','description','obs','observacao']),
+    estoque: findCol(header, ['estoque','quantidade','qty','stock','qtd'])
+  };
+
+  // Log para diagnóstico
+  console.log('[CSV] header:', header);
+  console.log('[CSV] colMap:', colMap);
+  console.log('[CSV] total rows bruto:', rows.length);
+  console.log('[CSV] farmId:', farmId);
+  console.log('[CSV] primeira row:', rows[0]);
+
+  var produtos = rows.map(function(row) {
+    var nome = getCol(row, colMap.nome);
+    var preco = parseFloat((getCol(row, colMap.preco)||'10').replace(',','.'));
+    if (isNaN(preco) || preco <= 0) preco = 10.00;
+    return {
+      farmacia_id:  farmId,
+      nome:         nome || '',
+      laboratorio:  getCol(row, colMap.lab),
+      categoria:    getCol(row, colMap.cat),
+      preco:        preco,
+      controlado:   /sim|yes|s|1|tarja/i.test(getCol(row, colMap.ctrl)||''),
+      unidade:      getCol(row, colMap.uni) || 'cx',
+      descricao:    getCol(row, colMap.desc),
+      estoque:      parseInt(getCol(row, colMap.estoque)) || 0,
+      principio_ativo: getCol(row, findCol(header, ['principio_ativo','principio','ativo','pa']))
+    };
+  }).filter(function(p){ return p.nome && p.nome.length > 1; });
+
+  console.log('[CSV] produtos válidos após filter:', produtos.length);
+  if (produtos.length === 0) {
+    showToast('e','CSV sem dados válidos','Verifique se a coluna "nome" existe no arquivo.');
+    btn.textContent = 'Importar';
+    return;
+  }
+  console.log('[CSV] exemplo produto[0]:', produtos[0]);
+
+  // Enviar em lotes de 50
+  var lotes = [];
+  for (var i=0; i<produtos.length; i+=50) lotes.push(produtos.slice(i,i+50));
+  console.log('[CSV] total lotes:', lotes.length);
+
+  var ok=0, erros=0;
+  var next = function(idx) {
+    if (idx >= lotes.length) {
+      showToast(ok>0?'s':'w', 'Importação concluída!', ok + ' produto(s) importado(s)' + (erros?' · '+erros+' com erro':''));
+      loadProds().then(function(){ renderProd(); });
+      return;
+    }
+    console.log('[CSV] enviando lote', idx+1, '/', lotes.length, '—', lotes[idx].length, 'itens');
+    apiFetch('/produtos/importar', {
+      method: 'POST',
+      body: JSON.stringify({produtos: lotes[idx]})
+    }).then(function(res) {
+      console.log('[CSV] lote', idx+1, 'resposta:', res.status, res.data);
+      if (res.ok) {
+        ok += (res.data.criados || lotes[idx].length);
+      } else {
+        erros += lotes[idx].length;
+        var errMsg = res.data && res.data.error ? res.data.error : ('HTTP ' + res.status + ' — verifique o backend');
+        showToast('e', 'Erro lote ' + (idx+1), errMsg);
+        if (idx === 0) { return; }
+      }
+      next(idx+1);
+    }).catch(function(e){
+      console.error('[CSV] catch lote', idx+1, e);
+      erros += lotes[idx].length;
+      next(idx+1);
+    });
+  };
+  next(0);
+}
+
+function findCol(header, names) {
+  for (var i=0; i<names.length; i++) {
+    var idx = header.indexOf(names[i]);
+    if (idx !== -1) return idx;
+  }
+  return -1;
+}
+function getCol(row, idx) {
+  return idx !== -1 && row[idx] ? row[idx].trim() : '';
+}
+
+// ── ALTERAR SENHA PRÓPRIA ─────────────────────────────────────
+function salvarNovaSenha() {
+  var atual  = document.getElementById('cfg-senha-atual')  ? document.getElementById('cfg-senha-atual').value  : '';
+  var nova   = document.getElementById('cfg-nova-senha')   ? document.getElementById('cfg-nova-senha').value   : '';
+  var conf   = document.getElementById('cfg-conf-senha')   ? document.getElementById('cfg-conf-senha').value   : '';
+  var msg    = document.getElementById('cfg-senha-msg');
+
+  if (!atual || !nova || !conf) { setMsg(msg,'e','Preencha todos os campos.'); return; }
+  if (nova.length < 6)          { setMsg(msg,'e','A nova senha deve ter pelo menos 6 caracteres.'); return; }
+  if (nova !== conf)             { setMsg(msg,'e','As senhas não coincidem.'); return; }
+
+  setMsg(msg,'i','Salvando...');
+  apiFetch('/auth/reset-senha', {
+    method: 'POST',
+    body: JSON.stringify({senha_atual: atual, nova_senha: nova})
+  }).then(function(res) {
+    if (res.ok) {
+      setMsg(msg,'s','✅ Senha alterada com sucesso!');
+      document.getElementById('cfg-senha-atual').value = '';
+      document.getElementById('cfg-nova-senha').value  = '';
+      document.getElementById('cfg-conf-senha').value  = '';
+      showToast('s','Senha alterada!','Novo acesso válido no painel e no app.');
+    } else {
+      setMsg(msg,'e', res.data.error || 'Erro ao alterar senha.');
+    }
+  }).catch(function(){ setMsg(msg,'e','Sem conexão. Tente novamente.'); });
+}
+function setMsg(el, type, text) {
+  if (!el) return;
+  var colors = {s:'var(--g)', e:'var(--r)', i:'var(--t2)', w:'var(--a)'};
+  el.style.color = colors[type] || 'var(--t2)';
+  el.textContent = text;
+}
+
+// ── SIDEBAR MOBILE ────────────────────────────────────────────
+function toggleSidebar() {
+  var sb  = document.querySelector('.sb');
+  var ov  = document.getElementById('sb-overlay');
+  var open = sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('on', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeSidebar() {
+  var sb = document.querySelector('.sb');
+  var ov = document.getElementById('sb-overlay');
+  sb.classList.remove('open');
+  if (ov) ov.classList.remove('on');
+  document.body.style.overflow = '';
+}
+// Fechar sidebar ao navegar (mobile)
+var _origGoto = goto;
+goto = function(id) {
+  if (window.innerWidth <= 768) closeSidebar();
+  _origGoto(id);
+};
+
+</script>
+</body>
+</html>
