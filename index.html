@@ -342,7 +342,7 @@ const API = 'https://web-production-b66cd.up.railway.app/api';
 let CU = null, AT = null, MC = {};
 
 // ── ESTADO DA APLICAÇÃO (carregado da API, nunca hardcoded) ────
-let FARMS = [], PRODS = [], PEDS = [], USRS = [], CURRENT_FARM_ID = null;
+let FARMS = [], PRODS = [], PEDS = [], USRS = [], CATS = [], CURRENT_FARM_ID = null;
 const SL = {pendente:'Novo',confirmado:'Confirmado',preparando:'Preparando',aguardando_entregador:'Aguardando',em_entrega:'Em entrega',entregue:'Entregue',cancelado:'Cancelado'};
 const SC = {pendente:'novo',confirmado:'novo',preparando:'prep',aguardando_entregador:'prep',em_entrega:'entr',entregue:'cok',cancelado:'can'};
 
@@ -397,7 +397,8 @@ function loadProds() {
           id: p.id || p._id,
           nome: p.nome || p.name || '',
           lab: p.laboratorio || p.lab || '',
-          cat: p.categoria || p.cat || '',
+          cat: p.categoria_nome || (CATS.find(function(c){return c.id===p.categoria_id;}) || {}).nome || p.categoria || p.cat || '',
+          categoria_id: p.categoria_id || null,
           farmacia_id: p.farmacia_id || p.farm_id || '',
           preco: p.preco || p.price || 0,
           promo: p.preco_promocional || p.promo || null,
@@ -464,8 +465,15 @@ function loadUsrs() {
     }
   }).catch(function() {});
 }
+function loadCats() {
+  return apiFetch('/categorias').then(function(res) {
+    if (res.ok) {
+      CATS = Array.isArray(res.data) ? res.data : (res.data.categorias || res.data.data || []);
+    }
+  }).catch(function() {});
+}
 function loadAll() {
-  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs()]);
+  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats()]);
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
@@ -1165,8 +1173,11 @@ function buildMBody(type, id) {
     h += '<div class="fr"><div class="fc3"><label>Nome do produto *</label><input id="mp-nome" value="' + (p.nome||'') + '" placeholder="Ex: Dipirona 500mg"></div><div class="fc3"><label>Laboratório</label><input id="mp-lab" value="' + (p.lab||p.laboratorio||'') + '" placeholder="EMS, Medley..."></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Preço (R$) *</label><input id="mp-preco" type="number" step="0.01" value="' + (p.preco||'') + '" placeholder="9.90"></div><div class="fc3"><label>Preço promoção (R$)</label><input id="mp-promo" type="number" step="0.01" value="' + (p.promo||'') + '" placeholder="Opcional"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Categoria</label><select id="mp-cat">';
-    var cats = ['Analgésico','Antibiótico','Vitamina','Gástrico','Cardiovascular','Diabetes','Higiene','Infantil','Controlado','Outros'];
-    for (var i=0;i<cats.length;i++) h += '<option' + (p.cat===cats[i]?' selected':'') + '>' + cats[i] + '</option>';
+    h += '<option value="">Selecione...</option>';
+    for (var ci=0;ci<CATS.length;ci++) {
+      var catSel = (p.categoria_id === CATS[ci].id) || (p.cat === CATS[ci].nome);
+      h += '<option value="' + CATS[ci].id + '"' + (catSel?' selected':'') + '>' + CATS[ci].nome + '</option>';
+    }
     h += '</select></div><div class="fc3"><label>Unidade</label><select id="mp-uni">';
     var unis = ['un','cx','fr','mg','ml'];
     for (var j=0;j<unis.length;j++) h += '<option' + (p.uni===unis[j]?' selected':'') + '>' + unis[j] + '</option>';
@@ -1298,7 +1309,7 @@ function saveModal() {
     var mpFarm = gv('mp-farm');
     if (!mpFarm) { showToast('e','Obrigatório','Selecione a farmácia'); btn.textContent='Salvar'; return; }
     var pp = {
-      nome: pNome, laboratorio: gv('mp-lab'), categoria: gv('mp-cat'),
+      nome: pNome, laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
       farmacia_id: mpFarm,
       preco: Number(pPreco), preco_promocional: Number(gv('mp-promo'))||null,
       controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
@@ -1317,7 +1328,7 @@ function saveModal() {
 
   } else if (type === 'prod-edit') {
     var pe = {
-      nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria: gv('mp-cat'),
+      nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
       farmacia_id: gv('mp-farm'),
       preco: Number(gv('mp-preco')), preco_promocional: Number(gv('mp-promo'))||null,
       controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
