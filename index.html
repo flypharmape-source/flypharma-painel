@@ -369,9 +369,15 @@ function apiFetch(path, opts) {
 
 // ── CARREGAR DADOS DA API ─────────────────────────────────────
 function loadFarms() {
-  return apiFetch('/farmacias/admin/todas').then(function(res) {
+  var url = CU && CU.role === 'farmacia' ? '/farmacias' : '/farmacias/admin/todas';
+  return apiFetch(url).then(function(res) {
     if (res.ok) {
-      FARMS = Array.isArray(res.data) ? res.data : (res.data.farmacias || res.data.data || []);
+      var lista = Array.isArray(res.data) ? res.data : (res.data.farmacias || res.data.data || []);
+      // Se for farmácia, filtra só a dela
+      if (CU && CU.role === 'farmacia' && CU.farmacia_id) {
+        lista = lista.filter(function(f){ return f.id === CU.farmacia_id; });
+      }
+      FARMS = lista;
       // normaliza campos
       FARMS = FARMS.map(function(f) {
         return {
@@ -1358,7 +1364,8 @@ function saveModal() {
   } else if (type === 'usr-new') {
     var uNome=gv('mu-nome'), uEmail=gv('mu-email'), uSenha=gv('mu-senha'), uRole=gv('mu-role');
     if (!uNome||!uEmail||!uSenha) { showToast('e','Obrigatório','Nome, e-mail e senha são obrigatórios'); btn.textContent='Salvar'; return; }
-    apiFetch('/auth/register', {method:'POST', body: JSON.stringify({nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel')})})
+    var uFarm = gv('mu-farm') || null;
+    apiFetch('/auth/register', {method:'POST', body: JSON.stringify({nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel'),farmacia_id:uFarm})})
     .then(function(res) {
       if (res.ok) {
         closeModal(); showToast('s','Usuário criado!', uNome + ' — ' + uRole);
@@ -1370,7 +1377,7 @@ function saveModal() {
     }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
 
   } else if (type === 'usr-edit') {
-    var ue = {nome:gv('mu-nome'), email:gv('mu-email'), role:gv('mu-role'), telefone:gv('mu-tel')};
+    var ue = {nome:gv('mu-nome'), email:gv('mu-email'), role:gv('mu-role'), telefone:gv('mu-tel'), farmacia_id:gv('mu-farm')||null};
     var novaSenhaEdit = gv('mu-nova-senha');
     if (novaSenhaEdit) {
       if (novaSenhaEdit.length < 6) { showToast('e','Senha fraca','A senha deve ter pelo menos 6 caracteres.'); btn.textContent='Salvar'; return; }
@@ -1770,6 +1777,12 @@ function setMsg(el, type, text) {
   var colors = {s:'var(--g)', e:'var(--r)', i:'var(--t2)', w:'var(--a)'};
   el.style.color = colors[type] || 'var(--t2)';
   el.textContent = text;
+}
+
+// ── TOGGLE CAMPO FARMÁCIA NO MODAL USUÁRIO ──────────────────
+function toggleFarmSelect(role) {
+  var wrap = document.getElementById('mu-farm-wrap');
+  if (wrap) wrap.style.display = role === 'farmacia' ? '' : 'none';
 }
 
 // ── ESQUECI MINHA SENHA ───────────────────────────────────────
