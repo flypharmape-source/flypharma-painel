@@ -1440,7 +1440,7 @@ function renderCham() {
   h += '<div class="fb" style="margin-bottom:18px">';
   ['todos','aberto','em_analise','resolvido'].forEach(function(f) {
     var labels = {todos:'Todos (' + CHAMS.length + ')', aberto:'Abertos', em_analise:'Em análise', resolvido:'Resolvidos'};
-    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._chamFiltro='' + f + '';renderCham()">' + labels[f] + '</button>';
+    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._chamFiltro=\'' + f + '\';renderCham()">' + labels[f] + '</button>';
   });
   h += '</div>';
 
