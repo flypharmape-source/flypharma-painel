@@ -1126,6 +1126,11 @@ function openModal(type, id) {
     });
   } else {
     document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    // Limpa campo de senha após render para evitar autocomplete
+    setTimeout(function(){
+      var f = document.getElementById('mu-nova-senha');
+      if (f) f.value = '';
+    }, 100);
   }
 }
 function closeModal() { document.getElementById('m-overlay').classList.remove('on'); }
@@ -1211,7 +1216,7 @@ function buildMBody(type, id) {
     h += '</select></div></div>';
     h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + (u.role==='farmacia'?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
     if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
-    if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="new-password"></div></div>';
+    if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="off"></div></div>';
   } else if (type === 'est-edit') {
     var pe = PRODS.find(function(x){return x.id===id;});
     pe = pe || {};
