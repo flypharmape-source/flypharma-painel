@@ -466,7 +466,7 @@ function loadUsrs() {
   }).catch(function() {});
 }
 function loadCats() {
-  return apiFetch('/categorias').then(function(res) {
+  return apiFetch('/app/categorias').then(function(res) {
     if (res.ok) {
       CATS = Array.isArray(res.data) ? res.data : (res.data.categorias || res.data.data || []);
     }
