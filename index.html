@@ -1098,7 +1098,23 @@ function buildMBody(type, id) {
     h += '<div class="fr"><div class="fc3"><label>Cidade</label><input id="mf-cidade" value="' + (f.cidade||'') + '" placeholder="Recife"></div><div class="fc3"><label>Bairro</label><input id="mf-bairro" value="' + (f.bairro||'') + '" placeholder="Boa Viagem"></div></div>';
     h += '<div class="fr"><div class="fc3 full"><label>Logradouro</label><input id="mf-end" value="' + (f.logradouro||'') + '" placeholder="Av. Boa Viagem, 1000"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
-    h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status manual</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
+    h += '<div style="margin-top:14px;border-top:1px solid var(--br);padding-top:14px">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🕐 Horários de funcionamento</div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:10px">A farmácia abrirá/fechará automaticamente conforme os horários abaixo.</div>';
+    var dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+    var horariosF = f.horarios || [];
+    h += '<div style="display:grid;gap:6px">';
+    for (var d=0;d<7;d++) {
+      var hor = horariosF.find(function(x){return x.dia_semana===d;}) || {hora_abertura:'08:00',hora_fechamento:'22:00',ativo:d>0};
+      h += '<div style="display:grid;grid-template-columns:50px 1fr 1fr 40px;gap:8px;align-items:center">';
+      h += '<span style="font-size:12px;font-weight:600;color:var(--n)">' + dias[d] + '</span>';
+      h += '<input type="time" id="mf-h-ab-'+d+'" value="' + (hor.hora_abertura||'08:00') + '" style="padding:6px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;' + (!hor.ativo?'opacity:.4':'') + '">';
+      h += '<input type="time" id="mf-h-fc-'+d+'" value="' + (hor.hora_fechamento||'22:00') + '" style="padding:6px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;' + (!hor.ativo?'opacity:.4':'') + '">';
+      h += '<input type="checkbox" id="mf-h-at-'+d+'" ' + (hor.ativo?'checked':'') + ' title="Ativo" style="width:18px;height:18px;accent-color:var(--t);cursor:pointer" onchange="document.getElementById(\x27mf-h-ab-'+d+'\x27).style.opacity=this.checked?1:.4;document.getElementById(\x27mf-h-fc-'+d+'\x27).style.opacity=this.checked?1:.4">';
+      h += '</div>';
+    }
+    h += '</div></div>';
   } else if (type === 'prod-new' || type === 'prod-edit') {
     var p = type === 'prod-edit' ? PRODS.find(function(x){return x.id===id;}) : {};
     p = p || {};
@@ -1163,6 +1179,15 @@ function saveModal() {
     if (!nome || !cnpj || !email || !senha) { showToast('e','Campos obrigatórios','Preencha: nome, CNPJ, e-mail e senha'); btn.textContent='Salvar'; return; }
     var cnpjRaw = cnpj.replace(/\D/g,'');
     if (!validateCNPJ(cnpjRaw)) { showToast('e','CNPJ inválido','Verifique os dígitos do CNPJ informado.'); btn.textContent='Salvar'; return; }
+    var horariosPayload = [];
+    for (var hd=0;hd<7;hd++) {
+      horariosPayload.push({
+        dia_semana: hd,
+        hora_abertura: document.getElementById('mf-h-ab-'+hd) ? document.getElementById('mf-h-ab-'+hd).value : '08:00',
+        hora_fechamento: document.getElementById('mf-h-fc-'+hd) ? document.getElementById('mf-h-fc-'+hd).value : '22:00',
+        ativo: document.getElementById('mf-h-at-'+hd) ? document.getElementById('mf-h-at-'+hd).checked : true
+      });
+    }
     var payload = {
       nome: nome, cnpj: cnpj, email: email, senha: senha, role: 'farmacia',
       cidade: gv('mf-cidade'), bairro: gv('mf-bairro'), logradouro: gv('mf-end'),
@@ -1174,6 +1199,8 @@ function saveModal() {
     apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
     .then(function(res) {
       if (res.ok) {
+        // Salva horários após criar farmácia
+        apiFetch('/farmacias/' + res.data.id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosPayload})});
         closeModal();
         showToast('s','Farmácia cadastrada!', nome + ' — login: ' + email);
         loadFarms().then(function(){ renderFarm(); });
@@ -1191,9 +1218,20 @@ function saveModal() {
       pedido_minimo: Number(gv('mf-pmin'))||0,
       aberta: gv('mf-aberta') === 'true'
     };
+    var horariosEdit = [];
+    for (var hde=0;hde<7;hde++) {
+      horariosEdit.push({
+        dia_semana: hde,
+        hora_abertura: document.getElementById('mf-h-ab-'+hde) ? document.getElementById('mf-h-ab-'+hde).value : '08:00',
+        hora_fechamento: document.getElementById('mf-h-fc-'+hde) ? document.getElementById('mf-h-fc-'+hde).value : '22:00',
+        ativo: document.getElementById('mf-h-at-'+hde) ? document.getElementById('mf-h-at-'+hde).checked : true
+      });
+    }
     apiFetch('/farmacias/' + id, {method:'PATCH', body: JSON.stringify(fe)})
     .then(function(res) {
       if (res.ok) {
+        // Salva horários
+        apiFetch('/farmacias/' + id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosEdit})});
         closeModal(); showToast('s','Farmácia atualizada!', fe.nome);
         loadFarms().then(function(){ renderFarm(); });
       } else {
