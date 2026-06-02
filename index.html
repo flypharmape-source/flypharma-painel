@@ -315,6 +315,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-usr"  class="page"></div>
     <div id="page-rel"  class="page"></div>
     <div id="page-cfg"  class="page"></div>
+    <div id="page-cham" class="page"></div>
   </div>
 </div>
 
@@ -342,7 +343,7 @@ const API = 'https://web-production-b66cd.up.railway.app/api';
 let CU = null, AT = null, MC = {};
 
 // ── ESTADO DA APLICAÇÃO (carregado da API, nunca hardcoded) ────
-let FARMS = [], PRODS = [], PEDS = [], USRS = [], CATS = [], CURRENT_FARM_ID = null;
+let FARMS = [], PRODS = [], PEDS = [], USRS = [], CATS = [], CHAMS = [], CURRENT_FARM_ID = null;
 const SL = {pendente:'Novo',confirmado:'Confirmado',preparando:'Preparando',aguardando_entregador:'Aguardando',em_entrega:'Em entrega',entregue:'Entregue',cancelado:'Cancelado'};
 const SC = {pendente:'novo',confirmado:'novo',preparando:'prep',aguardando_entregador:'prep',em_entrega:'entr',entregue:'cok',cancelado:'can'};
 
@@ -571,6 +572,7 @@ var NAV_ADM = [
     {id:'farm',lbl:'Farmácias'},
     {id:'prod',lbl:'Produtos'},
     {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'cham',lbl:'Chamados',bdg:true},
     {id:'usr',lbl:'Usuários'},
     {id:'rel',lbl:'Relatórios'},
   ]},
@@ -580,9 +582,11 @@ var NAV_FRM = [
   {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
   {g:'Operações', items:[
     {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'cham',lbl:'Chamados',bdg:true},
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
   ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
 var NAV_ICS = {
   dash:'<rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/>',
@@ -593,8 +597,9 @@ var NAV_ICS = {
   usr:'<circle cx="10" cy="6" r="3"/><path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>',
   rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
+  cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
 };
-var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações'};
+var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
 
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
@@ -632,14 +637,14 @@ function goto(id) {
   var pg = document.getElementById('page-' + id);
   if (pg) pg.classList.add('on');
   document.getElementById('tb-title').textContent = PTL[id] || id;
-  var actMap = {farm:'Nova farmácia',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:''};
+  var actMap = {farm:'Nova farmácia',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:'',cham:''};
   var lbl = actMap[id] !== undefined ? actMap[id] : '';
   var ab = document.getElementById('act-btn');
   ab.style.display = lbl ? 'flex' : 'none';
   document.getElementById('act-lbl').textContent = lbl;
   document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
   // Mostra loading e recarrega dados frescos da API antes de renderizar
-  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds};
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados};
   if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
   var loader = loadMap[id];
   if (loader) {
@@ -659,6 +664,7 @@ function renderPage(id) {
   else if (id === 'usr')  renderUsr();
   else if (id === 'rel')  renderRel();
   else if (id === 'cfg')  renderCfg();
+  else if (id === 'cham') renderCham();
 }
 
 function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
@@ -1394,6 +1400,92 @@ function saveModal() {
   } else {
     closeModal(); showToast('s','Salvo!','Operação realizada com sucesso.');
   }
+}
+
+// ── CHAMADOS ─────────────────────────────────────────────────
+var CHAMS = [];
+function loadChamados() {
+  return apiFetch('/chamados').then(function(res) {
+    if (res.ok) {
+      CHAMS = Array.isArray(res.data) ? res.data : (res.data.chamados || res.data.data || []);
+    }
+  }).catch(function() { CHAMS = []; });
+}
+
+var CHAM_STATUS = {
+  aberto:     { label:'Aberto',     cor:'var(--r)',  bg:'rgba(240,69,90,.1)'   },
+  em_analise: { label:'Em análise', cor:'var(--a)',  bg:'rgba(245,166,35,.1)'  },
+  resolvido:  { label:'Resolvido',  cor:'var(--g)',  bg:'rgba(34,201,122,.12)' },
+};
+var CHAM_MOTIVOS = {
+  atraso:'⏰ Pedido atrasado', errado:'❌ Produto errado', danificado:'💔 Produto danificado',
+  faltando:'📦 Item faltando', cancelar:'🚫 Cancelar pedido', pagamento:'💳 Problema no pagamento', outro:'💬 Outro motivo',
+};
+
+function renderCham() {
+  var el = document.getElementById('page-cham');
+  var isAdm = CU.role === 'admin';
+  var filtro = window._chamFiltro || 'todos';
+
+  var filtrados = filtro === 'todos' ? CHAMS
+    : CHAMS.filter(function(c){ return c.status === filtro; });
+
+  var h = '';
+
+  // Filtros
+  h += '<div class="fb" style="margin-bottom:18px">';
+  ['todos','aberto','em_analise','resolvido'].forEach(function(f) {
+    var labels = {todos:'Todos (' + CHAMS.length + ')', aberto:'Abertos', em_analise:'Em análise', resolvido:'Resolvidos'};
+    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._chamFiltro='' + f + '';renderCham()">' + labels[f] + '</button>';
+  });
+  h += '</div>';
+
+  if (filtrados.length === 0) {
+    h += '<div class="empty"><div class="ei">💬</div><div class="eT">Nenhum chamado</div><p>' + (filtro==='todos'?'Os chamados abertos pelos clientes aparecerão aqui.':'Nenhum chamado com este status.') + '</p></div>';
+    el.innerHTML = h; return;
+  }
+
+  h += '<div class="card"><table class="tbl"><thead><tr>';
+  h += '<th>#</th><th>Cliente</th><th>Farmácia</th><th>Motivo</th><th>Mensagem</th><th>Status</th><th>Data</th><th>Ações</th>';
+  h += '</tr></thead><tbody>';
+
+  filtrados.forEach(function(c) {
+    var st = CHAM_STATUS[c.status] || CHAM_STATUS.aberto;
+    var motivo = CHAM_MOTIVOS[c.motivo] || c.motivo || '—';
+    var data = c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '—';
+    h += '<tr>';
+    h += '<td><span class="oid">#' + (c.pedido_numero || c.pedido_id?.slice(0,6) || '—') + '</span></td>';
+    h += '<td><b>' + (c.cliente_nome || '—') + '</b><br><span style="font-size:11px;color:var(--t3)">' + (c.cliente_email || '') + '</span></td>';
+    h += '<td>' + (c.farmacia_nome || '—') + '</td>';
+    h += '<td style="font-size:12px">' + motivo + '</td>';
+    h += '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--t2)" title="' + (c.mensagem||'').replace(/"/g,"'") + '">' + (c.mensagem || '—') + '</td>';
+    h += '<td><span class="b" style="background:' + st.bg + ';color:' + st.cor + '">' + st.label + '</span></td>';
+    h += '<td style="font-size:12px;color:var(--t3)">' + data + '</td>';
+    h += '<td>';
+    if (c.status === 'aberto') {
+      h += '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;margin-right:4px;background:rgba(245,166,35,.12);color:#C98A10;border:1px solid rgba(245,166,35,.3)" onclick="atualizarChamado('' + c.id + '','em_analise')">Em análise</button>';
+    }
+    if (c.status !== 'resolvido') {
+      h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado('' + c.id + '','resolvido')">✅ Resolver</button>';
+    }
+    h += '</td>';
+    h += '</tr>';
+  });
+
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+function atualizarChamado(id, status) {
+  apiFetch('/chamados/' + id, { method: 'PATCH', body: JSON.stringify({ status: status }) })
+  .then(function(res) {
+    if (res.ok) {
+      showToast('s', 'Chamado atualizado!', status === 'resolvido' ? 'Marcado como resolvido.' : 'Em análise.');
+      loadChamados().then(function(){ renderCham(); });
+    } else {
+      showToast('e', 'Erro', res.data.error || 'Tente novamente.');
+    }
+  });
 }
 
 // ── CHART ─────────────────────────────────────────────────────
