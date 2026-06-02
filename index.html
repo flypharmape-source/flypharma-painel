@@ -93,7 +93,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .sb2 input::placeholder{color:var(--t3)}
 .fc{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--br);color:var(--t2);background:var(--w);transition:all .15s}
 .fc.on{background:var(--tl);border-color:var(--t);color:var(--td);font-weight:600}
-.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
 .fcard{background:var(--w);border:1.5px solid var(--br);border-radius:14px;overflow:hidden;transition:all .15s}
 .fcard:hover{border-color:var(--t);box-shadow:0 2px 12px rgba(30,45,61,.09)}
 .ftop{height:80px;background:linear-gradient(135deg,var(--n),#253647);display:flex;align-items:center;justify-content:center;position:relative}
@@ -104,7 +104,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .fst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
 .fstv{font-family:'Nunito';font-weight:700;font-size:16px;color:var(--n)}
 .fstl{font-size:10px;color:var(--t3)}
-.fft{padding:10px 14px;border-top:1px solid var(--br);display:flex;gap:8px;flex-wrap:wrap}
+.fft{padding:10px 14px;border-top:1px solid var(--br);display:flex;gap:8px}
 .mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
 .mo.on{opacity:1;pointer-events:all}
 .modal{background:var(--w);border-radius:14px;width:560px;max-height:90vh;overflow:auto;transform:translateY(16px);transition:transform .2s;box-shadow:0 20px 60px rgba(0,0,0,.3)}
@@ -191,8 +191,6 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 
   /* Farm cards em 1 coluna */
   .fg2{grid-template-columns:1fr}
-  .fft{flex-wrap:wrap}
-  .fft .btn{flex:1 1 calc(50% - 4px);min-width:calc(50% - 4px)}
 
   /* Modal fullscreen */
   .modal{
@@ -783,7 +781,6 @@ function renderFarm() {
   var inat = FARMS.filter(function(f){return !f.ativo;}).length;
   h += '<div class="fc" onclick="filterFarmStatus(\'ativa\',this)">Ativas (' + atv + ')</div>';
   h += '<div class="fc" onclick="filterFarmStatus(\'inativa\',this)">Inativas (' + inat + ')</div>';
-  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'farm-new\')">+ Nova farmácia</button></div>';
   h += '</div>';
   h += '<div class="fg2" id="farm-grid">' + FARMS.map(farmCard).join('') + '</div>';
   el.innerHTML = h;
@@ -805,10 +802,10 @@ function farmCard(f) {
     '<div><div class="fstv">4.8\u2605</div><div class="fstl">Aval.</div></div>' +
     '</div></div>' +
     '<div class="fft">' +
-    '<button class="btn btn-s" style="flex:1;min-width:80px;justify-content:center;font-size:12px;white-space:nowrap" onclick="filtrarProdsPorFarmacia(\'' + f.id + '\')">📦 Produtos</button>' +
-    '<button class="btn btn-o" style="flex:1;min-width:70px;justify-content:center;font-size:12px;white-space:nowrap" onclick="openModal(\'farm-edit\',\'' + f.id + '\')">✏️ Editar</button>' +
-    '<button class="btn ' + (f.ativo?'btn-d':'btn-g') + '" style="flex:1;min-width:90px;justify-content:center;font-size:12px;white-space:nowrap" onclick="toggleFarm(\'' + f.id + '\')">' + (f.ativo?'🚫 Desativar':'✅ Ativar') + '</button>' +
-    (isAdm ? '<button class="btn btn-d" style="justify-content:center;font-size:12px;padding:8px 10px;white-space:nowrap" title="Excluir permanentemente" onclick="delFarm(\'' + f.id + '\')">🗑️</button>' : '') +
+    '<button class="btn btn-s" style="flex:1;justify-content:center;font-size:12px" onclick="filtrarProdsPorFarmacia(\'' + f.id + '\')">📦 Produtos</button>' +
+    '<button class="btn btn-o" style="flex:1;justify-content:center;font-size:12px" onclick="openModal(\'farm-edit\',\'' + f.id + '\')">\u270F\uFE0F Editar</button>' +
+    '<button class="btn ' + (f.ativo?'btn-d':'btn-g') + '" style="flex:1;justify-content:center;font-size:12px" onclick="toggleFarm(\'' + f.id + '\')">' + (f.ativo?'🚫 Desativar':'\u2705 Ativar') + '</button>' +
+    (isAdm ? '<button class="btn btn-d" style="justify-content:center;font-size:12px;padding:8px 10px" title="Excluir permanentemente" onclick="delFarm(\'' + f.id + '\')">🗑\uFE0F</button>' : '') +
     '</div></div>';
 }
 
