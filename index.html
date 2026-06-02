@@ -781,6 +781,7 @@ function renderFarm() {
   var inat = FARMS.filter(function(f){return !f.ativo;}).length;
   h += '<div class="fc" onclick="filterFarmStatus(\'ativa\',this)">Ativas (' + atv + ')</div>';
   h += '<div class="fc" onclick="filterFarmStatus(\'inativa\',this)">Inativas (' + inat + ')</div>';
+  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'farm-new\')">+ Nova farmácia</button></div>';
   h += '</div>';
   h += '<div class="fg2" id="farm-grid">' + FARMS.map(farmCard).join('') + '</div>';
   el.innerHTML = h;
@@ -907,7 +908,7 @@ function renderProd() {
     h += '</div>';
   }
   h += '<div class="fc on">Todos (' + prodsFiltrados.length + ')</div>';
-  h += '<div style="margin-left:auto;display:flex;gap:8px">' +'<button class="btn btn-o" onclick="openImportCSV()">📥 Importar CSV</button>' +'<button class="btn btn-p" onclick="openModal(\'prod-new\')">+ Novo produto</button>' +'</div>';
+  h += '<div style="margin-left:auto;display:flex;gap:8px">' +'<button class="btn btn-o" onclick="openImportCSV()">📥 Importar CSV</button>' +'</div>';
   h += '</div>';
   h += '<div class="card"><table class="tbl" id="prod-table"><thead><tr><th>Produto</th><th>Laboratório</th><th>Categoria</th><th>Preço</th><th>Promoção</th><th>Controlado</th><th>Status</th><th>Ações</th></tr></thead><tbody id="prod-body">';
   h += PRODS.map(prodRow).join('');
@@ -1033,7 +1034,6 @@ function renderUsr() {
   var h = '<div class="fb">';
   h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar usuário..."></div>';
   h += '<div class="fc on">Todos (' + USRS.length + ')</div>';
-  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'usr-new\')">+ Novo usuário</button></div>';
   h += '</div>';
   h += '<div class="card"><table class="tbl"><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
   for (var i=0;i<USRS.length;i++) {
