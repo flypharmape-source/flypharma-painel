@@ -1065,8 +1065,24 @@ function openModal(type, id) {
   var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
   document.getElementById('m-title').textContent = titles[type] || type;
   document.getElementById('m-save-txt').textContent = type.indexOf('view') >= 0 ? 'Fechar' : 'Salvar';
-  document.getElementById('m-body').innerHTML = buildMBody(type, id);
   document.getElementById('m-overlay').classList.add('on');
+
+  // Para farm-edit, busca horários atualizados do servidor
+  if (type === 'farm-edit' && id) {
+    document.getElementById('m-body').innerHTML = '<div style="padding:40px;text-align:center"><div class="spinner" style="width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--t);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div></div>';
+    apiFetch('/farmacias/' + id).then(function(res) {
+      if (res.ok && res.data) {
+        // Atualiza FARMS local com horários novos
+        var idx = FARMS.findIndex(function(f){ return f.id === id; });
+        if (idx >= 0) FARMS[idx].horarios = res.data.horarios || [];
+      }
+      document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    }).catch(function() {
+      document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    });
+  } else {
+    document.getElementById('m-body').innerHTML = buildMBody(type, id);
+  }
 }
 function closeModal() { document.getElementById('m-overlay').classList.remove('on'); }
 function closeModalOut(e) { if (e.target === document.getElementById('m-overlay')) closeModal(); }
