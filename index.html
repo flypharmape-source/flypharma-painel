@@ -962,14 +962,18 @@ function renderProd() {
   h += '<div class="fc on">Todos (' + prodsFiltrados.length + ')</div>';
   h += '<div style="margin-left:auto;display:flex;gap:8px">' +'<button class="btn btn-o" onclick="openImportCSV()">📥 Importar CSV</button>' +'</div>';
   h += '</div>';
-  h += '<div class="card"><table class="tbl" id="prod-table"><thead><tr><th>Produto</th><th>Laboratório</th><th>Categoria</th><th>Preço</th><th>Promoção</th><th>Controlado</th><th>Status</th><th>Ações</th></tr></thead><tbody id="prod-body">';
+  var isAdmP = CU && CU.role === 'admin';
+  h += '<div class="card"><table class="tbl" id="prod-table"><thead><tr><th>Produto</th>' + (isAdmP ? '<th>Farmácia</th>' : '') + '<th>Laboratório</th><th>Categoria</th><th>Preço</th><th>Promoção</th><th>Controlado</th><th>Status</th><th>Ações</th></tr></thead><tbody id="prod-body">';
   h += PRODS.map(prodRow).join('');
   h += '</tbody></table></div>';
   el.innerHTML = h;
 }
 function prodRow(p) {
+  var isAdmRow = CU && CU.role === 'admin';
+  var farmNome = isAdmRow ? (FARMS.find(function(f){return f.id===p.farmacia_id;})||{}).nome || p.farm || '—' : null;
   return '<tr id="pr-' + p.id + '">' +
     '<td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + p.emoji + '</span><div><div style="font-weight:600">' + p.nome + '</div><div style="font-size:11px;color:var(--t3)">' + (p.desc||'') + '</div></div></div></td>' +
+    (isAdmRow ? '<td><span style="font-size:12px;font-weight:600;color:var(--t)">' + farmNome + '</span></td>' : '') +
     '<td>' + (p.lab||'—') + '</td>' +
     '<td>' + (p.cat||'—') + '</td>' +
     '<td><b>' + fmtR(p.preco) + '</b></td>' +
@@ -1038,7 +1042,7 @@ function avancarPed(id) {
   if (!p) return;
   var prox = ST_PROX[p.status];
   if (!prox) return;
-  apiFetch('/pedidos/' + id, {method:'PATCH', body: JSON.stringify({status: prox})})
+  apiFetch('/pedidos/' + id + '/status', {method:'PATCH', body: JSON.stringify({status: prox})})
   .then(function(res) {
     if (res.ok) {
       p.status = prox;
