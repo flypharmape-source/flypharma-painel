@@ -1202,11 +1202,14 @@ function buildMBody(type, id) {
   } else if (type === 'usr-new' || type === 'usr-edit') {
     var u = type === 'usr-edit' ? USRS.find(function(x){return x.id===id;}) : {};
     u = u || {};
-    h += '<div class="fr"><div class="fc3"><label>Nome completo *</label><input id="mu-nome" value="' + (u.nome||'') + '" placeholder="Nome do usuário"></div><div class="fc3"><label>Telefone</label><input id="mu-tel" value="' + (u.tel||'') + '" placeholder="(81) 9 9999-9999"></div></div>';
-    h += '<div class="fr"><div class="fc3"><label>E-mail *</label><input id="mu-email" type="email" value="' + (u.email||'') + '" placeholder="email@exemplo.com"></div><div class="fc3"><label>Perfil *</label><select id="mu-role">';
+    var farmOptsU = '<option value="">Nenhuma</option>';
+    FARMS.forEach(function(f){ farmOptsU += '<option value="' + f.id + '"' + (u.farmacia_id===f.id?' selected':'') + '>' + f.nome + '</option>'; });
+    h += '<div class="fr"><div class="fc3"><label>Nome completo *</label><input id="mu-nome" value="' + (u.nome||'') + '" placeholder="Nome do usuário"></div><div class="fc3"><label>Telefone</label><input id="mu-tel" value="' + (u.tel||u.telefone||'') + '" placeholder="(81) 9 9999-9999"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>E-mail *</label><input id="mu-email" type="email" value="' + (u.email||'') + '" placeholder="email@exemplo.com"></div><div class="fc3"><label>Perfil *</label><select id="mu-role" onchange="toggleFarmSelect(this.value)">';
     var roles = ['cliente','farmacia','entregador','admin'];
-    for (var ri=0;ri<roles.length;ri++) h += '<option' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri] + '</option>';
+    for (var ri=0;ri<roles.length;ri++) h += '<option value="' + roles[ri] + '"' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri].charAt(0).toUpperCase()+roles[ri].slice(1) + '</option>';
     h += '</select></div></div>';
+    h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + (u.role==='farmacia'?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
     if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
     if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="new-password"></div></div>';
   } else if (type === 'est-edit') {
