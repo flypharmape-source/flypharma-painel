@@ -1462,15 +1462,15 @@ function renderCham() {
     h += '<td><b>' + (c.cliente_nome || '—') + '</b><br><span style="font-size:11px;color:var(--t3)">' + (c.cliente_email || '') + '</span></td>';
     h += '<td>' + (c.farmacia_nome || '—') + '</td>';
     h += '<td style="font-size:12px">' + motivo + '</td>';
-    h += '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--t2)" title="' + (c.mensagem||'').replace(/"/g,"'") + '">' + (c.mensagem || '—') + '</td>';
+    h += '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--t2)">' + (c.mensagem || '—') + '</td>';
     h += '<td><span class="b" style="background:' + st.bg + ';color:' + st.cor + '">' + st.label + '</span></td>';
     h += '<td style="font-size:12px;color:var(--t3)">' + data + '</td>';
     h += '<td>';
     if (c.status === 'aberto') {
-      h += '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;margin-right:4px;background:rgba(245,166,35,.12);color:#C98A10;border:1px solid rgba(245,166,35,.3)" onclick="atualizarChamado('' + c.id + '','em_analise')">Em análise</button>';
+      h += '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;margin-right:4px;background:rgba(245,166,35,.12);color:#C98A10;border:1px solid rgba(245,166,35,.3)" onclick="atualizarChamado(\'' + c.id + '\',\'em_analise\')">Em análise</button>';
     }
     if (c.status !== 'resolvido') {
-      h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado('' + c.id + '','resolvido')">✅ Resolver</button>';
+      h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado(\'' + c.id + '\',\'resolvido\')">✅ Resolver</button>';
     }
     h += '</td>';
     h += '</tr>';
