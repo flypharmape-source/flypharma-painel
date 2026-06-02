@@ -1230,15 +1230,23 @@ function saveModal() {
     apiFetch('/farmacias/' + id, {method:'PATCH', body: JSON.stringify(fe)})
     .then(function(res) {
       if (res.ok) {
-        // Salva horários
-        apiFetch('/farmacias/' + id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosEdit})});
-        closeModal(); showToast('s','Farmácia atualizada!', fe.nome);
-        loadFarms().then(function(){ renderFarm(); });
+        // Salva horários e aguarda resposta
+        return apiFetch('/farmacias/' + id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosEdit})})
+          .then(function(hRes) {
+            closeModal();
+            if (hRes.ok) {
+              showToast('s','Farmácia atualizada!', fe.nome + ' — horários salvos');
+            } else {
+              showToast('s','Farmácia atualizada!', fe.nome);
+              console.warn('Erro ao salvar horários:', hRes.data);
+            }
+            loadFarms().then(function(){ renderFarm(); });
+          });
       } else {
         showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
         btn.textContent = 'Salvar';
       }
-    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+    }).catch(function(e){ console.error(e); showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
 
   } else if (type === 'prod-new') {
     var pNome = gv('mp-nome'), pPreco = gv('mp-preco');
