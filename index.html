@@ -1161,15 +1161,46 @@ function renderRel() {
 // CONFIG
 function renderCfg() {
   var el = document.getElementById('page-cfg');
-  el.innerHTML =
-    '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
-      '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:20px">⚙️ Configurações gerais</div>' +
-      '<div class="fr"><div class="fc3 full"><label>Nome da plataforma</label><input value="FlyPharma"></div>' +
-      '<div class="fc3 full"><label>E-mail de suporte</label><input value="suporte@flypharma.com"></div>' +
-      '<div class="fc3"><label>Taxa plataforma (%)</label><input type="number" value="5"></div>' +
-      '<div class="fc3"><label>Raio padrão (km)</label><input type="number" value="10"></div></div>' +
-      '<button class="btn btn-p" onclick="showToast(\'s\',\'Configurações salvas!\',\'Alterações aplicadas.\')">💾 Salvar configurações</button>' +
-    '</div>' +
+  var isAdm = CU && CU.role === 'admin';
+  var myfarm = FARMS.find(function(f){ return f.id === (CU && CU.farmacia_id); }) || {};
+  var logoAtual = myfarm.logo_url || '';
+
+  var html = '';
+
+  // ── Bloco de logo — apenas para farmácia ─────────────────
+  if (!isAdm) {
+    html +=
+      '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
+        '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🏥 Logo da farmácia</div>' +
+        '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Essa imagem aparece no app para os clientes</div>' +
+        '<div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">' +
+          '<div id="cfg-logo-preview" style="width:80px;height:80px;border-radius:14px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">' +
+            (logoAtual ? '<img src="' + logoAtual + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'>' : '<span style="font-size:32px">🏥</span>') +
+          '</div>' +
+          '<div>' +
+            '<input type="file" id="cfg-logo-file" accept="image/*" style="display:none" onchange="uploadLogoConfig(this)">' +
+            '<button class="btn btn-p" onclick="document.getElementById(\'cfg-logo-file\').click()">📷 Escolher foto</button>' +
+            '<div id="cfg-logo-status" style="font-size:12px;color:var(--t3);margin-top:8px">' + (logoAtual ? '✅ Logo atual carregada' : 'Nenhuma logo ainda') + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Configurações gerais — apenas admin ──────────────────
+  if (isAdm) {
+    html +=
+      '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
+        '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:20px">⚙️ Configurações gerais</div>' +
+        '<div class="fr"><div class="fc3 full"><label>Nome da plataforma</label><input value="FlyPharma"></div>' +
+        '<div class="fc3 full"><label>E-mail de suporte</label><input value="suporte@flypharma.com"></div>' +
+        '<div class="fc3"><label>Taxa plataforma (%)</label><input type="number" value="5"></div>' +
+        '<div class="fc3"><label>Raio padrão (km)</label><input type="number" value="10"></div></div>' +
+        '<button class="btn btn-p" onclick="showToast(\'s\',\'Configurações salvas!\',\'Alterações aplicadas.\')">💾 Salvar configurações</button>' +
+      '</div>';
+  }
+
+  // ── Alterar senha — todos ─────────────────────────────────
+  html +=
     '<div class="card" style="padding:32px;max-width:500px">' +
       '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🔑 Alterar minha senha</div>' +
       '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Válido para o painel e para o app</div>' +
@@ -1181,6 +1212,41 @@ function renderCfg() {
       '<div id="cfg-senha-msg" style="font-size:12px;margin-bottom:12px;min-height:18px"></div>' +
       '<button class="btn btn-p" onclick="salvarNovaSenha()">🔑 Alterar senha</button>' +
     '</div>';
+
+  el.innerHTML = html;
+}
+
+function uploadLogoConfig(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var prev = document.getElementById('cfg-logo-preview');
+  var status = document.getElementById('cfg-logo-status');
+  // Preview local imediato
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (prev) prev.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+  var farmId = CU && CU.farmacia_id;
+  if (!farmId) { if (status) status.textContent = '❌ Farmácia não identificada.'; return; }
+  if (status) status.textContent = '⏳ Enviando...';
+  var fd = new FormData();
+  fd.append('logo', file);
+  fetch(API_BASE + '/farmacias/' + farmId + '/logo', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN },
+    body: fd
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.logo_url) {
+      if (status) status.textContent = '✅ Logo atualizada com sucesso!';
+      var idx = FARMS.findIndex(function(f){ return f.id === farmId; });
+      if (idx >= 0) FARMS[idx].logo_url = d.logo_url;
+    } else {
+      if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
+    }
+  }).catch(function() {
+    if (status) status.textContent = '❌ Erro ao enviar.';
+  });
 }
 
 // ── MODAL ─────────────────────────────────────────────────────
