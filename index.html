@@ -868,8 +868,12 @@ function renderFarm() {
 
 function farmCard(f) {
   var isAdm = CU && CU.role === 'admin';
+  var logoHtml = f.logo_url
+    ? '<img src="' + f.logo_url + '" style="width:72px;height:72px;border-radius:14px;object-fit:cover;border:2px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.25)" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
+      + '<div class="flogo" style="display:none">' + f.nome[0] + '</div>'
+    : '<div class="flogo">' + f.nome[0] + '</div>';
   return '<div class="fcard" id="fc-' + f.id + '">' +
-    '<div class="ftop"><div class="flogo">' + f.nome[0] + '</div>' +
+    '<div class="ftop"><div style="display:flex;align-items:center;justify-content:center">' + logoHtml + '</div>' +
     '<div style="position:absolute;top:8px;right:8px"><span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
     (!f.ativo ? '<div style="position:absolute;top:8px;left:8px"><span class="b inativo">Inativa</span></div>' : '') +
     '</div>' +
@@ -1209,6 +1213,16 @@ function closeModalOut(e) { if (e.target === document.getElementById('m-overlay'
 
 function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
 
+function previewLogo(url) {
+  var prev = document.getElementById('mf-logo-preview');
+  if (!prev) return;
+  if (url && url.startsWith('http')) {
+    prev.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'">';
+  } else {
+    prev.innerHTML = '<span style="font-size:22px">🏥</span>';
+  }
+}
+
 function buildMBody(type, id) {
   var h = '';
   if (type === 'farm-new' || type === 'farm-edit') {
@@ -1233,6 +1247,18 @@ function buildMBody(type, id) {
     }
     h += '<div class="fr"><div class="fc3"><label>Cidade</label><input id="mf-cidade" value="' + (f.cidade||'') + '" placeholder="Recife"></div><div class="fc3"><label>Bairro</label><input id="mf-bairro" value="' + (f.bairro||'') + '" placeholder="Boa Viagem"></div></div>';
     h += '<div class="fr"><div class="fc3 full"><label>Logradouro</label><input id="mf-end" value="' + (f.logradouro||'') + '" placeholder="Av. Boa Viagem, 1000"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Logo da farmácia (URL da imagem)</label>';
+    h += '<div style="display:flex;gap:10px;align-items:center">';
+    h += '<input id="mf-logo" value="' + (f.logo_url||'') + '" placeholder="https://... cole o link da imagem da logo" style="flex:1" oninput="previewLogo(this.value)">';
+    h += '<div id="mf-logo-preview" style="width:52px;height:52px;border-radius:10px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">';
+    if (f.logo_url) {
+      h += '<img src="' + f.logo_url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'">';
+    } else {
+      h += '<span style="font-size:22px">🏥</span>';
+    }
+    h += '</div></div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-top:4px">Dica: use Imgur, Google Drive (link direto) ou qualquer URL pública de imagem.</div>';
+    h += '</div></div>';
     h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status manual</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
     h += '<div style="margin-top:14px;border-top:1px solid var(--br);padding-top:14px">';
@@ -1344,7 +1370,8 @@ function saveModal() {
       taxa_entrega: Number(gv('mf-taxa'))||6.90,
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
-      aberta: gv('mf-aberta') === 'true'
+      aberta: gv('mf-aberta') === 'true',
+      logo_url: gv('mf-logo') || null
     };
     apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
     .then(function(res) {
@@ -1366,7 +1393,8 @@ function saveModal() {
       logradouro: gv('mf-end'), taxa_entrega: Number(gv('mf-taxa'))||6.90,
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
-      aberta: gv('mf-aberta') === 'true'
+      aberta: gv('mf-aberta') === 'true',
+      logo_url: gv('mf-logo') || null
     };
     var horariosEdit = [];
     for (var hde=0;hde<7;hde++) {
