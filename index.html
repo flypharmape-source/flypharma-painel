@@ -250,8 +250,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .cmsg.mine{align-self:flex-end;}
 .cmsg.other{align-self:flex-start;}
 .cbubble{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;}
-.cmsg.mine .cbubble{background:var(--p);color:#fff!important;border-bottom-right-radius:4px;}
-.cmsg.other .cbubble{background:#fff;color:#1A2532!important;border:1px solid var(--b);border-bottom-left-radius:4px;}
+.cmsg.mine .cbubble{background:var(--p);color:#fff;border-bottom-right-radius:4px;}
+.cmsg.other .cbubble{background:#fff;color:var(--t1);border:1px solid var(--b);border-bottom-left-radius:4px;}
 .cautor{font-size:11px;color:var(--t3);margin-bottom:3px;}
 .chora{font-size:10px;color:var(--t3);margin-top:3px;}
 .cmsg.mine .chora{text-align:right;}
@@ -1492,7 +1492,7 @@ function loadChamados() {
     }
   }).catch(function() { CHAMS = []; }).then(function() {
     // Badge de chamados abertos
-    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto' || c.status === 'em_analise'; }).length;
+    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto'; }).length;
     var bdg = document.getElementById('bdg-cham');
     if (bdg) {
       if (abertos > 0) { bdg.textContent = abertos > 99 ? '99+' : abertos; bdg.style.display = 'flex'; }
@@ -2032,29 +2032,14 @@ function appendMsgChat(msg, scroll) {
   var hora = new Date(msg.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
   var div = document.createElement('div');
   div.className = 'cmsg ' + (mine ? 'mine' : 'other');
+  var bubbleStyle = mine
+    ? 'padding:10px 14px;border-radius:16px 16px 4px 16px;font-size:13px;line-height:1.5;background:#3ECFBF;color:#fff;display:inline-block;'
+    : 'padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13px;line-height:1.5;background:#fff;color:#1A2532;border:1px solid #E3E8EE;display:inline-block;';
   div.innerHTML = (!mine ? '<div class="cautor">' + msg.autor_nome + '</div>' : '') +
-    '<div class="cbubble">' + escH(msg.texto) + '</div>' +
+    '<div style="' + bubbleStyle + '">' + escH(msg.texto) + '</div>' +
     '<div class="chora">' + hora + '</div>';
   document.getElementById('chat-msgs').appendChild(div);
   if (scroll !== false) document.getElementById('chat-msgs').scrollTop = 99999;
-  // Som de notificacao para mensagens do cliente
-  if (!mine) { playBeep(); }
-}
-
-function playBeep() {
-  try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.frequency.value = 880;
-    osc.type = 'sine';
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.3);
-  } catch(e) {}
 }
 
 function enviarMsgChat() {
