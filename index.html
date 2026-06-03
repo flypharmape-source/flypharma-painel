@@ -1414,7 +1414,7 @@ function carregarReceitasPedido(pedidoId) {
       var cor = statusCor[r.status] || 'var(--t3)';
       var lbl = statusLabel[r.status] || r.status;
       h2 += '<div style="padding:12px;display:flex;gap:12px;align-items:flex-start">';
-      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:pointer" onclick="window.open(this.src,\'_blank\')\'" title="Clique para ver em tamanho completo">';
+      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:pointer" onclick="window.open(this.src,\'_blank\')" title="Clique para ver em tamanho completo">';
       h2 += '<div style="flex:1">';
       h2 += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
       h2 += '<span style="font-size:12px;font-weight:700;color:' + cor + ';background:' + cor + '18;padding:3px 10px;border-radius:20px">' + lbl + '</span>';
