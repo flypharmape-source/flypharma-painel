@@ -445,7 +445,10 @@ function loadProds() {
   }).catch(function() {});
 }
 function loadPeds() {
-  return apiFetch('/pedidos/admin/todos').then(function(res) {
+  // Admin usa rota geral, farmácia usa rota própria
+  var isAdm = CU && CU.role === 'admin';
+  var url = isAdm ? '/pedidos/admin/todos' : ('/farmacias/' + (CU && CU.farmacia_id) + '/pedidos');
+  return apiFetch(url).then(function(res) {
     if (res.ok) {
       PEDS = Array.isArray(res.data) ? res.data : (res.data.pedidos || res.data.data || []);
       PEDS = PEDS.map(function(p) {
@@ -464,18 +467,14 @@ function loadPeds() {
         };
       });
     }
-  }).catch(function() {});
-  // Atualizar badge de pedidos pendentes
-  var pendentes = PEDS.filter(function(p){ return p.status === 'pendente' || p.status === 'confirmado'; }).length;
-  var bdg = document.getElementById('bdg-ped');
-  if (bdg) {
-    if (pendentes > 0) {
-      bdg.textContent = pendentes > 99 ? '99+' : pendentes;
-      bdg.style.display = 'flex';
-    } else {
-      bdg.style.display = 'none';
+    // Atualizar badge de pedidos pendentes
+    var pendentes = PEDS.filter(function(p){ return p.status === 'pendente' || p.status === 'confirmado'; }).length;
+    var bdg = document.getElementById('bdg-ped');
+    if (bdg) {
+      if (pendentes > 0) { bdg.textContent = pendentes > 99 ? '99+' : pendentes; bdg.style.display = 'flex'; }
+      else { bdg.style.display = 'none'; }
     }
-  }
+  }).catch(function() {});
 }
 function loadUsrs() {
   return apiFetch('/usuarios').then(function(res) {
