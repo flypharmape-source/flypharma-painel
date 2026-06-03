@@ -1549,7 +1549,7 @@ function renderCham() {
     if (c.status !== 'resolvido') {
       h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado(\'' + c.id + '\',\'resolvido\')">&#10003; Resolver</button>';
     }
-    h += '<button class="btn" style="font-size:11px;padding:5px 10px;margin-left:4px;background:rgba(62,207,191,.12);color:var(--p);border:1px solid rgba(62,207,191,.3)" onclick="abrirChat(\'' + c.id + '\',\'' + (c.pedido_numero||0) + '\',\'' + (c.farmacia_nome||'') + '\',\'' + (c.motivo||'') + \')">Chat</button>';
+    h += '<button class="btn" style="font-size:11px;padding:5px 10px;margin-left:4px;background:rgba(62,207,191,.12);color:var(--p);border:1px solid rgba(62,207,191,.3)" data-cid="' + c.id + '" data-pnum="' + (c.pedido_numero||0) + '" data-fnome="' + (c.farmacia_nome||'').replace(/"/g,"") + '" data-motivo="' + (c.motivo||'') + '" onclick="var b=this;abrirChat(b.dataset.cid,b.dataset.pnum,b.dataset.fnome,b.dataset.motivo)">Chat</button>';
     h += '</td>';
     h += '</tr>';
   });
@@ -1965,8 +1965,8 @@ var _chatId = null, _chatSocket = null;
 
 function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   _chatId = chamadoId;
-  document.getElementById('chat-titulo').textContent = 'Chat - Pedido #' + pedNum;
-  document.getElementById('chat-sub').textContent = farmNome + ' - ' + (CHAM_MOTIVOS[motivo] || motivo);
+  document.getElementById('chat-titulo').textContent = 'Chat · Pedido #' + pedNum;
+  document.getElementById('chat-sub').textContent = farmNome + ' · ' + (CHAM_MOTIVOS[motivo] || motivo);
   document.getElementById('chat-msgs').innerHTML = '<div style="text-align:center;color:var(--t3);padding:20px">Carregando...</div>';
   document.getElementById('chat-modal').classList.add('open');
 
