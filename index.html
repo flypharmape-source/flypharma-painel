@@ -413,7 +413,10 @@ function loadFarms() {
           ativo: f.ativo !== undefined ? f.ativo : (f.status !== 'inativo'),
           taxa_entrega: f.taxa_entrega || 6.90,
           raio_entrega_km: f.raio_entrega_km || 5,
-          pedido_minimo: f.pedido_minimo || 0
+          pedido_minimo: f.pedido_minimo || 0,
+          logo_url: f.logo_url || null,
+          horarios: f.horarios || [],
+          user_id: f.user_id || null
         };
       });
     }
@@ -1349,6 +1352,9 @@ function uploadLogoConfig(input) {
       if (status) status.textContent = '✅ Logo atualizada com sucesso!';
       var idx = FARMS.findIndex(function(f){ return f.id === farmId; });
       if (idx >= 0) FARMS[idx].logo_url = d.logo_url;
+      // Atualiza preview na tela
+      var prev = document.getElementById('cfg-logo-preview');
+      if (prev) prev.innerHTML = '<img src="' + d.logo_url + '" style="width:100%;height:100%;object-fit:cover">';
     } else {
       if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
     }
