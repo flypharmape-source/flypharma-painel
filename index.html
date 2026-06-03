@@ -1218,6 +1218,38 @@ function closeModalOut(e) { if (e.target === document.getElementById('m-overlay'
 
 function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
 
+function previewLogoFile(input, farmaciaId) {
+  var file = input.files[0];
+  if (!file) return;
+  var prev = document.getElementById('mf-logo-preview');
+  var status = document.getElementById('mf-logo-status');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (prev) prev.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+  if (!farmaciaId) { if (status) status.textContent = 'Salve a farmácia primeiro para adicionar logo.'; return; }
+  if (status) status.textContent = '⏳ Enviando...';
+  var fd = new FormData();
+  fd.append('logo', file);
+  fetch(API_BASE + '/farmacias/' + farmaciaId + '/logo', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN },
+    body: fd
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.logo_url) {
+      if (status) status.textContent = '✅ Logo atualizada!';
+      var idx = FARMS.findIndex(function(f){ return f.id === farmaciaId; });
+      if (idx >= 0) FARMS[idx].logo_url = d.logo_url;
+      renderFarm();
+    } else {
+      if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
+    }
+  }).catch(function() {
+    if (status) status.textContent = '❌ Erro ao enviar.';
+  });
+}
+
 function previewLogo(url) {
   var prev = document.getElementById('mf-logo-preview');
   if (!prev) return;
@@ -1252,17 +1284,20 @@ function buildMBody(type, id) {
     }
     h += '<div class="fr"><div class="fc3"><label>Cidade</label><input id="mf-cidade" value="' + (f.cidade||'') + '" placeholder="Recife"></div><div class="fc3"><label>Bairro</label><input id="mf-bairro" value="' + (f.bairro||'') + '" placeholder="Boa Viagem"></div></div>';
     h += '<div class="fr"><div class="fc3 full"><label>Logradouro</label><input id="mf-end" value="' + (f.logradouro||'') + '" placeholder="Av. Boa Viagem, 1000"></div></div>';
-    h += '<div class="fr"><div class="fc3 full"><label>Logo da farmácia (URL da imagem)</label>';
-    h += '<div style="display:flex;gap:10px;align-items:center">';
-    h += '<input id="mf-logo" value="' + (f.logo_url||'') + '" placeholder="https://... cole o link da imagem da logo" style="flex:1" oninput="previewLogo(this.value)">';
-    h += '<div id="mf-logo-preview" style="width:52px;height:52px;border-radius:10px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">';
+    h += '<div class="fr"><div class="fc3 full"><label>Logo da farmácia</label>';
+    h += '<div style="display:flex;gap:12px;align-items:center">';
+    h += '<div id="mf-logo-preview" style="width:64px;height:64px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br);cursor:pointer" onclick="document.getElementById(\'mf-logo-file\').click()">';
     if (f.logo_url) {
       h += '<img src="' + f.logo_url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'">';
     } else {
-      h += '<span style="font-size:22px">🏥</span>';
+      h += '<span style="font-size:28px">🏥</span>';
     }
+    h += '</div>';
+    h += '<div style="flex:1">';
+    h += '<input type="file" id="mf-logo-file" accept="image/*" style="display:none" onchange="previewLogoFile(this,\'' + (f.id||'') + '\')">';
+    h += '<button type="button" onclick="document.getElementById(\'mf-logo-file\').click()" style="background:var(--t);color:var(--n);border:none;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:13px">📷 Escolher foto</button>';
+    h += '<div id="mf-logo-status" style="font-size:11px;color:var(--t3);margin-top:6px">' + (f.logo_url ? '✅ Logo atual carregada' : 'Nenhuma logo selecionada') + '</div>';
     h += '</div></div>';
-    h += '<div style="font-size:11px;color:var(--t3);margin-top:4px">Dica: use Imgur, Google Drive (link direto) ou qualquer URL pública de imagem.</div>';
     h += '</div></div>';
     h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status manual</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
@@ -1376,7 +1411,6 @@ function saveModal() {
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
       aberta: gv('mf-aberta') === 'true',
-      logo_url: gv('mf-logo') || null
     };
     apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
     .then(function(res) {
@@ -1399,7 +1433,6 @@ function saveModal() {
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
       aberta: gv('mf-aberta') === 'true',
-      logo_url: gv('mf-logo') || null
     };
     var horariosEdit = [];
     for (var hde=0;hde<7;hde++) {
@@ -1434,7 +1467,7 @@ function saveModal() {
   } else if (type === 'prod-new') {
     var pNome = gv('mp-nome'), pPreco = gv('mp-preco');
     if (!pNome || !pPreco) { showToast('e','Obrigatório','Nome e preço são obrigatórios'); btn.textContent='Salvar'; return; }
-    var mpFarm = gv('mp-farm');
+    var mpFarm = gv('mp-farm') || (CU && CU.farmacia_id);
     if (!mpFarm) { showToast('e','Obrigatório','Selecione a farmácia'); btn.textContent='Salvar'; return; }
     var pp = {
       nome: pNome, laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
@@ -1443,7 +1476,10 @@ function saveModal() {
       controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
       descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
     };
-    apiFetch('/produtos', {method:'POST', body: JSON.stringify(pp)})
+    // FIX: admin usa /produtos, farmacia usa /farmacias/:id/produtos
+    var isAdmProd = CU && CU.role === 'admin';
+    var prodUrl = isAdmProd ? '/produtos' : '/farmacias/' + mpFarm + '/produtos';
+    apiFetch(prodUrl, {method:'POST', body: JSON.stringify(pp)})
     .then(function(res) {
       if (res.ok) {
         closeModal(); showToast('s','Produto cadastrado!', pNome);
@@ -1457,12 +1493,15 @@ function saveModal() {
   } else if (type === 'prod-edit') {
     var pe = {
       nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
-      farmacia_id: gv('mp-farm'),
+      farmacia_id: gv('mp-farm') || (CU && CU.farmacia_id),
       preco: Number(gv('mp-preco')), preco_promocional: Number(gv('mp-promo'))||null,
       controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
       descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
     };
-    apiFetch('/produtos/' + id, {method:'PATCH', body: JSON.stringify(pe)})
+    // FIX: admin usa /produtos/:id, farmacia usa /farmacias/:farmId/produtos/:prodId
+    var isAdmEdit = CU && CU.role === 'admin';
+    var editUrl = isAdmEdit ? '/produtos/' + id : '/farmacias/' + (CU && CU.farmacia_id) + '/produtos/' + id;
+    apiFetch(editUrl, {method:'PATCH', body: JSON.stringify(pe)})
     .then(function(res) {
       if (res.ok) {
         closeModal(); showToast('s','Produto atualizado!', pe.nome);
