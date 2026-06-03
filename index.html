@@ -1284,14 +1284,16 @@ function renderCfg() {
       '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
         '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🏥 Logo da farmácia</div>' +
         '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Essa imagem aparece no app para os clientes</div>' +
-        '<div style="display:flex;gap:16px;align-items:center;margin-bottom:16px">' +
-          '<div id="cfg-logo-preview" style="width:80px;height:80px;border-radius:14px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">' +
-            (logoAtual ? '<img src="' + logoAtual + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'>' : '<span style="font-size:32px">🏥</span>') +
-          '</div>' +
-          '<div>' +
-            '<input type="file" id="cfg-logo-file" accept="image/*" style="display:none" onchange="uploadLogoConfig(this)">' +
-            '<button class="btn btn-p" onclick="document.getElementById(\'cfg-logo-file\').click()">📷 Escolher foto</button>' +
-            '<div id="cfg-logo-status" style="font-size:12px;color:var(--t3);margin-top:8px">' + (logoAtual ? '✅ Logo atual carregada' : 'Nenhuma logo ainda') + '</div>' +
+        '<div style="margin-bottom:16px">' +
+          '<div style="display:flex;align-items:center;gap:14px">' +
+            '<div id="cfg-logo-preview" style="width:72px;height:72px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br);position:relative">' +
+              (logoAtual ? '<img src="' + logoAtual + '" style="width:72px;height:72px;object-fit:cover;border-radius:12px" onerror="this.style.display=\'none\'">' : '<span style="font-size:28px">🏥</span>') +
+            '</div>' +
+            '<div>' +
+              '<input type="file" id="cfg-logo-file" accept="image/*" style="display:none" onchange="uploadLogoConfig(this)">' +
+              '<button class="btn btn-p" onclick="document.getElementById(\'cfg-logo-file\').click()" style="font-size:13px;padding:8px 16px">📷 Escolher foto</button>' +
+              '<div id="cfg-logo-status" style="font-size:11px;color:var(--t3);margin-top:6px">' + (logoAtual ? '✅ Logo carregada' : 'Nenhuma logo ainda') + '</div>' +
+            '</div>' +
           '</div>' +
         '</div>' +
       '</div>';
