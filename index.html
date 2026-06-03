@@ -1055,8 +1055,12 @@ function renderPed() {
     h += '<td>' + sbadge(p.status) + '</td>';
     h += '<td>' + p.hora + '</td>';
     h += '<td><div style="display:flex;gap:6px"><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'ped-view\',\'' + p.id + '\')">👁️</button>';
-    if (['pendente','confirmado','preparando'].indexOf(p.status) >= 0) {
-      h += '<button class="btn btn-p" style="padding:4px 10px;font-size:12px" onclick="avancarPed(\'' + p.id + '\')">▶</button>';
+    if (['pendente','confirmado','preparando','aguardando_entregador','em_entrega'].indexOf(p.status) >= 0) {
+      var label = p.status === 'em_entrega' ? '&#10003; Entregue' : '&#9654;';
+      var style = p.status === 'em_entrega'
+        ? 'padding:4px 10px;font-size:12px;background:rgba(34,201,122,.15);color:#18A065;border:1px solid rgba(34,201,122,.3)'
+        : 'padding:4px 10px;font-size:12px';
+      h += '<button class="btn" style="' + style + '" onclick="avancarPed(\'' + p.id + '\')">'+label+'</button>';
     }
     h += '</div></td></tr>';
   }
