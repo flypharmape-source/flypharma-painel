@@ -340,6 +340,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-rel"  class="page"></div>
     <div id="page-cfg"  class="page"></div>
     <div id="page-cham" class="page"></div>
+    <div id="page-rec"  class="page"></div>
   </div>
 </div>
 
@@ -509,9 +510,23 @@ function loadCats() {
     }
   }).catch(function() {});
 }
+function atualizarBadgeRec() {
+  var farmId = CU && CU.farmacia_id;
+  if (!farmId) return;
+  apiFetch('/receitas?farmacia_id=' + farmId + '&status=pendente').then(function(res) {
+    var bdg = document.getElementById('bdg-rec');
+    if (!bdg) return;
+    var total = (res.ok && res.data) ? res.data.length : 0;
+    if (total > 0) { bdg.textContent = total > 99 ? '99+' : total; bdg.style.display = 'flex'; }
+    else { bdg.style.display = 'none'; }
+  }).catch(function(){});
+}
+
 function loadAll() {
   return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats()]);
 }
+
+function loadAllPost() { if (CU && CU.role !== 'admin') atualizarBadgeRec(); }
 
 // ── AUTH ──────────────────────────────────────────────────────
 function doLogin() {
@@ -534,7 +549,7 @@ function doLogin() {
       CU = res.data.user;
       if (AT) localStorage.setItem('fly_at', AT);
       localStorage.setItem('fly_cu', JSON.stringify(CU));
-      loadAll().then(function() { startApp(true); });
+      loadAll().then(function() { startApp(true); loadAllPost(); });
     } else {
       showErr(res.data.error || res.data.message || 'E-mail ou senha inválidos.');
       btn.innerHTML = 'Entrar'; btn.disabled = false;
@@ -619,6 +634,7 @@ var NAV_FRM = [
   {g:'Operações', items:[
     {id:'ped',lbl:'Pedidos',bdg:true},
     {id:'cham',lbl:'Chamados',bdg:true},
+    {id:'rec',lbl:'Receitas',bdg:true},
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
   ]},
@@ -634,8 +650,9 @@ var NAV_ICS = {
   rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
   cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
+  rec:'<path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>',
 };
-var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
+var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados',rec:'Receitas'};
 
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
@@ -707,6 +724,7 @@ function renderPage(id) {
   else if (id === 'usr')  renderUsr();
   else if (id === 'rel')  renderRel();
   else if (id === 'cfg')  renderCfg();
+  else if (id === 'rec')   renderRec();
   else if (id === 'cham') renderCham();
 }
 
@@ -1159,6 +1177,79 @@ function renderRel() {
 }
 
 // CONFIG
+function renderRec() {
+  var el = document.getElementById('page-rec');
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">' +
+    '<div class="fb" style="margin:0;flex:1">' +
+      '<div class="fc on" onclick="filtrarRec(\'todas\',this)">Todas</div>' +
+      '<div class="fc" onclick="filtrarRec(\'pendente\',this)">Pendentes</div>' +
+      '<div class="fc" onclick="filtrarRec(\'aprovada\',this)">Aprovadas</div>' +
+      '<div class="fc" onclick="filtrarRec(\'reprovada\',this)">Reprovadas</div>' +
+    '</div></div>' +
+    '<div id="rec-grid" class="card"><div style="padding:40px;text-align:center;color:var(--t3)">⏳ Carregando receitas...</div></div>';
+  carregarReceitas('todas');
+}
+
+var REC_STATUS_FILTRO = 'todas';
+
+function filtrarRec(status, el) {
+  REC_STATUS_FILTRO = status;
+  document.querySelectorAll('#page-rec .fc').forEach(function(e){ e.classList.remove('on'); });
+  if (el) el.classList.add('on');
+  carregarReceitas(status);
+}
+
+function carregarReceitas(status) {
+  var grid = document.getElementById('rec-grid');
+  if (!grid) return;
+  var farmId = CU && CU.farmacia_id;
+  var url = '/receitas?farmacia_id=' + (farmId || '');
+  if (status && status !== 'todas') url += '&status=' + status;
+  apiFetch(url).then(function(res) {
+    if (!res.ok || !res.data || !res.data.length) {
+      grid.innerHTML = '<div style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:12px">📋</div><div style="color:var(--t3)">Nenhuma receita encontrada.</div></div>';
+      // Atualiza badge
+      var bdg = document.getElementById('bdg-rec');
+      if (bdg) bdg.style.display = 'none';
+      return;
+    }
+    var receitas = res.data;
+    // Atualiza badge com pendentes
+    var pendentes = receitas.filter(function(r){ return r.status === 'pendente'; }).length;
+    var bdg = document.getElementById('bdg-rec');
+    if (bdg) {
+      if (pendentes > 0) { bdg.textContent = pendentes; bdg.style.display = 'flex'; }
+      else { bdg.style.display = 'none'; }
+    }
+    var statusCor   = { pendente:'var(--a)', em_analise:'#7A50C8', aprovada:'var(--g)', reprovada:'var(--r)' };
+    var statusLabel = { pendente:'Pendente', em_analise:'Em análise', aprovada:'Aprovada', reprovada:'Reprovada' };
+    var h = '<table class="tbl"><thead><tr><th>Receita</th><th>Cliente</th><th>Pedido</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+    receitas.forEach(function(r) {
+      var cor = statusCor[r.status] || 'var(--t3)';
+      var lbl = statusLabel[r.status] || r.status;
+      var dt = r.created_at ? new Date(r.created_at).toLocaleDateString('pt-BR') : '—';
+      h += '<tr>';
+      h += '<td><a href="' + r.imagem_url + '" target="_blank"><img src="' + r.imagem_url + '" style="width:52px;height:64px;object-fit:cover;border-radius:6px;border:1px solid var(--br);cursor:pointer" title="Clique para ver em tamanho completo"></a></td>';
+      h += '<td><b>' + (r.cliente_nome || '—') + '</b></td>';
+      h += '<td><span class="oid">#' + (r.pedido_id ? r.pedido_id.slice(0,6) : '—') + '</span></td>';
+      h += '<td>' + dt + '</td>';
+      h += '<td><span class="b" style="color:' + cor + ';background:' + cor + '18">' + lbl + '</span></td>';
+      h += '<td><div style="display:flex;gap:6px">';
+      if (r.status === 'pendente' || r.status === 'em_analise') {
+        h += '<button class="btn btn-p" style="padding:4px 10px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'aprovada\')">✅ Aprovar</button>';
+        h += '<button class="btn btn-d" style="padding:4px 10px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'reprovada\')">❌ Reprovar</button>';
+      } else {
+        h += '<span style="font-size:12px;color:var(--t3)">' + (r.observacao || '—') + '</span>';
+      }
+      h += '</div></td></tr>';
+    });
+    h += '</tbody></table>';
+    grid.innerHTML = h;
+  }).catch(function() {
+    grid.innerHTML = '<div style="padding:20px;color:var(--r)">Erro ao carregar receitas.</div>';
+  });
+}
+
 function renderCfg() {
   var el = document.getElementById('page-cfg');
   var isAdm = CU && CU.role === 'admin';
