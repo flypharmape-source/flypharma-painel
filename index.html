@@ -1218,6 +1218,67 @@ function closeModalOut(e) { if (e.target === document.getElementById('m-overlay'
 
 function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
 
+function carregarReceitasPedido(pedidoId) {
+  var wrap = document.getElementById('receitas-pedido-wrap');
+  if (!wrap) return;
+  apiFetch('/receitas?farmacia_id=' + (CU && CU.farmacia_id || '') + '&pedido_id=' + pedidoId)
+  .then(function(res) {
+    if (!res.ok || !res.data || !res.data.length) {
+      wrap.innerHTML = '<div style="background:var(--bg);border-radius:10px;padding:12px;font-size:12px;color:var(--t3)">📋 Nenhuma receita enviada para este pedido.</div>';
+      return;
+    }
+    var receitas = res.data.filter(function(r){ return r.pedido_id === pedidoId; });
+    if (!receitas.length) {
+      wrap.innerHTML = '<div style="background:var(--bg);border-radius:10px;padding:12px;font-size:12px;color:var(--t3)">📋 Nenhuma receita enviada para este pedido.</div>';
+      return;
+    }
+    var statusCor = { pendente:'var(--a)', em_analise:'#7A50C8', aprovada:'var(--g)', reprovada:'var(--r)' };
+    var statusLabel = { pendente:'Pendente', em_analise:'Em análise', aprovada:'Aprovada', reprovada:'Reprovada' };
+    var h2 = '<div style="border:1.5px solid var(--br);border-radius:10px;overflow:hidden;margin-bottom:4px">';
+    h2 += '<div style="padding:10px 12px;background:var(--bg);font-size:12px;font-weight:700;color:var(--n);border-bottom:1px solid var(--br)">📋 Receita(s) enviada(s)</div>';
+    receitas.forEach(function(r) {
+      var cor = statusCor[r.status] || 'var(--t3)';
+      var lbl = statusLabel[r.status] || r.status;
+      h2 += '<div style="padding:12px;display:flex;gap:12px;align-items:flex-start">';
+      h2 += '<a href="' + r.imagem_url + '" target="_blank" title="Ver receita em tamanho completo">';
+      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:pointer">';
+      h2 += '</a>';
+      h2 += '<div style="flex:1">';
+      h2 += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      h2 += '<span style="font-size:12px;font-weight:700;color:' + cor + ';background:' + cor + '18;padding:3px 10px;border-radius:20px">' + lbl + '</span>';
+      h2 += '</div>';
+      if (r.status === 'pendente' || r.status === 'em_analise') {
+        h2 += '<div style="display:flex;gap:8px">';
+        h2 += '<button class="btn btn-p" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'aprovada\')">✅ Aprovar</button>';
+        h2 += '<button class="btn btn-d" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'reprovada\')">❌ Reprovar</button>';
+        h2 += '</div>';
+      } else if (r.observacao) {
+        h2 += '<div style="font-size:11px;color:var(--t2)">Obs: ' + r.observacao + '</div>';
+      }
+      h2 += '</div></div>';
+    });
+    h2 += '</div>';
+    wrap.innerHTML = h2;
+  }).catch(function() {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--t3)">Erro ao carregar receitas.</div>';
+  });
+}
+
+function analisarReceita(receitaId, status) {
+  var obs = status === 'reprovada' ? prompt('Motivo da reprovação (opcional):') : null;
+  apiFetch('/receitas/' + receitaId, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: status, observacao: obs || '' })
+  }).then(function(res) {
+    if (res.ok) {
+      showToast('s', status === 'aprovada' ? 'Receita aprovada!' : 'Receita reprovada', '');
+      carregarReceitasPedido(MC.id);
+    } else {
+      showToast('e', 'Erro', res.data.error || 'Tente novamente');
+    }
+  });
+}
+
 function previewLogoFile(input, farmaciaId) {
   var file = input.files[0];
   if (!file) return;
@@ -1382,6 +1443,9 @@ function buildMBody(type, id) {
     h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">FARMÁCIA: ' + pv.farm + ' · ' + pv.metodo + '</div>';
     h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">ITENS: ' + pv.itens + ' produto(s) · Hora: ' + pv.hora + '</div>';
     h += '</div>';
+    // ✅ Seção de receitas do pedido
+    h += '<div id="receitas-pedido-wrap" style="margin-bottom:12px"><div style="font-size:12px;color:var(--t3)">⏳ Carregando receitas...</div></div>';
+    setTimeout(function(){ carregarReceitasPedido(pv.id); }, 100);
     if (['pendente','confirmado','preparando','aguardando_entregador'].indexOf(pv.status) >= 0) {
       h += '<div style="background:var(--tl);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:600;color:var(--td);margin-bottom:8px">Avançar status</div>';
       h += '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="avancarPed(\'' + pv.id + '\');closeModal()">▶ Próximo status</button>';
