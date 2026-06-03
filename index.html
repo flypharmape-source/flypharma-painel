@@ -661,9 +661,11 @@ function startApp(novoLogin) {
   if (novoLogin) showToast('s', 'Bem-vindo, ' + CU.nome.split(' ')[0] + '!', 'Login realizado com sucesso.');
 }
   // Carregar badge de chamados ao logar
-  loadChamados();
-  if (window._badgeInterval) clearInterval(window._badgeInterval);
-  window._badgeInterval = setInterval(function() { loadChamados(); }, 60000);
+  setTimeout(function() {
+    loadChamados();
+    if (window._badgeInterval) clearInterval(window._badgeInterval);
+    window._badgeInterval = setInterval(function() { loadChamados(); }, 60000);
+  }, 300);
 
 function goto(id) {
   document.querySelectorAll('.sb-item').forEach(function(e) { e.classList.remove('on'); });
@@ -1496,7 +1498,7 @@ function loadChamados() {
     }
   }).catch(function() { CHAMS = []; }).then(function() {
     // Badge de chamados abertos
-    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto'; }).length;
+    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto' || c.status === 'em_analise'; }).length;
     var bdg = document.getElementById('bdg-cham');
     if (bdg) {
       if (abertos > 0) { bdg.textContent = abertos > 99 ? '99+' : abertos; bdg.style.display = 'flex'; }
