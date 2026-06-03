@@ -1148,14 +1148,122 @@ function renderUsr() {
 // RELATÓRIOS
 function renderRel() {
   var el = document.getElementById('page-rel');
-  var h = '<div class="sg">';
-  h += statCard('t', NAV_ICS.prod, 'R$48.200', 'Faturamento total', '↑ 18%', 'up');
-  h += statCard('g', NAV_ICS.ped, '1.847', 'Pedidos este mês', '↑ 12%', 'up');
-  h += statCard('a', NAV_ICS.usr, '324', 'Novos clientes', '↑ 8%', 'up');
-  h += statCard('r', NAV_ICS.cfg, '2,3%', 'Taxa cancelamento', '↑ 0.2%', 'dn');
-  h += '</div>';
-  h += '<div class="card" style="padding:40px;text-align:center;color:var(--t2)"><div style="font-size:36px;margin-bottom:12px">📊</div><div style="font-family:\'Nunito\';font-size:18px;font-weight:700;color:var(--n);margin-bottom:6px">Relatórios detalhados</div><div>Exportação CSV/Excel disponível em breve</div></div>';
-  el.innerHTML = h;
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">📊 Relatórios</div><div style="margin-left:auto;display:flex;gap:8px"><select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
+    '<div id="rel-stats" class="sg" style="margin-bottom:16px"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
+      '<div class="card" id="rel-top-produtos"><div class="ch"><span class="ct">🏆 Produtos mais vendidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+      '<div class="card" id="rel-status-dist"><div class="ch"><span class="ct">📦 Distribuição de status</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+    '</div>' +
+    '<div class="card" id="rel-ultimos"><div class="ch"><span class="ct">📋 Últimos pedidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>';
+  carregarRelatorio();
+}
+
+function carregarRelatorio() {
+  var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
+  var isAdm = CU && CU.role === 'admin';
+  var farmId = CU && CU.farmacia_id;
+  var pedsFiltrados = PEDS.filter(function(p) {
+    if (!p.created_at && !p.hora) return true;
+    return true; // usa todos os pedidos disponíveis
+  });
+
+  // Stats
+  var total = pedsFiltrados.length;
+  var fat = pedsFiltrados.reduce(function(acc, p) { return acc + Number(p.total || 0); }, 0);
+  var entregues = pedsFiltrados.filter(function(p) { return p.status === 'entregue'; }).length;
+  var cancelados = pedsFiltrados.filter(function(p) { return p.status === 'cancelado'; }).length;
+  var taxaCanc = total > 0 ? ((cancelados / total) * 100).toFixed(1) : '0.0';
+
+  var stats = document.getElementById('rel-stats');
+  if (stats) stats.innerHTML =
+    statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', entregues + ' entregues', 'up') +
+    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'todos os períodos', 'up') +
+    statCard('a', NAV_ICS.usr, entregues, 'Pedidos entregues', Math.round(entregues/Math.max(total,1)*100) + '%', 'up') +
+    statCard('r', NAV_ICS.cfg, taxaCanc + '%', 'Taxa cancelamento', cancelados + ' cancelados', cancelados > 0 ? 'dn' : 'up');
+
+  // Top produtos
+  var prodCount = {};
+  pedsFiltrados.forEach(function(p) {
+    // conta por nome simplificado
+  });
+
+  var topEl = document.getElementById('rel-top-produtos');
+  if (topEl) {
+    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Pedidos</th><th>Status</th></tr></thead><tbody>';
+    // Usa PRODS disponíveis
+    var prodsList = PRODS.slice(0, 8);
+    if (prodsList.length === 0) {
+      h += '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Nenhum produto cadastrado</td></tr>';
+    } else {
+      prodsList.forEach(function(p, i) {
+        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd || 0) + ' un. estoque</td><td><span class="b ' + (p.ativo ? 'ativo' : 'inativo') + '">' + (p.ativo ? 'Ativo' : 'Inativo') + '</span></td></tr>';
+      });
+    }
+    h += '</tbody></table>';
+    topEl.innerHTML = '<div class="ch"><span class="ct">🏆 Produtos cadastrados</span></div>' + h;
+  }
+
+  // Distribuição de status
+  var statusDist = {};
+  pedsFiltrados.forEach(function(p) {
+    statusDist[p.status] = (statusDist[p.status] || 0) + 1;
+  });
+  var statusEl = document.getElementById('rel-status-dist');
+  if (statusEl) {
+    var h2 = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
+    var statusLabels = { pendente:'Aguardando pgto', confirmado:'Confirmado', preparando:'Preparando', aguardando_entregador:'Buscando entregador', em_entrega:'Em entrega', entregue:'Entregue', cancelado:'Cancelado' };
+    var statusCores = { pendente:'var(--a)', confirmado:'var(--t)', preparando:'var(--a)', aguardando_entregador:'#7A50C8', em_entrega:'var(--n)', entregue:'var(--g)', cancelado:'var(--r)' };
+    Object.keys(statusLabels).forEach(function(st) {
+      var qty = statusDist[st] || 0;
+      if (!qty && st !== 'entregue') return;
+      var pct = total > 0 ? Math.round(qty / total * 100) : 0;
+      h2 += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + statusLabels[st] + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
+      h2 += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (statusCores[st]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
+    });
+    if (Object.keys(statusDist).length === 0) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
+    h2 += '</div>';
+    statusEl.innerHTML = '<div class="ch"><span class="ct">📦 Distribuição de status</span></div>' + h2;
+  }
+
+  // Últimos pedidos
+  var ultEl = document.getElementById('rel-ultimos');
+  if (ultEl) {
+    var h3 = '<table class="tbl"><thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Método</th><th>Status</th><th>Hora</th></tr></thead><tbody>';
+    var ultPeds = pedsFiltrados.slice(0, 20);
+    if (!ultPeds.length) {
+      h3 += '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido encontrado</td></tr>';
+    } else {
+      ultPeds.forEach(function(p) {
+        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'PIX') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
+      });
+    }
+    h3 += '</tbody></table>';
+    ultEl.innerHTML = '<div class="ch"><span class="ct">📋 Últimos pedidos</span><span class="ca" onclick="goto(\'ped\')">Ver todos →</span></div>' + h3;
+  }
+}
+
+function exportarRelatorioCSV() {
+  var rows = [['ID','Cliente','Farmácia','Total','Método','Status','Hora']];
+  PEDS.forEach(function(p) {
+    rows.push([
+      '#' + p.num,
+      p.cli || '—',
+      p.farm || '—',
+      'R$' + Number(p.total||0).toFixed(2),
+      p.metodo || 'PIX',
+      p.status || '—',
+      p.hora || '—'
+    ]);
+  });
+  var csv = rows.map(function(r) { return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'flypharma-pedidos-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('s', 'CSV exportado!', rows.length - 1 + ' pedidos exportados');
 }
 
 // CONFIG
