@@ -661,8 +661,9 @@ function startApp(novoLogin) {
   // Carregar badge de chamados ao logar
   setTimeout(function() {
     loadChamados();
+    loadPeds();
     if (window._badgeInterval) clearInterval(window._badgeInterval);
-    window._badgeInterval = setInterval(function() { loadChamados(); }, 60000);
+    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); }, 60000);
   }, 500);
 }
 
