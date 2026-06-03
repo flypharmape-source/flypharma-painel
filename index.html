@@ -659,13 +659,13 @@ function startApp(novoLogin) {
   document.getElementById('sb-nav').innerHTML = html;
   goto('dash');
   if (novoLogin) showToast('s', 'Bem-vindo, ' + CU.nome.split(' ')[0] + '!', 'Login realizado com sucesso.');
-}
   // Carregar badge de chamados ao logar
   setTimeout(function() {
     loadChamados();
     if (window._badgeInterval) clearInterval(window._badgeInterval);
     window._badgeInterval = setInterval(function() { loadChamados(); }, 60000);
-  }, 300);
+  }, 500);
+}
 
 function goto(id) {
   document.querySelectorAll('.sb-item').forEach(function(e) { e.classList.remove('on'); });
