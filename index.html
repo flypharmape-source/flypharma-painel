@@ -1965,8 +1965,8 @@ var _chatId = null, _chatSocket = null;
 
 function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   _chatId = chamadoId;
-  document.getElementById('chat-titulo').textContent = 'Chat · Pedido #' + pedNum;
-  document.getElementById('chat-sub').textContent = farmNome + ' · ' + (CHAM_MOTIVOS[motivo] || motivo);
+  document.getElementById('chat-titulo').textContent = 'Chat - Pedido #' + pedNum;
+  document.getElementById('chat-sub').textContent = farmNome + ' - ' + (CHAM_MOTIVOS[motivo] || motivo);
   document.getElementById('chat-msgs').innerHTML = '<div style="text-align:center;color:var(--t3);padding:20px">Carregando...</div>';
   document.getElementById('chat-modal').classList.add('open');
 
