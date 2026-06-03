@@ -1320,13 +1320,23 @@ function buildMBody(type, id) {
   } else if (type === 'prod-new' || type === 'prod-edit') {
     var p = type === 'prod-edit' ? PRODS.find(function(x){return x.id===id;}) : {};
     p = p || {};
-    h += '<div class="fr"><div class="fc3 full"><label>Farmácia *</label><select id="mp-farm">';
-    h += '<option value="">Selecione a farmácia...</option>';
-    for (var fi=0;fi<FARMS.length;fi++) {
-      var farmSel = (p.farmacia_id === FARMS[fi].id) || (CURRENT_FARM_ID && CURRENT_FARM_ID === FARMS[fi].id);
-      h += '<option value="' + FARMS[fi].id + '"' + (farmSel?' selected':'') + '>' + FARMS[fi].nome + '</option>';
+    h += '<div class="fr"><div class="fc3 full"><label>Farmácia *</label>';
+    var isAdmProdForm = CU && CU.role === 'admin';
+    if (!isAdmProdForm) {
+      // Farmácia vê apenas a sua, pré-selecionada e bloqueada
+      var myFarm = FARMS.find(function(f){ return f.id === (CU && CU.farmacia_id); }) || FARMS[0] || {};
+      h += '<input type="text" value="' + (myFarm.nome||'Minha farmácia') + '" disabled style="background:var(--bg);color:var(--t2);cursor:not-allowed">';
+      h += '<input type="hidden" id="mp-farm" value="' + (myFarm.id||'') + '">';
+    } else {
+      h += '<select id="mp-farm">';
+      h += '<option value="">Selecione a farmácia...</option>';
+      for (var fi=0;fi<FARMS.length;fi++) {
+        var farmSel = (p.farmacia_id === FARMS[fi].id) || (CURRENT_FARM_ID && CURRENT_FARM_ID === FARMS[fi].id);
+        h += '<option value="' + FARMS[fi].id + '"' + (farmSel?' selected':'') + '>' + FARMS[fi].nome + '</option>';
+      }
+      h += '</select>';
     }
-    h += '</select></div></div>';
+    h += '</div></div>';
     h += '<div class="fr"><div class="fc3"><label>Nome do produto *</label><input id="mp-nome" value="' + (p.nome||'') + '" placeholder="Ex: Dipirona 500mg"></div><div class="fc3"><label>Laboratório</label><input id="mp-lab" value="' + (p.lab||p.laboratorio||'') + '" placeholder="EMS, Medley..."></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Preço (R$) *</label><input id="mp-preco" type="number" step="0.01" value="' + (p.preco||'') + '" placeholder="9.90"></div><div class="fc3"><label>Preço promoção (R$)</label><input id="mp-promo" type="number" step="0.01" value="' + (p.promo||'') + '" placeholder="Opcional"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Categoria</label><select id="mp-cat">';
