@@ -1490,7 +1490,15 @@ function loadChamados() {
     if (res.ok) {
       CHAMS = Array.isArray(res.data) ? res.data : (res.data.chamados || res.data.data || []);
     }
-  }).catch(function() { CHAMS = []; });
+  }).catch(function() { CHAMS = []; }).then(function() {
+    // Badge de chamados abertos
+    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto'; }).length;
+    var bdg = document.getElementById('bdg-cham');
+    if (bdg) {
+      if (abertos > 0) { bdg.textContent = abertos > 99 ? '99+' : abertos; bdg.style.display = 'flex'; }
+      else { bdg.style.display = 'none'; }
+    }
+  });
 }
 
 var CHAM_STATUS = {
@@ -1954,7 +1962,8 @@ goto = function(id) {
     <div class="chat-msgs" id="chat-msgs"></div>
     <div class="chat-inp">
       <textarea id="chat-input" placeholder="Digite sua resposta..." rows="1"
-        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsgChat();}"></textarea>
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsgChat();}"
+        oninput="if(_chatSocket&&_chatId)_chatSocket.emit('digitando',{chamado_id:_chatId,autor_id:CU&&CU.id})"></textarea>
       <button onclick="enviarMsgChat()">Enviar</button>
     </div>
   </div>
@@ -1977,7 +1986,31 @@ function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   if (_chatSocket) { _chatSocket.disconnect(); }
   _chatSocket = io('https://web-production-b66cd.up.railway.app', { transports: ['websocket','polling'] });
   _chatSocket.emit('join_chamado', chamadoId);
-  _chatSocket.on('nova_mensagem', function(msg) { appendMsgChat(msg); });
+  _chatSocket.on('nova_mensagem', function(msg) {
+    appendMsgChat(msg);
+    // Remover indicador digitando quando mensagem chegar
+    var dEl = document.getElementById('chat-digitando');
+    if (dEl) dEl.remove();
+  });
+  _chatSocket.on('digitando', function(data) {
+    if (data.autor_id !== (window._painelUser && window._painelUser.id)) {
+      var el = document.getElementById('chat-msgs');
+      var dEl = document.getElementById('chat-digitando');
+      if (!dEl) {
+        dEl = document.createElement('div');
+        dEl.id = 'chat-digitando';
+        dEl.style.cssText = 'align-self:flex-start;background:#fff;border:1px solid #E3E8EE;border-radius:16px;border-bottom-left-radius:4px;padding:8px 14px;font-size:13px;color:#9AAABB;max-width:75%;';
+        dEl.textContent = 'digitando...';
+        el.appendChild(dEl);
+        el.scrollTop = el.scrollHeight;
+      }
+      clearTimeout(window._typingTimer);
+      window._typingTimer = setTimeout(function() {
+        var d = document.getElementById('chat-digitando');
+        if (d) d.remove();
+      }, 3000);
+    }
+  });
 }
 
 function fecharChat() {
@@ -2021,6 +2054,11 @@ function escH(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 document.getElementById('chat-modal').addEventListener('click', function(e) {
   if (e.target === this) fecharChat();
 });
+
+// Polling: atualizar badge de chamados a cada 30s
+setInterval(function() {
+  if (typeof loadChamados === 'function') loadChamados();
+}, 30000);
 </script>
 
 </body>
