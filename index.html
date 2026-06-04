@@ -1826,6 +1826,7 @@ function saveModal() {
   } else if (type === 'est-edit') {
     var estId = id;
     var novaQtd = Number(gv('me-qtd'))||0;
+    var novaMin = Number(gv('me-min'))||10;
     // FIX: farmacia usa rota propria de estoque, admin usa rota de produto
     var isAdmEst = CU && CU.role === 'admin';
     var estUrl = isAdmEst
@@ -1833,7 +1834,7 @@ function saveModal() {
       : '/farmacias/' + (CU && CU.farmacia_id) + '/estoque/' + estId;
     var estBody = isAdmEst
       ? JSON.stringify({estoque: novaQtd})
-      : JSON.stringify({quantidade: novaQtd});
+      : JSON.stringify({quantidade: novaQtd, qtd_minima: novaMin});
     apiFetch(estUrl, {method:'PATCH', body: estBody})
     .then(function(res) {
       if (res.ok) {
