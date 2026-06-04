@@ -144,6 +144,10 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .empty .eT{font-family:'Nunito';font-size:17px;font-weight:700;color:var(--n);margin-bottom:6px}
 .toast-area{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:9998}
 .toast{background:var(--w);border:1.5px solid var(--br);border-radius:10px;padding:13px 16px;display:flex;align-items:flex-start;gap:12px;min-width:280px;max-width:340px;box-shadow:0 2px 12px rgba(30,45,61,.09);animation:ts .3s ease}
+#lightbox{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out;animation:fi .2s ease}
+#lightbox.on{display:flex}
+#lightbox img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#lightbox-close{position:fixed;top:18px;right:22px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
 @keyframes ts{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
 .ti{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
 .ti.s{background:rgba(34,201,122,.12)}.ti.i{background:var(--tl)}.ti.w{background:rgba(245,166,35,.12)}.ti.e{background:rgba(240,69,90,.10)}
@@ -1441,7 +1445,7 @@ function carregarReceitasPedido(pedidoId) {
       var cor = statusCor[r.status] || 'var(--t3)';
       var lbl = statusLabel[r.status] || r.status;
       h2 += '<div style="padding:12px;display:flex;gap:12px;align-items:flex-start">';
-      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:pointer" onclick="window.open(this.src,\'_blank\')" title="Clique para ver em tamanho completo">';
+      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:zoom-in;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'" onclick="openLightbox(\'' + r.imagem_url + '\')" title="Clique para ampliar">';
       h2 += '<div style="flex:1">';
       h2 += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
       h2 += '<span style="font-size:12px;font-weight:700;color:' + cor + ';background:' + cor + '18;padding:3px 10px;border-radius:20px">' + lbl + '</span>';
@@ -2426,5 +2430,25 @@ setInterval(function() {
 }, 30000);
 </script>
 
+<!-- Lightbox receita -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()" title="Fechar">✕</button>
+  <img id="lightbox-img" src="" alt="Receita">
+</div>
+<script>
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('on');
+  document.getElementById('lightbox-img').src = '';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
 </body>
 </html>
