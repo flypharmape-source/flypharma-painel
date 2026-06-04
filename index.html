@@ -404,6 +404,7 @@ function loadFarms() {
       FARMS = lista;
       // normaliza campos
       FARMS = FARMS.map(function(f) {
+          f.tipo = f.tipo || 'farmacia';
         return {
           id: f.id || f._id,
           nome: f.nome || f.name || '',
@@ -897,7 +898,7 @@ function farmCard(f) {
     : '<div class="flogo">' + f.nome[0] + '</div>';
   return '<div class="fcard" id="fc-' + f.id + '">' +
     '<div class="ftop"><div style="display:flex;align-items:center;justify-content:center">' + logoHtml + '</div>' +
-    '<div style="position:absolute;top:8px;right:8px"><span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
+    '<div style="position:absolute;top:8px;right:8px">' + (f.tipo==='petshop'?'<span class="b" style="background:#FF7043;color:#fff;margin-right:4px">🐾</span>':'') + '<span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
     (!f.ativo ? '<div style="position:absolute;top:8px;left:8px"><span class="b inativo">Inativa</span></div>' : '') +
     '</div>' +
     '<div class="fbody">' +
@@ -1389,6 +1390,11 @@ function uploadLogoConfig(input) {
 }
 
 // ── MODAL ─────────────────────────────────────────────────────
+function togglePetFields(tipo) {
+  // Atualiza label do nome
+  var lbl = document.querySelector('label[for="mf-nome"]');
+  // Atualiza placeholder do select de farmácia em produtos se estiver aberto
+}
 function openModal(type, id) {
   MC = {type: type, id: id};
   var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
@@ -1529,7 +1535,8 @@ function buildMBody(type, id) {
   if (type === 'farm-new' || type === 'farm-edit') {
     var f = type === 'farm-edit' ? FARMS.find(function(x){return x.id===id;}) : {};
     f = f || {};
-    h += '<div class="fr"><div class="fc3"><label>Nome da farmácia *</label><input id="mf-nome" value="' + (f.nome||'') + '" placeholder="Ex: Drogasil Boa Viagem"></div><div class="fc3"><label>CNPJ *</label><input id="mf-cnpj" value="' + cnpjMask(f.cnpj||'') + '" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)" onblur="validateCNPJField(this)" style="padding-right:34px"><span id=\"cnpj-ic\" style=\"position:absolute;right:10px;bottom:9px;font-size:15px\"></span></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Tipo de estabelecimento *</label><select id="mf-tipo" onchange="togglePetFields(this.value)"><option value="farmacia"' + ((f.tipo||'farmacia')==='farmacia'?' selected':'') + '>🏥 Farmácia</option><option value="petshop"' + (f.tipo==='petshop'?' selected':'') + '>🐾 Pet Shop</option></select></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Nome do estabelecimento *</label><input id="mf-nome" value="' + (f.nome||'') + '" placeholder="Ex: Drogasil Boa Viagem"></div><div class="fc3"><label>CNPJ *</label><input id="mf-cnpj" value="' + cnpjMask(f.cnpj||'') + '" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)" onblur="validateCNPJField(this)" style="padding-right:34px"><span id=\"cnpj-ic\" style=\"position:absolute;right:10px;bottom:9px;font-size:15px\"></span></div></div>';
     if (type === 'csv-import') {
     // Captura dados antes do modal fechar
     var farmEl = document.getElementById('csv-farm-id');
@@ -1605,15 +1612,22 @@ function buildMBody(type, id) {
     h += '<div class="fr"><div class="fc3"><label>Preço (R$) *</label><input id="mp-preco" type="number" step="0.01" value="' + (p.preco||'') + '" placeholder="9.90"></div><div class="fc3"><label>Preço promoção (R$)</label><input id="mp-promo" type="number" step="0.01" value="' + (p.promo||'') + '" placeholder="Opcional"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Categoria</label><select id="mp-cat">';
     h += '<option value="">Selecione...</option>';
-    for (var ci=0;ci<CATS.length;ci++) {
-      var catSel = (p.categoria_id === CATS[ci].id) || (p.cat === CATS[ci].nome);
-      h += '<option value="' + CATS[ci].id + '"' + (catSel?' selected':'') + '>' + CATS[ci].nome + '</option>';
+    // Filtra categorias conforme tipo da farmácia selecionada
+    var farmIdSel = (document.getElementById('mp-farm') ? document.getElementById('mp-farm').value : null) || (CU && CU.farmacia_id);
+    var farmTipo = (FARMS.find(function(x){return x.id===farmIdSel;})||{}).tipo || 'farmacia';
+    var PET_CATS_NAMES = ['Pet - Antipulgas','Pet - Vermífugos','Pet - Suplementos Pet','Pet - Outros'];
+    var CATS_FILTRADAS = CATS.filter(function(c){
+      return farmTipo==='petshop' ? PET_CATS_NAMES.some(function(n){return c.nome.indexOf('Pet')>=0;}) : c.nome.indexOf('Pet') < 0;
+    });
+    for (var ci=0;ci<CATS_FILTRADAS.length;ci++) {
+      var catSel = (p.categoria_id === CATS_FILTRADAS[ci].id) || (p.cat === CATS_FILTRADAS[ci].nome);
+      h += '<option value="' + CATS_FILTRADAS[ci].id + '"' + (catSel?' selected':'') + '>' + CATS_FILTRADAS[ci].nome + '</option>';
     }
     h += '</select></div><div class="fc3"><label>Unidade</label><select id="mp-uni">';
     var unis = ['un','cx','fr','mg','ml'];
     for (var j=0;j<unis.length;j++) h += '<option' + (p.uni===unis[j]?' selected':'') + '>' + unis[j] + '</option>';
     h += '</select></div></div>';
-    h += '<div class="fr"><div class="fc3"><label>Controlado?</label><select id="mp-ctrl"><option value="false"' + (!p.ctrl?' selected':'') + '>Não</option><option value="true"' + (p.ctrl?' selected':'') + '>Sim — exige receita</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
+    h += '<div class="fr" id="mp-ctrl-wrap"' + (farmTipo==='petshop' ? ' style="display:none"' : '') + '><div class="fc3"><label>Controlado?</label><select id="mp-ctrl"><option value="false"' + (!p.ctrl?' selected':'') + '>Não</option><option value="true"' + (p.ctrl?' selected':'') + '>Sim — exige receita</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
     h += '<div class="fr"><div class="fc3 full"><label>Descrição</label><textarea id="mp-desc" placeholder="Descrição do produto...">' + (p.desc||'') + '</textarea></div></div>';
   } else if (type === 'usr-new' || type === 'usr-edit') {
     var u = type === 'usr-edit' ? USRS.find(function(x){return x.id===id;}) : {};
@@ -1684,6 +1698,7 @@ function saveModal() {
     var payload = {
       nome: nome, cnpj: cnpj, email: email, senha: senha, role: 'farmacia',
       cidade: gv('mf-cidade'), bairro: gv('mf-bairro'), logradouro: gv('mf-end'),
+      tipo: gv('mf-tipo')||'farmacia',
       taxa_entrega: Number(gv('mf-taxa'))||6.90,
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
@@ -1705,6 +1720,7 @@ function saveModal() {
 
   } else if (type === 'farm-edit') {
     var fe = {
+      tipo: gv('mf-tipo')||'farmacia',
       nome: gv('mf-nome'), cidade: gv('mf-cidade'), bairro: gv('mf-bairro'),
       logradouro: gv('mf-end'), taxa_entrega: Number(gv('mf-taxa'))||6.90,
       raio_entrega_km: Number(gv('mf-raio'))||5,
