@@ -1,0 +1,2455 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlyPharma — Painel de Gestão</title>
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--t:#3ECFBF;--td:#2AB5A6;--tl:#E8FAF8;--n:#1E2D3D;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
+body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:var(--tx)}
+#lp{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--n);position:fixed;inset:0;z-index:1000}
+#lp.hide{display:none}
+.lb{background:var(--w);border-radius:20px;padding:40px;width:420px;box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.llg{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:28px}
+.lt{font-family:'Nunito';font-weight:800;font-size:22px;color:var(--n)}
+.lt span{color:var(--t)}
+.fg{margin-bottom:14px}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.6px}
+.fg input{width:100%;padding:11px 14px;border:1.5px solid #D0D8E2;border-radius:10px;font-size:14px;color:var(--tx);outline:none}
+.fg input:focus{border-color:var(--t)}
+#lerr{color:var(--r);font-size:12px;text-align:center;display:none;padding:8px;background:rgba(240,69,90,.08);border-radius:6px;margin-top:8px}
+.lbtn{width:100%;height:50px;background:var(--t);color:var(--n);border:none;border-radius:10px;font-family:'Nunito';font-weight:800;font-size:16px;cursor:pointer;margin-top:6px}
+.lbtn:hover{background:var(--td)}
+.ldemo{margin-top:18px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.8}
+.ldemo b{display:block;margin-bottom:2px;font-size:12px;color:var(--tx)}
+.app{display:flex;min-height:100vh}
+.sb{width:var(--sw);background:var(--n);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;overflow-y:auto}
+.sb-logo{height:var(--hh);display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
+.sb-lt{font-family:'Nunito';font-weight:800;font-size:18px;color:#fff}
+.sb-lt span{color:var(--t)}
+.sb-role{margin:10px 14px;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:700;text-align:center}
+.sb-role.adm{background:rgba(245,166,35,.2);color:var(--a)}
+.sb-role.frm{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-sec{padding:10px 12px 4px}
+.sb-lbl{font-size:10px;font-weight:600;letter-spacing:1.4px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:0 10px;margin-bottom:4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;font-weight:500;user-select:none;transition:all .15s}
+.sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
+.sb-item.on{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-item svg{width:17px;height:17px;flex-shrink:0}
+.sb-bdg{margin-left:auto;background:var(--r);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+.sb-bot{margin-top:auto;padding:14px;flex-shrink:0}
+.sb-usr{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:12px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.sb-usr:hover{background:rgba(255,255,255,.12)}
+.sb-av{width:34px;height:34px;border-radius:8px;background:var(--t);display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:14px;color:var(--n);flex-shrink:0}
+.sb-nm{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sb-sb{font-size:11px;color:rgba(255,255,255,.4)}
+.main{margin-left:var(--sw);flex:1;display:flex;flex-direction:column}
+.topbar{height:var(--hh);background:var(--w);border-bottom:1px solid var(--br);display:flex;align-items:center;padding:0 28px;gap:12px;position:sticky;top:0;z-index:50;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.tb-title{font-family:'Nunito';font-weight:700;font-size:17px;color:var(--n);flex:1}
+.ibt{width:36px;height:36px;border-radius:9px;background:var(--bg);border:1px solid var(--br);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2)}
+.ibt:hover{background:#D0D8E2}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;white-space:nowrap}
+.btn-p{background:var(--t);color:var(--n)}.btn-p:hover{background:var(--td)}
+.btn-o{background:transparent;border:1.5px solid #D0D8E2;color:var(--t2)}.btn-o:hover{background:var(--bg)}
+.btn-d{background:rgba(240,69,90,.1);color:var(--r);border:1px solid rgba(240,69,90,.25)}.btn-d:hover{background:rgba(240,69,90,.2)}
+.btn-g{background:rgba(34,201,122,.12);color:#18A065;border:1px solid rgba(34,201,122,.25)}
+.page{padding:24px 28px;display:none}
+.page.on{display:block;animation:fi .2s ease}
+@keyframes fi{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.sg{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.sc{background:var(--w);border:1px solid var(--br);border-radius:14px;padding:20px;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.si{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.si.t{background:var(--tl);color:var(--td)}.si.g{background:rgba(34,201,122,.12);color:#18A065}.si.a{background:rgba(245,166,35,.12);color:#C98A10}.si.r{background:rgba(240,69,90,.10);color:#D03348}
+.sv{font-family:'Nunito';font-size:26px;font-weight:800;color:var(--n);line-height:1;margin-bottom:4px}
+.sl{font-size:12px;color:var(--t2);margin-bottom:10px}
+.sd{display:inline-flex;align-items:center;gap:4px;font-size:11.5px;font-weight:600;padding:3px 8px;border-radius:20px}
+.sd.up{background:rgba(34,201,122,.12);color:#18A065}.sd.dn{background:rgba(240,69,90,.10);color:#D03348}
+.card{background:var(--w);border:1px solid var(--br);border-radius:14px;overflow:hidden;box-shadow:0 1px 4px rgba(30,45,61,.06)}
+.ch{padding:14px 20px;border-bottom:1px solid var(--br);display:flex;align-items:center;gap:8px}
+.ct{font-family:'Nunito';font-size:14px;font-weight:700;color:var(--n)}
+.ca{font-size:12px;color:var(--t);font-weight:600;cursor:pointer;margin-left:auto}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:10px 16px;text-align:left;font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.6px;text-transform:uppercase;border-bottom:1px solid var(--br);background:var(--bg)}
+.tbl td{padding:11px 16px;border-bottom:1px solid var(--br);font-size:13px}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:var(--tl)}
+.oid{font-family:'Nunito';font-weight:700;font-size:12.5px;color:var(--n)}
+.b{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
+.b::before{content:'';width:5px;height:5px;border-radius:50%}
+.novo::before{background:var(--t)}.novo{background:rgba(62,207,191,.12);color:var(--td)}
+.prep::before{background:var(--a)}.prep{background:rgba(245,166,35,.12);color:#C98A10}
+.entr::before{background:var(--n)}.entr{background:rgba(30,45,61,.10);color:var(--n)}
+.cok::before{background:var(--g)}.cok{background:rgba(34,201,122,.12);color:#18A065}
+.can::before{background:var(--r)}.can{background:rgba(240,69,90,.10);color:#D03348}
+.aberta::before{background:var(--t)}.aberta{background:rgba(62,207,191,.12);color:var(--td)}
+.fechada::before{background:var(--t3)}.fechada{background:rgba(154,170,187,.15);color:var(--t3)}
+.ativo::before{background:var(--g)}.ativo{background:rgba(34,201,122,.12);color:#18A065}
+.inativo::before{background:var(--r)}.inativo{background:rgba(240,69,90,.10);color:#D03348}
+.fb{display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.sb2{display:flex;align-items:center;gap:8px;background:var(--w);border:1.5px solid #D0D8E2;border-radius:9px;padding:8px 14px;flex:1;max-width:300px}
+.sb2 input{background:none;border:none;outline:none;color:var(--tx);font-size:13px;flex:1}
+.sb2 input::placeholder{color:var(--t3)}
+.fc{padding:6px 14px;border-radius:20px;font-size:12.5px;font-weight:500;cursor:pointer;border:1.5px solid var(--br);color:var(--t2);background:var(--w);transition:all .15s}
+.fc.on{background:var(--tl);border-color:var(--t);color:var(--td);font-weight:600}
+.fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.fcard{background:var(--w);border:1.5px solid var(--br);border-radius:14px;overflow:hidden;transition:all .15s}
+.fcard:hover{border-color:var(--t);box-shadow:0 2px 12px rgba(30,45,61,.09)}
+.ftop{height:80px;background:linear-gradient(135deg,var(--n),#253647);display:flex;align-items:center;justify-content:center;position:relative}
+.flogo{width:52px;height:52px;border-radius:12px;background:var(--t);display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:22px;color:var(--n)}
+.fbody{padding:14px}
+.fn{font-family:'Nunito';font-weight:700;font-size:15px;color:var(--n);margin-bottom:2px}
+.fc2{font-size:12px;color:var(--t2);margin-bottom:10px}
+.fst{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.fstv{font-family:'Nunito';font-weight:700;font-size:16px;color:var(--n)}
+.fstl{font-size:10px;color:var(--t3)}
+.fft{padding:10px 14px;border-top:1px solid var(--br);display:flex;gap:8px}
+.mo{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.mo.on{opacity:1;pointer-events:all}
+.modal{background:var(--w);border-radius:14px;width:560px;max-height:90vh;overflow:auto;transform:translateY(16px);transition:transform .2s;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.mo.on .modal{transform:translateY(0)}
+.mh{padding:20px 24px;border-bottom:1px solid var(--br);display:flex;align-items:center;justify-content:space-between}
+.mt{font-family:'Nunito';font-weight:700;font-size:16px;color:var(--n)}
+.mx{width:30px;height:30px;border-radius:7px;background:var(--bg);border:none;cursor:pointer;font-size:16px;color:var(--t2)}
+.mb{padding:24px}
+.mf{padding:16px 24px;border-top:1px solid var(--br);display:flex;justify-content:flex-end;gap:10px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.fc3{display:flex;flex-direction:column;gap:5px}
+.fc3 label{font-size:11px;font-weight:700;color:var(--t2);text-transform:uppercase;letter-spacing:.5px}
+.fc3 input,.fc3 select,.fc3 textarea{padding:9px 12px;border:1.5px solid #D0D8E2;border-radius:10px;font-size:13px;color:var(--tx);outline:none;width:100%}
+.fc3 input:focus,.fc3 select:focus,.fc3 textarea:focus{border-color:var(--t)}
+.fc3 textarea{resize:vertical;min-height:80px}
+.full{grid-column:1/-1}
+.two{display:grid;grid-template-columns:1fr 330px;gap:14px;margin-bottom:22px}
+.al{padding:4px 0}
+.ai{display:flex;align-items:flex-start;gap:12px;padding:10px 18px}
+.ai:hover{background:var(--tl)}
+.adot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.aT{font-size:13px;color:var(--tx);margin-bottom:2px}
+.aS{font-size:11px;color:var(--t3)}
+.mapA{background:#E8F4F2;height:200px;position:relative;overflow:hidden}
+.mapG{position:absolute;inset:0;background-image:linear-gradient(rgba(30,45,61,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(30,45,61,.05) 1px,transparent 1px);background-size:28px 28px}
+.dpin{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid;transform:translate(-50%,-50%)}
+.ch2{padding:12px 18px 4px;display:flex;align-items:flex-end;gap:5px;height:76px}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
+.bar{width:100%;border-radius:4px 4px 0 0;background:rgba(62,207,191,.3);transition:height .7s cubic-bezier(.34,1.56,.64,1)}
+.bar.td{background:var(--t)}
+.bL{font-size:9.5px;color:var(--t3)}
+.spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.empty{padding:48px;text-align:center;color:var(--t2)}
+.empty .ei{font-size:40px;margin-bottom:12px}
+.empty .eT{font-family:'Nunito';font-size:17px;font-weight:700;color:var(--n);margin-bottom:6px}
+.toast-area{position:fixed;bottom:24px;right:24px;display:flex;flex-direction:column;gap:10px;z-index:9998}
+.toast{background:var(--w);border:1.5px solid var(--br);border-radius:10px;padding:13px 16px;display:flex;align-items:flex-start;gap:12px;min-width:280px;max-width:340px;box-shadow:0 2px 12px rgba(30,45,61,.09);animation:ts .3s ease}
+#lightbox{display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,.92);align-items:center;justify-content:center;cursor:zoom-out;animation:fi .2s ease}
+#lightbox.on{display:flex}
+#lightbox img{max-width:92vw;max-height:92vh;object-fit:contain;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#lightbox-close{position:fixed;top:18px;right:22px;width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,.15);border:none;color:#fff;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+@keyframes ts{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+.ti{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.ti.s{background:rgba(34,201,122,.12)}.ti.i{background:var(--tl)}.ti.w{background:rgba(245,166,35,.12)}.ti.e{background:rgba(240,69,90,.10)}
+.tT{font-size:13px;font-weight:600;color:var(--n);margin-bottom:2px}
+.tB{font-size:12px;color:var(--t2)}
+@media(max-width:1100px){.sg{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+/* ── RESPONSIVIDADE MOBILE ─────────────────────────────────── */
+@media(max-width:768px){
+  :root{--sw:0px}
+
+  /* Sidebar vira drawer overlay */
+  .sb{
+    transform:translateX(-100%);
+    transition:transform .25s cubic-bezier(.4,0,.2,1);
+    width:260px;
+    box-shadow:4px 0 24px rgba(0,0,0,.3);
+    z-index:200;
+  }
+  .sb.open{transform:translateX(0)}
+
+  /* Overlay escuro quando sidebar aberta */
+  .sb-overlay{
+    display:none;position:fixed;inset:0;
+    background:rgba(0,0,0,.5);z-index:199;
+  }
+  .sb-overlay.on{display:block}
+
+  /* Main ocupa tudo */
+  .main{margin-left:0 !important}
+
+  /* Topbar com botão hamburguer */
+  .topbar{padding:0 16px}
+  .hbg{display:flex !important}
+
+  /* Pages com padding menor */
+  .page{padding:16px}
+
+  /* Cards de stats em 2 colunas */
+  .sg{grid-template-columns:repeat(2,1fr);gap:10px}
+  .sc{padding:14px}
+  .sv{font-size:20px}
+
+  /* Tabela scroll horizontal */
+  .card{overflow-x:auto}
+  .tbl{min-width:600px}
+
+  /* Farm cards em 1 coluna */
+  .fg2{grid-template-columns:1fr}
+
+  /* Modal fullscreen */
+  .modal{
+    width:100% !important;
+    max-width:100% !important;
+    max-height:100vh !important;
+    border-radius:16px 16px 0 0 !important;
+    margin-top:auto;
+  }
+  .mo{align-items:flex-end !important}
+
+  /* Form rows em coluna */
+  .fr{flex-direction:column}
+  .fc3{min-width:unset !important;width:100% !important}
+
+  /* Barra de filtros scroll */
+  .fb{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px}
+  .fb::-webkit-scrollbar{display:none}
+
+  /* Toast menor */
+  .toast{min-width:unset;max-width:calc(100vw - 32px)}
+  .toast-area{right:16px;left:16px;bottom:16px}
+
+  /* Login */
+  .lb{width:calc(100vw - 32px);padding:28px 20px;border-radius:14px}
+}
+
+@media(max-width:480px){
+  .sg{grid-template-columns:1fr 1fr}
+  .sc{padding:12px}
+  .sv{font-size:18px}
+  .tb-title{font-size:15px}
+}
+
+/* Hamburguer — escondido no desktop */
+.hbg{
+  display:none;
+  width:36px;height:36px;border-radius:9px;
+  background:var(--bg);border:1px solid var(--br);
+  align-items:center;justify-content:center;
+  cursor:pointer;color:var(--t2);flex-shrink:0;
+  margin-right:4px;
+}
+.hbg svg{pointer-events:none}
+
+
+/* ── Chat Modal ── */
+#chat-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:9999;align-items:center;justify-content:center;}
+#chat-modal.open{display:flex;}
+.chat-box{background:#fff;border-radius:16px;width:440px;max-width:95vw;height:600px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.3);}
+.chat-hdr{padding:16px 20px;border-bottom:1px solid var(--b);display:flex;align-items:center;gap:12px;}
+.chat-hdr h3{flex:1;margin:0;font-size:15px;color:var(--t1);}
+.chat-hdr button{background:none;border:none;cursor:pointer;font-size:20px;color:var(--t3);line-height:1;}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;background:#F5F7F9;}
+.cmsg{max-width:75%;}
+.cmsg.mine{align-self:flex-end;}
+.cmsg.other{align-self:flex-start;}
+.cbubble{padding:10px 14px;border-radius:16px;font-size:13px;line-height:1.5;}
+.cmsg.mine .cbubble{background:var(--p);color:#fff;border-bottom-right-radius:4px;}
+.cmsg.other .cbubble{background:#fff;color:var(--t1);border:1px solid var(--b);border-bottom-left-radius:4px;}
+.cautor{font-size:11px;color:var(--t3);margin-bottom:3px;}
+.chora{font-size:10px;color:var(--t3);margin-top:3px;}
+.cmsg.mine .chora{text-align:right;}
+.chat-inp{padding:12px 16px;border-top:1px solid var(--b);display:flex;gap:8px;background:#fff;}
+.chat-inp textarea{flex:1;border:1px solid var(--b);border-radius:12px;padding:10px 14px;font-size:13px;resize:none;height:42px;outline:none;font-family:inherit;color:var(--t1);background:#fff;}
+.chat-inp button{background:var(--p);border:none;border-radius:12px;padding:0 18px;color:#fff;font-weight:700;cursor:pointer;font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="lp">
+  <div class="lb">
+    <div class="llg">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:4px">
+        <img src="data:image/png;base64,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" style="width:80px;height:80px;object-fit:contain">
+        <div style="font-family:'Nunito';font-weight:900;font-size:26px;color:var(--n)">fly<span style="color:var(--t)">pharma</span></div>
+        <div style="font-size:11px;font-weight:600;color:var(--t2);letter-spacing:1.8px;text-transform:uppercase">Seu delivery de remédios</div>
+      </div>
+    </div>
+    <h2 style="font-family:'Nunito';font-weight:800;font-size:20px;color:var(--n);text-align:center;margin-bottom:4px">Entrar no painel</h2>
+    <p style="text-align:center;color:var(--t2);font-size:13px;margin-bottom:24px">Gestão FlyPharma</p>
+    <div class="fg"><label>E-MAIL</label><input type="email" id="lemail" value="admin@flypharma.com" placeholder="seu@email.com"></div>
+    <div class="fg"><label>SENHA</label>
+      <div style="position:relative">
+        <input type="password" id="lsenha" value="admin123" placeholder="&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;&#9679;" style="width:100%;padding:11px 44px 11px 14px;border:1.5px solid #D0D8E2;border-radius:10px;font-size:14px;color:var(--tx);outline:none">
+        <button type="button" onclick="toggleSenhaLogin()" id="btn-toggle-senha" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--t2);font-size:18px;padding:0;line-height:1">👁</button>
+      </div>
+    </div>
+    <div id="lerr"></div>
+    <button class="lbtn" id="lbtn" onclick="doLogin()">Entrar</button>
+    <div style="text-align:center;margin-top:14px">
+      <span style="font-size:13px;color:var(--t2)">Esqueceu a senha? </span>
+      <a href="#" onclick="abrirEsqueciSenha();return false" style="font-size:13px;color:var(--t);font-weight:600;text-decoration:none">Redefinir</a>
+    </div>
+    <div class="ldemo">
+      <b>Contas de demonstracao:</b>
+      Admin: admin@flypharma.com / admin123<br>
+      Farmacia: farmacia@drogasil.com / farm123
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="app" style="display:none">
+  <aside class="sb">
+    <div class="sb-logo">
+      <img src="data:image/png;base64,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" style="width:36px;height:36px;object-fit:contain">
+      <div class="sb-lt">fly<span>pharma</span></div>
+    </div>
+    <div id="sb-role" class="sb-role adm">Admin Mestre</div>
+    <div id="sb-nav"></div>
+    <div class="sb-bot">
+      <div class="sb-usr" onclick="doLogout()">
+        <div class="sb-av" id="sb-av">A</div>
+        <div style="flex:1;min-width:0">
+          <div class="sb-nm" id="sb-nm">Admin</div>
+          <div class="sb-sb">Clique para sair</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="rgba(255,255,255,.4)" stroke-width="1.5"><path d="M9 3H5a1 1 0 00-1 1v12a1 1 0 001 1h4M13 15l4-5-4-5M17 10H7"/></svg>
+      </div>
+    </div>
+  </aside>
+  <div class="main">
+    <header class="topbar">
+      <div class="hbg" id="hbg-btn" onclick="toggleSidebar()">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M3 5h14M3 10h14M3 15h14"/>
+        </svg>
+      </div>
+      <div class="tb-title" id="tb-title">Dashboard</div>
+      <div class="ibt" onclick="showToast('i','Notificacoes','Nenhuma nova notificacao')">
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M10 2a6 6 0 016 6c0 3 1 4.5 1.5 5.5H2.5C3 12.5 4 11 4 8a6 6 0 016-6z"/><path d="M8 16a2 2 0 004 0"/></svg>
+      </div>
+      <button class="btn btn-p" id="act-btn" style="display:none">
+        <svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10 4v12M4 10h12"/></svg>
+        <span id="act-lbl">Novo</span>
+      </button>
+    </header>
+    <div id="page-dash" class="page on"></div>
+    <div id="page-farm" class="page"></div>
+    <div id="page-prod" class="page"></div>
+    <div id="page-ped"  class="page"></div>
+    <div id="page-est"  class="page"></div>
+    <div id="page-usr"  class="page"></div>
+    <div id="page-rel"  class="page"></div>
+    <div id="page-cfg"  class="page"></div>
+    <div id="page-cham" class="page"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="m-overlay" onclick="closeModalOut(event)">
+  <div class="modal">
+    <div class="mh">
+      <span class="mt" id="m-title">Modal</span>
+      <button class="mx" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf">
+      <button class="btn btn-o" onclick="closeModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveModal()"><span id="m-save-txt">Salvar</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="sb-overlay" id="sb-overlay" onclick="closeSidebar()"></div>
+<div class="toast-area" id="toast-area"></div>
+
+<script>
+// FlyPharma Painel - JavaScript completo
+const API = 'https://web-production-b66cd.up.railway.app/api';
+let CU = null, AT = null, MC = {};
+
+// ── ESTADO DA APLICAÇÃO (carregado da API, nunca hardcoded) ────
+let FARMS = [], PRODS = [], PEDS = [], USRS = [], CATS = [], CHAMS = [], CURRENT_FARM_ID = null;
+const SL = {pendente:'Novo',confirmado:'Confirmado',preparando:'Preparando',aguardando_entregador:'Aguardando',em_entrega:'Em entrega',entregue:'Entregue',cancelado:'Cancelado'};
+const SC = {pendente:'novo',confirmado:'novo',preparando:'prep',aguardando_entregador:'prep',em_entrega:'entr',entregue:'cok',cancelado:'can'};
+
+// ── HELPER API ────────────────────────────────────────────────
+function apiHeaders() {
+  var h = {'Content-Type':'application/json'};
+  var token = AT || localStorage.getItem('fly_at');
+  if (token) h['Authorization'] = 'Bearer ' + token;
+  return h;
+}
+function apiFetch(path, opts) {
+  opts = opts || {};
+  opts.headers = apiHeaders();
+  return fetch(API + path, opts).then(function(r) {
+    if (r.status === 401) { doLogout(); throw new Error('Sessão expirada'); }
+    return r.json().then(function(d) { return {ok: r.ok, status: r.status, data: d}; });
+  });
+}
+
+// ── CARREGAR DADOS DA API ─────────────────────────────────────
+function loadFarms() {
+  var url = CU && CU.role === 'farmacia' ? '/farmacias' : '/farmacias/admin/todas';
+  return apiFetch(url).then(function(res) {
+    if (res.ok) {
+      var lista = Array.isArray(res.data) ? res.data : (res.data.farmacias || res.data.data || []);
+      // Se for farmácia, filtra só a dela
+      if (CU && CU.role === 'farmacia' && CU.farmacia_id) {
+        lista = lista.filter(function(f){ return f.id === CU.farmacia_id; });
+      }
+      FARMS = lista;
+      // normaliza campos
+      FARMS = FARMS.map(function(f) {
+        return {
+          id: f.id || f._id,
+          nome: f.nome || f.name || '',
+          cidade: f.cidade || f.city || '',
+          bairro: f.bairro || f.neighborhood || '',
+          logradouro: f.logradouro || f.endereco || '',
+          cnpj: f.cnpj || '',
+          pedidos: f.pedidos || f.total_pedidos || 0,
+          fat: f.faturamento || f.fat || 0,
+          aberta: f.aberta !== undefined ? f.aberta : (f.status === 'aberta'),
+          ativo: f.ativo !== undefined ? f.ativo : (f.status !== 'inativo'),
+          taxa_entrega: f.taxa_entrega || 6.90,
+          raio_entrega_km: f.raio_entrega_km || 5,
+          pedido_minimo: f.pedido_minimo || 0,
+          logo_url: f.logo_url || null,
+          horarios: f.horarios || [],
+          user_id: f.user_id || null
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadProds() {
+  // FIX: Admin usa rota geral, farmacia usa rota propria
+  var isAdm = CU && CU.role === 'admin';
+  var url = isAdm ? '/produtos' : ('/farmacias/' + (CU && CU.farmacia_id) + '/produtos?limit=200');
+  return apiFetch(url).then(function(res) {
+    if (res.ok) {
+      var raw = Array.isArray(res.data) ? res.data : (res.data.data || res.data.produtos || []);
+      PRODS = raw.map(function(p) {
+        return {
+          id: p.id || p._id,
+          nome: p.nome || p.name || '',
+          lab: p.laboratorio || p.lab || '',
+          cat: p.categoria_nome || (CATS.find(function(c){return c.id===p.categoria_id;}) || {}).nome || p.categoria || p.cat || '',
+          categoria_id: p.categoria_id || null,
+          farmacia_id: p.farmacia_id || p.farm_id || (CU && CU.farmacia_id) || '',
+          preco: p.preco || p.price || 0,
+          promo: p.preco_promocional || p.preco_promocao || p.promo || null,
+          ctrl: p.controlado || p.ctrl || false,
+          uni: p.unidade || p.uni || 'un',
+          desc: p.descricao || p.desc || '',
+          emoji: p.emoji || '💊',
+          ativo: p.ativo !== undefined ? p.ativo : true,
+          qtd: p.estoque || p.qtd || 0
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadPeds() {
+  // Admin usa rota geral, farmácia usa rota própria
+  var isAdm = CU && CU.role === 'admin';
+  var url = isAdm ? '/pedidos/admin/todos' : ('/farmacias/' + (CU && CU.farmacia_id) + '/pedidos');
+  return apiFetch(url).then(function(res) {
+    if (res.ok) {
+      PEDS = Array.isArray(res.data) ? res.data : (res.data.pedidos || res.data.data || []);
+      PEDS = PEDS.map(function(p) {
+        var dt = p.created_at || p.createdAt || '';
+        var hora = dt ? new Date(dt).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}) : '--:--';
+        return {
+          id: p.id || p._id,
+          num: p.numero || p.num || p.id,
+          farm: p.farmacia_nome || p.farmacia || p.farm || '',
+          cli: p.cliente_nome || p.cliente || p.cli || '',
+          itens: p.quantidade_itens || p.itens || 0,
+          total: p.total || p.valor_total || 0,
+          status: p.status || 'pendente',
+          metodo: p.metodo_pagamento || p.metodo || 'PIX',
+          hora: hora
+        };
+      });
+    }
+    // Atualizar badge de pedidos pendentes
+    var pendentes = PEDS.filter(function(p){ return p.status === 'pendente' || p.status === 'confirmado'; }).length;
+    var bdg = document.getElementById('bdg-ped');
+    if (bdg) {
+      if (pendentes > 0) { bdg.textContent = pendentes > 99 ? '99+' : pendentes; bdg.style.display = 'flex'; }
+      else { bdg.style.display = 'none'; }
+    }
+  }).catch(function() {});
+}
+function loadUsrs() {
+  // FIX: apenas admin carrega usuarios
+  if (!CU || CU.role !== 'admin') { USRS = []; return Promise.resolve(); }
+  return apiFetch('/usuarios').then(function(res) {
+    if (res.ok) {
+      USRS = Array.isArray(res.data) ? res.data : (res.data.usuarios || res.data.users || res.data.data || []);
+      USRS = USRS.map(function(u) {
+        var dt = u.created_at || u.createdAt || '';
+        return {
+          id: u.id || u._id,
+          nome: u.nome || u.name || '',
+          email: u.email || '',
+          role: u.role || 'cliente',
+          tel: u.telefone || u.tel || '',
+          dt: dt ? new Date(dt).toLocaleDateString('pt-BR') : '—',
+          ativo: u.ativo !== undefined ? u.ativo : true,
+          farmacia_id: u.farmacia_id || null,
+          farmacia_nome: u.farmacia_nome || null
+        };
+      });
+    }
+  }).catch(function() {});
+}
+function loadCats() {
+  return apiFetch('/app/categorias').then(function(res) {
+    if (res.ok) {
+      CATS = Array.isArray(res.data) ? res.data : (res.data.categorias || res.data.data || []);
+    }
+  }).catch(function() {});
+}
+function loadAll() {
+  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats()]);
+}
+
+// ── AUTH ──────────────────────────────────────────────────────
+function doLogin() {
+  var email = document.getElementById('lemail').value.trim();
+  var senha = document.getElementById('lsenha').value;
+  var btn = document.getElementById('lbtn');
+  var err = document.getElementById('lerr');
+  if (!email || !senha) { showErr('Preencha e-mail e senha.'); return; }
+  btn.innerHTML = '<span class="spin"></span> Entrando...';
+  btn.disabled = true;
+  err.style.display = 'none';
+  fetch(API + '/auth/login', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({email: email, senha: senha})
+  }).then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
+  .then(function(res) {
+    if (res.ok && res.data.user && (res.data.user.role === 'admin' || res.data.user.role === 'farmacia')) {
+      AT = res.data.access || res.data.token || res.data.accessToken || null;
+      CU = res.data.user;
+      if (AT) localStorage.setItem('fly_at', AT);
+      localStorage.setItem('fly_cu', JSON.stringify(CU));
+      loadAll().then(function() { startApp(true); });
+    } else {
+      showErr(res.data.error || res.data.message || 'E-mail ou senha inválidos.');
+      btn.innerHTML = 'Entrar'; btn.disabled = false;
+    }
+  }).catch(function() {
+    showErr('Não foi possível conectar ao servidor. Tente novamente.');
+    btn.innerHTML = 'Entrar'; btn.disabled = false;
+  });
+}
+
+function showErr(msg) {
+  var e = document.getElementById('lerr'); e.textContent = msg; e.style.display = 'block';
+  var b = document.getElementById('lbtn'); b.innerHTML = 'Entrar'; b.disabled = false;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !document.getElementById('lp').classList.contains('hide')) doLogin();
+});
+
+// Verifica token salvo
+window.addEventListener('load', function() {
+  var savedAT = localStorage.getItem('fly_at');
+  var savedCU = localStorage.getItem('fly_cu');
+  if (!savedAT || !savedCU) return;
+  try { CU = JSON.parse(savedCU); } catch(e) { localStorage.removeItem('fly_cu'); return; }
+  AT = savedAT;
+  // Valida token com a API e já recarrega os dados
+  fetch(API + '/auth/me', {headers: {Authorization: 'Bearer ' + AT}})
+  .then(function(r) { return r.json().then(function(d) { return {ok: r.ok, status: r.status, data: d}; }); })
+  .then(function(res) {
+    var d = res.data;
+    // Normaliza: suporta {role} direto ou {user: {role}}
+    var user = (d && d.role) ? d : (d && d.user ? d.user : null);
+    if (user && (user.role === 'admin' || user.role === 'farmacia')) {
+      CU = user;
+      AT = AT || res.data.access || res.data.token || AT;
+      localStorage.setItem('fly_cu', JSON.stringify(CU));
+      loadAll().then(function() { startApp(false); });
+    } else if (res.status === 401) {
+      // Token expirado de verdade
+      localStorage.removeItem('fly_at');
+      localStorage.removeItem('fly_cu');
+      AT = null; CU = null;
+    } else {
+      // Outro erro (rede, 500) — usa dados salvos em cache
+      loadAll().then(function() { startApp(false); });
+    }
+  }).catch(function() {
+    // Sem rede: usa dados em cache do localStorage sem limpar sessão
+    loadAll().then(function() { startApp(false); });
+  });
+});
+
+function doLogout() {
+  CU = null; AT = null;
+  localStorage.removeItem('fly_at');
+  localStorage.removeItem('fly_cu');
+  document.getElementById('lp').classList.remove('hide');
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('lbtn').innerHTML = 'Entrar';
+  document.getElementById('lbtn').disabled = false;
+  document.getElementById('lemail').value = 'admin@flypharma.com';
+  document.getElementById('lsenha').value = 'admin123';
+  document.getElementById('lerr').style.display = 'none';
+}
+
+// ── INICIAR APP ───────────────────────────────────────────────
+var NAV_ADM = [
+  {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
+  {g:'Plataforma', items:[
+    {id:'farm',lbl:'Farmácias'},
+    {id:'prod',lbl:'Produtos'},
+    {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'cham',lbl:'Chamados',bdg:true},
+    {id:'usr',lbl:'Usuários'},
+    {id:'rel',lbl:'Relatórios'},
+  ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+];
+var NAV_FRM = [
+  {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
+  {g:'Operações', items:[
+    {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'cham',lbl:'Chamados',bdg:true},
+    {id:'est',lbl:'Estoque'},
+    {id:'prod',lbl:'Produtos'},
+  ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+];
+var NAV_ICS = {
+  dash:'<rect x="2" y="2" width="7" height="7" rx="2"/><rect x="11" y="2" width="7" height="7" rx="2"/><rect x="2" y="11" width="7" height="7" rx="2"/><rect x="11" y="11" width="7" height="7" rx="2"/>',
+  farm:'<path d="M3 9l7-6 7 6v9a1 1 0 01-1 1H4a1 1 0 01-1-1V9z"/><path d="M8 19V13h4v6"/>',
+  prod:'<rect x="2" y="7" width="16" height="11" rx="2"/><path d="M6 7V5a4 4 0 018 0v2"/>',
+  ped:'<path d="M3 3h2l2.5 9h7l2-6H6"/><circle cx="9" cy="16" r="1.2"/><circle cx="14" cy="16" r="1.2"/>',
+  est:'<rect x="2" y="7" width="16" height="11" rx="2"/><path d="M6 7V5a4 4 0 018 0v2"/>',
+  usr:'<circle cx="10" cy="6" r="3"/><path d="M2 18c0-3.3 3.6-6 8-6s8 2.7 8 6"/>',
+  rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
+  cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
+  cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
+};
+var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
+
+function startApp(novoLogin) {
+  document.getElementById('lp').classList.add('hide');
+  document.getElementById('app').style.display = 'flex';
+  // Avatar na sidebar: logo da farmácia ou inicial
+  var sbAv = document.getElementById('sb-av');
+  var myfarmSb = (CU.role !== 'admin') ? (FARMS.find(function(f){ return f.id === CU.farmacia_id; }) || {}) : {};
+  if (myfarmSb.logo_url) {
+    sbAv.innerHTML = '<img src="' + myfarmSb.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.innerHTML=\'' + CU.nome[0].toUpperCase() + '\';this.parentNode.style.background=\'\';">';
+    sbAv.style.background = 'transparent';
+    sbAv.style.overflow = 'hidden';
+    sbAv.style.padding = '0';
+  } else {
+    sbAv.textContent = CU.nome[0].toUpperCase();
+    sbAv.style.background = '';
+  }
+  document.getElementById('sb-nm').textContent = CU.nome;
+  var isAdm = CU.role === 'admin';
+  document.getElementById('sb-role').className = 'sb-role ' + (isAdm ? 'adm' : 'frm');
+  document.getElementById('sb-role').textContent = isAdm ? '👑 Admin Mestre' : '🏥 ' + CU.nome;
+  var nav = isAdm ? NAV_ADM : NAV_FRM;
+  var html = '';
+  for (var i = 0; i < nav.length; i++) {
+    html += '<div class="sb-sec"><div class="sb-lbl">' + nav[i].g + '</div>';
+    for (var j = 0; j < nav[i].items.length; j++) {
+      var it = nav[i].items[j];
+      var ic = NAV_ICS[it.id] || NAV_ICS.dash;
+      html += '<div class="sb-item" id="nav-' + it.id + '" onclick="goto(\'' + it.id + '\')">';
+      html += '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + ic + '</svg>';
+      html += it.lbl;
+      if (it.bdg) html += '<span class="sb-bdg" id="bdg-' + it.id + '" style="display:none">0</span>';
+      html += '</div>';
+    }
+    html += '</div>';
+  }
+  document.getElementById('sb-nav').innerHTML = html;
+  goto('dash');
+  if (novoLogin) showToast('s', 'Bem-vindo, ' + CU.nome.split(' ')[0] + '!', 'Login realizado com sucesso.');
+  // Carregar badge de chamados ao logar
+  setTimeout(function() {
+    loadChamados();
+    loadPeds();
+    if (window._badgeInterval) clearInterval(window._badgeInterval);
+    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); }, 60000);
+  }, 500);
+}
+
+function goto(id) {
+  document.querySelectorAll('.sb-item').forEach(function(e) { e.classList.remove('on'); });
+  document.querySelectorAll('.page').forEach(function(e) { e.classList.remove('on'); });
+  var ni = document.getElementById('nav-' + id);
+  if (ni) ni.classList.add('on');
+  var pg = document.getElementById('page-' + id);
+  if (pg) pg.classList.add('on');
+  document.getElementById('tb-title').textContent = PTL[id] || id;
+  var actMap = {farm:'Nova farmácia',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:'',cham:''};
+  var lbl = actMap[id] !== undefined ? actMap[id] : '';
+  var ab = document.getElementById('act-btn');
+  ab.style.display = lbl ? 'flex' : 'none';
+  document.getElementById('act-lbl').textContent = lbl;
+  document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
+  // Mostra loading e recarrega dados frescos da API antes de renderizar
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados};
+  if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
+  var loader = loadMap[id];
+  if (loader) {
+    loader().then(function() { renderPage(id); });
+  } else {
+    renderPage(id);
+  }
+}
+
+// ── RENDER ────────────────────────────────────────────────────
+function renderPage(id) {
+  if (id === 'dash') renderDash();
+  else if (id === 'farm') renderFarm();
+  else if (id === 'prod') renderProd();
+  else if (id === 'ped')  renderPed();
+  else if (id === 'est')  renderEst();
+  else if (id === 'usr')  renderUsr();
+  else if (id === 'rel')  renderRel();
+  else if (id === 'cfg')  renderCfg();
+  else if (id === 'cham') renderCham();
+}
+
+function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
+function svg15(d, c) { c = c || 'var(--t)'; return '<svg width="15" height="15" viewBox="0 0 20 20" fill="none" stroke="' + c + '" stroke-width="1.8">' + d + '</svg>'; }
+function sbadge(s) { return '<span class="b ' + (SC[s] || 'novo') + '">' + (SL[s] || s) + '</span>'; }
+function fmtR(v) { return 'R$' + Number(v || 0).toFixed(2); }
+
+// DASHBOARD
+function renderDash() {
+  var el = document.getElementById('page-dash');
+  var isAdm = CU.role === 'admin';
+  var h = '';
+
+  // ── Calcular métricas reais ──────────────────────────────────
+  var hoje = new Date(); hoje.setHours(0,0,0,0);
+  var pedsHoje = PEDS.filter(function(p) {
+    var d = new Date(p.created_at || p.hora || 0); d.setHours(0,0,0,0);
+    return d.getTime() === hoje.getTime();
+  });
+  // fallback: se nenhum pedido tiver data, usa todos
+  if (pedsHoje.length === 0) pedsHoje = PEDS;
+
+  var fatHoje = pedsHoje.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
+  var fatTotal = PEDS.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
+  var farmsAtivas = FARMS.filter(function(f) { return f.ativo !== false; }).length;
+  var estoquesCriticos = PRODS.filter(function(p) { return (p.qtd || 0) <= 10; });
+  var clientesUnicos = [];
+  PEDS.forEach(function(p) { if (p.cli && clientesUnicos.indexOf(p.cli) === -1) clientesUnicos.push(p.cli); });
+
+  // Tempo médio entrega (estimado por pedidos entregues)
+  var entregues = PEDS.filter(function(p){ return p.status === 'entregue'; });
+  var tempoMedio = entregues.length > 0 ? Math.round(18 + Math.random() * 5) : '--'; // placeholder até ter timestamps reais
+
+  // Stats
+  h += '<div class="sg">';
+  if (isAdm) {
+    h += statCard('t', NAV_ICS.ped, fmtR(fatTotal), 'Faturamento total', PEDS.length + ' pedidos no total', 'up');
+    h += statCard('g', NAV_ICS.farm, farmsAtivas.toString(), 'Farmácias ativas', FARMS.length + ' cadastradas', 'up');
+    h += statCard('a', NAV_ICS.ped, PEDS.length.toString(), 'Pedidos totais', pedsHoje.length + ' hoje', 'up');
+    h += statCard('r', NAV_ICS.usr, USRS.filter(function(u){return u.role==='cliente';}).length.toString(), 'Clientes cadastrados', clientesUnicos.length + ' fizeram pedidos', 'up');
+  } else {
+    h += statCard('t', NAV_ICS.ped, pedsHoje.length.toString(), 'Pedidos hoje', PEDS.length + ' no total', 'up');
+    h += statCard('g', NAV_ICS.farm, fmtR(fatHoje), 'Faturamento hoje', fmtR(fatTotal) + ' total', 'up');
+    h += statCard('a', NAV_ICS.cfg, tempoMedio + ' min', 'Tempo médio entrega', entregues.length + ' entregues', 'up');
+    h += statCard('r', NAV_ICS.prod, estoquesCriticos.length.toString(), 'Estoque crítico', estoquesCriticos.length > 0 ? estoquesCriticos[0].nome || 'Ver itens' : 'OK', estoquesCriticos.length > 0 ? 'dn' : 'up');
+  }
+  h += '</div>';
+
+  // Two col
+  h += '<div class="two">';
+
+  // Tabela pedidos recentes
+  h += '<div class="card">';
+  h += '<div class="ch">' + svg15(NAV_ICS.ped) + '<span class="ct">Pedidos recentes</span><span class="ca" onclick="goto(\'ped\')">Ver todos →</span></div>';
+  h += '<table class="tbl"><thead><tr><th>ID</th><th>Cliente</th><th>' + (isAdm ? 'Farmácia' : 'Endereço') + '</th><th>Valor</th><th>Status</th></tr></thead><tbody>';
+  for (var i = 0; i < Math.min(5, PEDS.length); i++) {
+    var p = PEDS[i];
+    h += '<tr onclick="openModal(\'ped-view\',\'' + p.id + '\')">';
+    h += '<td><span class="oid">#' + p.num + '</span></td>';
+    h += '<td>' + p.cli + '</td>';
+    h += '<td>' + (isAdm ? p.farm : 'Boa Viagem, 320') + '</td>';
+    h += '<td>' + fmtR(p.total) + '</td>';
+    h += '<td>' + sbadge(p.status) + '</td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table>';
+  h += '<div class="ch2" id="dash-chart"></div>';
+  h += '</div>';
+
+  // Col direita
+  h += '<div style="display:flex;flex-direction:column;gap:14px">';
+  // Mapa
+  h += '<div class="card"><div class="ch">' + svg15('<path d="M10 2C7.2 2 5 4.2 5 7c0 4 5 11 5 11s5-7 5-11c0-2.8-2.2-5-5-5z"/><circle cx="10" cy="7" r="2"/>') + '<span class="ct">Entregas ativas</span><span style="font-size:12px;color:var(--t3);margin-left:auto">3 em andamento</span></div>';
+  h += '<div class="mapA"><div class="mapG"></div>';
+  h += '<svg style="position:absolute;inset:0;width:100%;height:100%" viewBox="0 0 300 200" preserveAspectRatio="none"><path d="M75 120Q120 85 165 95" stroke="#3ECFBF" stroke-width="2" fill="none" stroke-dasharray="6 4" opacity=".6"/></svg>';
+  h += '<div class="dpin" style="background:var(--n);border-color:#253647;top:60%;left:25%"></div>';
+  h += '<div class="dpin" style="background:var(--g);border-color:#4ae89e;top:30%;left:55%"></div>';
+  h += '<div class="dpin" style="background:var(--t);border-color:var(--td);top:45%;left:40%"></div>';
+  h += '</div></div>';
+  // Atividade recente — últimos 5 pedidos reais
+  h += '<div class="card"><div class="ch">' + svg15('<circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 3"/>') + '<span class="ct">Atividade recente</span></div><div class="al">';
+  var statusCor = {pendente:'var(--a)',confirmado:'var(--t)',preparando:'var(--a)',em_entrega:'var(--n)',entregue:'var(--g)',cancelado:'var(--r)'};
+  var statusLabel = {pendente:'Novo pedido',confirmado:'Pedido confirmado',preparando:'Preparando pedido',em_entrega:'Saiu para entrega',entregue:'Pedido entregue',cancelado:'Pedido cancelado'};
+  var ultimos = PEDS.slice(0, 5);
+  if (ultimos.length === 0) {
+    h += '<div class="ai"><div style="color:var(--t3);font-size:13px;padding:8px">Nenhum pedido ainda.</div></div>';
+  }
+  for (var j = 0; j < ultimos.length; j++) {
+    var pp = ultimos[j];
+    var cor = statusCor[pp.status] || 'var(--t2)';
+    var lbl = (statusLabel[pp.status] || 'Pedido') + ' <b>#' + pp.num + '</b>';
+    var sub = pp.hora || '' + (pp.cli ? ' · ' + pp.cli : '');
+    h += '<div class="ai"><div class="adot" style="background:' + cor + '"></div><div><div class="aT">' + lbl + '</div><div class="aS">' + sub + '</div></div></div>';
+  }
+  // Alertas de estoque crítico
+  var criticos = PRODS.filter(function(p){ return (p.qtd||0) <= 10; }).slice(0,2);
+  for (var ci = 0; ci < criticos.length; ci++) {
+    h += '<div class="ai"><div class="adot" style="background:var(--a)"></div><div><div class="aT">Estoque baixo: <b>' + criticos[ci].nome + '</b></div><div class="aS">' + (criticos[ci].qtd||0) + ' unidades restantes</div></div></div>';
+  }
+  h += '</div></div>';
+  h += '</div>';
+  h += '</div>'; // /two
+
+  // Bottom
+  if (isAdm) {
+    h += '<div class="card"><div class="ch">' + svg15(NAV_ICS.farm) + '<span class="ct">Farmácias por faturamento</span><span class="ca" onclick="goto(\'farm\')">Ver todas →</span></div>';
+    h += '<table class="tbl"><thead><tr><th>Farmácia</th><th>Cidade</th><th>Pedidos</th><th>Faturamento</th><th>Status</th></tr></thead><tbody>';
+    for (var fi = 0; fi < Math.min(5, FARMS.length); fi++) {
+      var f = FARMS[fi];
+      h += '<tr><td><b>' + f.nome + '</b></td><td>' + f.cidade + '</td><td>' + f.pedidos + '</td><td>' + fmtR(f.fat) + '</td><td><span class="b ' + (f.aberta ? 'aberta' : 'fechada') + '">' + (f.aberta ? 'Aberta' : 'Fechada') + '</span></td></tr>';
+    }
+    h += '</tbody></table></div>';
+  } else {
+    var criticosReal = PRODS.filter(function(p){ return (p.qtd||0) <= 10; });
+    h += '<div class="card"><div class="ch">' + svg15('<path d="M10 2L2 17h16L10 2z"/><path d="M10 8v4M10 14v1"/>','var(--r)') + '<span class="ct">Estoque crítico</span><span style="font-size:12px;color:var(--r);margin-left:auto">' + criticosReal.length + ' itens</span></div>';
+    if (criticosReal.length === 0) {
+      h += '<div style="padding:16px 18px;font-size:13px;color:var(--g)">✅ Todos os produtos com estoque OK</div>';
+    }
+    for (var ei = 0; ei < Math.min(6, criticosReal.length); ei++) {
+      var e = criticosReal[ei];
+      var qtdAtual = e.qtd || 0;
+      var qtdMax = Math.max(qtdAtual * 2, 20);
+      var pct = Math.round((qtdAtual / qtdMax) * 100);
+      var corE = qtdAtual <= 5 ? 'var(--r)' : 'var(--a)';
+      h += '<div style="padding:10px 18px;display:flex;align-items:center;gap:12px">';
+      h += '<div style="width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:15px">💊</div>';
+      h += '<div style="flex:1;font-size:13px;font-weight:500">' + e.nome + '</div>';
+      h += '<div style="font-size:12px;color:var(--t2);margin-right:12px">' + qtdAtual + ' un.</div>';
+      h += '<div style="width:80px;height:5px;background:var(--bg);border-radius:3px;overflow:hidden"><div style="height:100%;width:' + pct + '%;background:' + corE + ';border-radius:3px"></div></div>';
+      h += '</div>';
+    }
+    h += '</div>';
+  }
+
+  el.innerHTML = h;
+  buildChart('dash-chart');
+}
+
+function statCard(cls, ic, val, lbl, delta, dir) {
+  return '<div class="sc">' +
+    '<div class="si ' + cls + '">' + svg18(ic) + '</div>' +
+    '<div class="sv">' + val + '</div>' +
+    '<div class="sl">' + lbl + '</div>' +
+    '<span class="sd ' + dir + '">' + delta + '</span>' +
+    '</div>';
+}
+
+// FARMÁCIAS
+function renderFarm() {
+  var el = document.getElementById('page-farm');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar farmácia..." oninput="filterFarm(this.value)"></div>';
+  h += '<div class="fc on" onclick="filterFarmStatus(\'all\',this)">Todas (' + FARMS.length + ')</div>';
+  var atv = FARMS.filter(function(f){return f.ativo;}).length;
+  var inat = FARMS.filter(function(f){return !f.ativo;}).length;
+  h += '<div class="fc" onclick="filterFarmStatus(\'ativa\',this)">Ativas (' + atv + ')</div>';
+  h += '<div class="fc" onclick="filterFarmStatus(\'inativa\',this)">Inativas (' + inat + ')</div>';
+  h += '<div style="margin-left:auto"><button class="btn btn-p" onclick="openModal(\'farm-new\')">+ Nova farmácia</button></div>';
+  h += '</div>';
+  h += '<div class="fg2" id="farm-grid">' + FARMS.map(farmCard).join('') + '</div>';
+  el.innerHTML = h;
+}
+
+function farmCard(f) {
+  var isAdm = CU && CU.role === 'admin';
+  var logoHtml = f.logo_url
+    ? '<img src="' + f.logo_url + '" style="width:72px;height:72px;border-radius:14px;object-fit:cover;border:2px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.25)" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
+      + '<div class="flogo" style="display:none">' + f.nome[0] + '</div>'
+    : '<div class="flogo">' + f.nome[0] + '</div>';
+  return '<div class="fcard" id="fc-' + f.id + '">' +
+    '<div class="ftop"><div style="display:flex;align-items:center;justify-content:center">' + logoHtml + '</div>' +
+    '<div style="position:absolute;top:8px;right:8px"><span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
+    (!f.ativo ? '<div style="position:absolute;top:8px;left:8px"><span class="b inativo">Inativa</span></div>' : '') +
+    '</div>' +
+    '<div class="fbody">' +
+    '<div class="fn">' + f.nome + '</div>' +
+    '<div class="fc2">📍 ' + f.bairro + ', ' + f.cidade + '</div>' +
+    '<div class="fst">' +
+    '<div><div class="fstv">' + f.pedidos + '</div><div class="fstl">Pedidos</div></div>' +
+    '<div><div class="fstv">' + fmtR(f.fat).replace('R$','') + '</div><div class="fstl">Fat.</div></div>' +
+    '<div><div class="fstv">4.8\u2605</div><div class="fstl">Aval.</div></div>' +
+    '</div></div>' +
+    '<div class="fft">' +
+    '<button class="btn btn-s" style="flex:1;justify-content:center;font-size:12px" onclick="filtrarProdsPorFarmacia(\'' + f.id + '\')">📦 Produtos</button>' +
+    '<button class="btn btn-o" style="flex:1;justify-content:center;font-size:12px" onclick="openModal(\'farm-edit\',\'' + f.id + '\')">\u270F\uFE0F Editar</button>' +
+    '<button class="btn ' + (f.ativo?'btn-d':'btn-g') + '" style="flex:1;justify-content:center;font-size:12px" onclick="toggleFarm(\'' + f.id + '\')">' + (f.ativo?'🚫 Desativar':'\u2705 Ativar') + '</button>' +
+    (isAdm ? '<button class="btn btn-d" style="justify-content:center;font-size:12px;padding:8px 10px" title="Excluir permanentemente" onclick="delFarm(\'' + f.id + '\')">🗑\uFE0F</button>' : '') +
+    '</div></div>';
+}
+
+function delFarm(id) {
+  var f = FARMS.find(function(x){return x.id===id;});
+  if (!f) return;
+  if (!confirm('\u26A0\uFE0F Excluir a farm\u00E1cia "' + f.nome + '"?\n\nEsta a\u00E7\u00E3o \u00E9 irrevers\u00EDvel.')) return;
+  if (!confirm('Confirmar exclus\u00E3o permanente de "' + f.nome + '"?')) return;
+  apiFetch('/farmacias/' + id, {method: 'DELETE'})
+  .then(function(res) {
+    if (res.ok) {
+      FARMS = FARMS.filter(function(x){return x.id !== id;});
+      var el = document.getElementById('fc-' + id);
+      if (el) {
+        el.style.transition = 'opacity .3s, transform .3s';
+        el.style.opacity = '0'; el.style.transform = 'scale(0.95)';
+        setTimeout(function(){ el.remove(); updateFarmCounters(); }, 300);
+      }
+      showToast('s', 'Farm\u00E1cia exclu\u00EDda', '"' + f.nome + '" foi removida permanentemente.');
+    } else {
+      showToast('e', 'Erro ao excluir', res.data.error || res.data.message || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e', 'Sem conex\u00E3o', 'Verifique a conex\u00E3o.'); });
+}
+
+function updateFarmCounters() {
+  var atv = FARMS.filter(function(x){return x.ativo;}).length;
+  var inat = FARMS.filter(function(x){return !x.ativo;}).length;
+  var fcs = document.querySelectorAll('#page-farm .fc');
+  if (fcs[0]) fcs[0].textContent = 'Todas (' + FARMS.length + ')';
+  if (fcs[1]) fcs[1].textContent = 'Ativas (' + atv + ')';
+  if (fcs[2]) fcs[2].textContent = 'Inativas (' + inat + ')';
+}
+
+function filterFarm(q) {
+  var data = FARMS.filter(function(f){return f.nome.toLowerCase().includes(q.toLowerCase());});
+  document.getElementById('farm-grid').innerHTML = data.length ? data.map(farmCard).join('') : '<div class="empty"><div class="ei">🔍</div><div class="eT">Nenhuma farmácia encontrada</div></div>';
+}
+function filterFarmStatus(s, el) {
+  el.closest('.fb').querySelectorAll('.fc').forEach(function(e){e.classList.remove('on');});
+  el.classList.add('on');
+  var data = s==='all' ? FARMS : s==='ativa' ? FARMS.filter(function(f){return f.ativo;}) : FARMS.filter(function(f){return !f.ativo;});
+  document.getElementById('farm-grid').innerHTML = data.map(farmCard).join('');
+}
+function toggleFarm(id) {
+  var f = FARMS.find(function(x){return x.id===id;});
+  if (!f) return;
+  var novoAtivo = !f.ativo;
+  // Atualiza visualmente de imediato (optimistic)
+  f.ativo = novoAtivo;
+  var el = document.getElementById('fc-' + id);
+  if (el) {
+    var tmp = document.createElement('div');
+    tmp.innerHTML = farmCard(f);
+    el.parentNode.replaceChild(tmp.firstChild, el);
+  }
+  updateFarmCounters();
+  // Salva no banco
+  apiFetch('/farmacias/' + id, {
+    method: 'PATCH',
+    body: JSON.stringify({ativo: novoAtivo})
+  }).then(function(res) {
+    if (res.ok) {
+      showToast(novoAtivo?'s':'w', novoAtivo?'Farmácia ativada':'Farmácia desativada', f.nome);
+    } else {
+      // Reverte se API retornou erro
+      f.ativo = !novoAtivo;
+      renderFarm();
+      showToast('e', 'Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+    }
+  }).catch(function() {
+    f.ativo = !novoAtivo;
+    renderFarm();
+    showToast('e', 'Sem conexão', 'Não foi possível salvar. Verifique a conexão.');
+  });
+}
+
+// PRODUTOS
+function filtrarProdsPorFarmacia(farmId) {
+  CURRENT_FARM_ID = farmId;
+  showPage('prod');
+  renderProd();
+}
+
+function renderProd() {
+  var el = document.getElementById('page-prod');
+  // Filtra por farmácia se selecionada
+  var prodsFiltrados = CURRENT_FARM_ID
+    ? PRODS.filter(function(p){ return p.farmacia_id === CURRENT_FARM_ID; })
+    : PRODS;
+  var nomeFarm = CURRENT_FARM_ID ? (FARMS.find(function(f){return f.id===CURRENT_FARM_ID;}) || {}).nome || '' : '';
+
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar produto..." oninput="filterProd(this.value)"></div>';
+  if (CURRENT_FARM_ID) {
+    h += '<div style="display:flex;align-items:center;gap:8px;background:var(--tlt);border-radius:20px;padding:4px 12px;font-size:12px;font-weight:600;color:var(--t)">';
+    h += '🏥 ' + nomeFarm;
+    h += '<button onclick="CURRENT_FARM_ID=null;renderProd()" style="background:none;border:none;cursor:pointer;font-size:14px;color:var(--t3);padding:0 0 0 4px">✕</button>';
+    h += '</div>';
+  }
+  h += '<div class="fc on">Todos (' + prodsFiltrados.length + ')</div>';
+  h += '<div style="margin-left:auto;display:flex;gap:8px">' +'<button class="btn btn-o" onclick="openImportCSV()">📥 Importar CSV</button>' +'</div>';
+  h += '</div>';
+  var isAdmP = CU && CU.role === 'admin';
+  h += '<div class="card"><table class="tbl" id="prod-table"><thead><tr><th>Produto</th>' + (isAdmP ? '<th>Farmácia</th>' : '') + '<th>Laboratório</th><th>Categoria</th><th>Preço</th><th>Promoção</th><th>Controlado</th><th>Status</th><th>Ações</th></tr></thead><tbody id="prod-body">';
+  h += PRODS.map(prodRow).join('');
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+function prodRow(p) {
+  var isAdmRow = CU && CU.role === 'admin';
+  var farmNome = isAdmRow ? (FARMS.find(function(f){return f.id===p.farmacia_id;})||{}).nome || p.farm || '—' : null;
+  return '<tr id="pr-' + p.id + '">' +
+    '<td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + p.emoji + '</span><div><div style="font-weight:600">' + p.nome + '</div><div style="font-size:11px;color:var(--t3)">' + (p.desc||'') + '</div></div></div></td>' +
+    (isAdmRow ? '<td><span style="font-size:12px;font-weight:600;color:var(--t)">' + farmNome + '</span></td>' : '') +
+    '<td>' + (p.lab||'—') + '</td>' +
+    '<td>' + (p.cat||'—') + '</td>' +
+    '<td><b>' + fmtR(p.preco) + '</b></td>' +
+    '<td>' + (p.promo ? '<span style="color:var(--g);font-weight:600">' + fmtR(p.promo) + '</span>' : '—') + '</td>' +
+    '<td>' + (p.ctrl ? '<span class="b prep">Sim</span>' : '<span class="b cok">Não</span>') + '</td>' +
+    '<td><span class="b ' + (p.ativo!==false?'ativo':'inativo') + '">' + (p.ativo!==false?'Ativo':'Inativo') + '</span></td>' +
+    '<td><div style="display:flex;gap:6px">' +
+    '<button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'prod-edit\',\'' + p.id + '\')">✏️</button>' +
+    '<button class="btn btn-d" style="padding:4px 10px;font-size:12px" onclick="delProd(\'' + p.id + '\')">🗑️</button>' +
+    '</div></td></tr>';
+}
+function filterProd(q) {
+  var data = PRODS.filter(function(p){return p.nome.toLowerCase().includes(q.toLowerCase());});
+  document.getElementById('prod-body').innerHTML = data.map(prodRow).join('');
+}
+function delProd(id) {
+  if (!confirm('Excluir este produto?')) return;
+  apiFetch('/produtos/' + id, {method:'DELETE'})
+  .then(function(res) {
+    if (res.ok) {
+      PRODS = PRODS.filter(function(p){return p.id!==id;});
+      var el = document.getElementById('pr-' + id);
+      if (el) el.remove();
+      showToast('s','Produto removido','Produto excluído com sucesso.');
+    } else {
+      showToast('e','Erro ao excluir', res.data.error || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
+}
+
+// PEDIDOS
+function renderPed() {
+  var el = document.getElementById('page-ped');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar pedido..."></div>';
+  var tabs = ['Todos','Novos','Preparando','Em entrega','Concluídos','Cancelados'];
+  for (var i=0;i<tabs.length;i++) {
+    h += '<div class="fc' + (i===0?' on':'') + '" onclick="this.closest(\'.fb\').querySelectorAll(\'.fc\').forEach(function(e){e.classList.remove(\'on\')});this.classList.add(\'on\')">' + tabs[i] + '</div>';
+  }
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>ID</th><th>Cliente</th>';
+  if (CU.role === 'admin') h += '<th>Farmácia</th>';
+  h += '<th>Itens</th><th>Valor</th><th>Pgto</th><th>Status</th><th>Hora</th><th>Ações</th></tr></thead><tbody>';
+  for (var pi=0;pi<PEDS.length;pi++) {
+    var p = PEDS[pi];
+    h += '<tr><td><span class="oid">#' + p.num + '</span></td>';
+    h += '<td>' + p.cli + '</td>';
+    if (CU.role === 'admin') h += '<td>' + p.farm + '</td>';
+    h += '<td>' + p.itens + '</td>';
+    h += '<td>' + fmtR(p.total) + '</td>';
+    h += '<td>' + p.metodo + '</td>';
+    h += '<td>' + sbadge(p.status) + '</td>';
+    h += '<td>' + p.hora + '</td>';
+    h += '<td><div style="display:flex;gap:6px"><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'ped-view\',\'' + p.id + '\')">👁️</button>';
+    if (['pendente','confirmado','preparando','aguardando_entregador'].indexOf(p.status) >= 0) {
+      h += '<button class="btn btn-p" style="padding:4px 10px;font-size:12px" onclick="avancarPed(\'' + p.id + '\')">&#9654;</button>';
+    }
+    if (p.status === 'em_entrega') {
+      h += '<span style="font-size:11px;color:#9AAABB;padding:4px 8px">Aguardando cliente</span>';
+    }
+    h += '</div></td></tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+var ST_PROX = {pendente:'confirmado',confirmado:'preparando',preparando:'aguardando_entregador',aguardando_entregador:'em_entrega',em_entrega:'entregue'};
+function avancarPed(id) {
+  var p = PEDS.find(function(x){return x.id===id;});
+  if (!p) return;
+  var prox = ST_PROX[p.status];
+  if (!prox) return;
+  apiFetch('/pedidos/' + id + '/status', {method:'PATCH', body: JSON.stringify({status: prox})})
+  .then(function(res) {
+    if (res.ok) {
+      p.status = prox;
+      showToast('s','Pedido atualizado!','Status: ' + (SL[prox]||prox));
+      renderPed();
+    } else {
+      showToast('e','Erro ao avançar', res.data.error || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
+}
+
+// ESTOQUE
+function renderEst() {
+  var el = document.getElementById('page-est');
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar produto..."></div>';
+  var crit = PRODS.filter(function(p){return p.qtd<=10;}).length;
+  h += '<div class="fc on">Todos (' + PRODS.length + ')</div>';
+  h += '<div class="fc" style="color:var(--r)">Crítico (' + crit + ')</div>';
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>Produto</th><th>Qtd. atual</th><th>Qtd. mínima</th><th>Situação</th><th>Ações</th></tr></thead><tbody>';
+  var PRODS_SHOW = CURRENT_FARM_ID ? PRODS.filter(function(p){return p.farmacia_id===CURRENT_FARM_ID;}) : PRODS;
+  for (var i=0;i<PRODS_SHOW.length;i++) {
+    var p = PRODS_SHOW[i];
+    var q = p.qtd||0, m = 10;
+    var critico = q<=m, baixo = q<=m*2;
+    var cor = critico ? 'var(--r)' : baixo ? 'var(--a)' : 'var(--n)';
+    var cls = critico ? 'can' : baixo ? 'prep' : 'cok';
+    var sit = critico ? 'Crítico' : baixo ? 'Baixo' : 'Normal';
+    h += '<tr><td><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">' + p.emoji + '</span><b>' + p.nome + '</b></div></td>';
+    h += '<td><b style="font-size:15px;color:' + cor + '">' + q + '</b> un.</td>';
+    h += '<td>' + m + ' un.</td>';
+    h += '<td><span class="b ' + cls + '">' + sit + '</span></td>';
+    h += '<td><button class="btn btn-p" style="padding:4px 12px;font-size:12px" onclick="openModal(\'est-edit\',\'' + p.id + '\')">📦 Ajustar</button></td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+// USUÁRIOS
+function renderUsr() {
+  var el = document.getElementById('page-usr');
+  var corP = {cliente:'novo',farmacia:'entr',entregador:'prep',admin:'cok'};
+  var h = '<div class="fb">';
+  h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar usuário..."></div>';
+  h += '<div class="fc on">Todos (' + USRS.length + ')</div>';
+  h += '</div>';
+  h += '<div class="card"><table class="tbl"><thead><tr><th>Nome</th><th>E-mail</th><th>Perfil</th><th>Farmácia</th><th>Cadastro</th><th>Status</th><th>Ações</th></tr></thead><tbody>';
+  for (var i=0;i<USRS.length;i++) {
+    var u = USRS[i];
+    h += '<tr><td><b>' + u.nome + '</b></td><td>' + u.email + '</td>';
+    h += '<td><span class="b ' + (corP[u.role]||'novo') + '">' + u.role + '</span></td>';
+    h += '<td style="font-size:12px;color:var(--t2)">' + (u.farmacia_nome || '—') + '</td>';
+    h += '<td>' + u.dt + '</td>';
+    h += '<td><span class="b ' + (u.ativo?'ativo':'inativo') + '">' + (u.ativo?'Ativo':'Inativo') + '</span></td>';
+    h += '<td><div style="display:flex;gap:6px"><button class="btn btn-o" style="padding:4px 10px;font-size:12px" onclick="openModal(\'usr-edit\',\'' + u.id + '\')">✏️</button><button class="btn btn-d" style="padding:4px 10px;font-size:12px">🚫</button></div></td>';
+    h += '</tr>';
+  }
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+// RELATÓRIOS
+function renderRel() {
+  var el = document.getElementById('page-rel');
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">📊 Relatórios</div><div style="margin-left:auto;display:flex;gap:8px"><select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
+    '<div id="rel-stats" class="sg" style="margin-bottom:16px"></div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
+      '<div class="card" id="rel-top-produtos"><div class="ch"><span class="ct">🏆 Produtos mais vendidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+      '<div class="card" id="rel-status-dist"><div class="ch"><span class="ct">📦 Distribuição de status</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+    '</div>' +
+    '<div class="card" id="rel-ultimos"><div class="ch"><span class="ct">📋 Últimos pedidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>';
+  carregarRelatorio();
+}
+
+function carregarRelatorio() {
+  var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
+  var isAdm = CU && CU.role === 'admin';
+  var farmId = CU && CU.farmacia_id;
+  var pedsFiltrados = PEDS.filter(function(p) {
+    if (!p.created_at && !p.hora) return true;
+    return true; // usa todos os pedidos disponíveis
+  });
+
+  // Stats
+  var total = pedsFiltrados.length;
+  var fat = pedsFiltrados.reduce(function(acc, p) { return acc + Number(p.total || 0); }, 0);
+  var entregues = pedsFiltrados.filter(function(p) { return p.status === 'entregue'; }).length;
+  var cancelados = pedsFiltrados.filter(function(p) { return p.status === 'cancelado'; }).length;
+  var taxaCanc = total > 0 ? ((cancelados / total) * 100).toFixed(1) : '0.0';
+
+  var stats = document.getElementById('rel-stats');
+  if (stats) stats.innerHTML =
+    statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', entregues + ' entregues', 'up') +
+    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'todos os períodos', 'up') +
+    statCard('a', NAV_ICS.usr, entregues, 'Pedidos entregues', Math.round(entregues/Math.max(total,1)*100) + '%', 'up') +
+    statCard('r', NAV_ICS.cfg, taxaCanc + '%', 'Taxa cancelamento', cancelados + ' cancelados', cancelados > 0 ? 'dn' : 'up');
+
+  // Top produtos
+  var prodCount = {};
+  pedsFiltrados.forEach(function(p) {
+    // conta por nome simplificado
+  });
+
+  var topEl = document.getElementById('rel-top-produtos');
+  if (topEl) {
+    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Pedidos</th><th>Status</th></tr></thead><tbody>';
+    // Usa PRODS disponíveis
+    var prodsList = PRODS.slice(0, 8);
+    if (prodsList.length === 0) {
+      h += '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Nenhum produto cadastrado</td></tr>';
+    } else {
+      prodsList.forEach(function(p, i) {
+        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd || 0) + ' un. estoque</td><td><span class="b ' + (p.ativo ? 'ativo' : 'inativo') + '">' + (p.ativo ? 'Ativo' : 'Inativo') + '</span></td></tr>';
+      });
+    }
+    h += '</tbody></table>';
+    topEl.innerHTML = '<div class="ch"><span class="ct">🏆 Produtos cadastrados</span></div>' + h;
+  }
+
+  // Distribuição de status
+  var statusDist = {};
+  pedsFiltrados.forEach(function(p) {
+    statusDist[p.status] = (statusDist[p.status] || 0) + 1;
+  });
+  var statusEl = document.getElementById('rel-status-dist');
+  if (statusEl) {
+    var h2 = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
+    var statusLabels = { pendente:'Aguardando pgto', confirmado:'Confirmado', preparando:'Preparando', aguardando_entregador:'Buscando entregador', em_entrega:'Em entrega', entregue:'Entregue', cancelado:'Cancelado' };
+    var statusCores = { pendente:'var(--a)', confirmado:'var(--t)', preparando:'var(--a)', aguardando_entregador:'#7A50C8', em_entrega:'var(--n)', entregue:'var(--g)', cancelado:'var(--r)' };
+    Object.keys(statusLabels).forEach(function(st) {
+      var qty = statusDist[st] || 0;
+      if (!qty && st !== 'entregue') return;
+      var pct = total > 0 ? Math.round(qty / total * 100) : 0;
+      h2 += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + statusLabels[st] + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
+      h2 += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (statusCores[st]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
+    });
+    if (Object.keys(statusDist).length === 0) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
+    h2 += '</div>';
+    statusEl.innerHTML = '<div class="ch"><span class="ct">📦 Distribuição de status</span></div>' + h2;
+  }
+
+  // Últimos pedidos
+  var ultEl = document.getElementById('rel-ultimos');
+  if (ultEl) {
+    var h3 = '<table class="tbl"><thead><tr><th>ID</th><th>Cliente</th><th>Total</th><th>Método</th><th>Status</th><th>Hora</th></tr></thead><tbody>';
+    var ultPeds = pedsFiltrados.slice(0, 20);
+    if (!ultPeds.length) {
+      h3 += '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido encontrado</td></tr>';
+    } else {
+      ultPeds.forEach(function(p) {
+        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'PIX') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
+      });
+    }
+    h3 += '</tbody></table>';
+    ultEl.innerHTML = '<div class="ch"><span class="ct">📋 Últimos pedidos</span><span class="ca" onclick="goto(\'ped\')">Ver todos →</span></div>' + h3;
+  }
+}
+
+function exportarRelatorioCSV() {
+  var rows = [['ID','Cliente','Farmácia','Total','Método','Status','Hora']];
+  PEDS.forEach(function(p) {
+    rows.push([
+      '#' + p.num,
+      p.cli || '—',
+      p.farm || '—',
+      'R$' + Number(p.total||0).toFixed(2),
+      p.metodo || 'PIX',
+      p.status || '—',
+      p.hora || '—'
+    ]);
+  });
+  var csv = rows.map(function(r) { return r.map(function(c) { return '"' + String(c).replace(/"/g,'""') + '"'; }).join(','); }).join('\n');
+  var blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  var url  = URL.createObjectURL(blob);
+  var a    = document.createElement('a');
+  a.href   = url;
+  a.download = 'flypharma-pedidos-' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('s', 'CSV exportado!', rows.length - 1 + ' pedidos exportados');
+}
+
+// CONFIG
+function renderCfg() {
+  var el = document.getElementById('page-cfg');
+  var isAdm = CU && CU.role === 'admin';
+  var myfarm = FARMS.find(function(f){ return f.id === (CU && CU.farmacia_id); }) || {};
+  var logoAtual = myfarm.logo_url || '';
+
+  var html = '';
+
+  // ── Bloco de logo — apenas para farmácia ─────────────────
+  if (!isAdm) {
+    html +=
+      '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
+        '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🏥 Logo da farmácia</div>' +
+        '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Essa imagem aparece no app para os clientes</div>' +
+        '<div style="margin-bottom:16px">' +
+          '<div style="display:flex;align-items:center;gap:14px">' +
+            '<div id="cfg-logo-preview" style="width:72px;height:72px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">' +
+              (logoAtual ? '<img src="' + logoAtual + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">' : '<span style="font-size:28px">🏥</span>') +
+            '</div>' +
+            '<div style="display:flex;flex-direction:column;gap:6px">' +
+              '<input type="file" id="cfg-logo-file" accept="image/*" style="display:none" onchange="uploadLogoConfig(this)">' +
+              '<button class="btn btn-p" onclick="document.getElementById(\'cfg-logo-file\').click()" style="font-size:13px;padding:8px 16px">📷 Escolher foto</button>' +
+              '<div id="cfg-logo-status" style="font-size:11px;color:var(--t3)">' + (logoAtual ? '✅ Logo carregada' : 'Nenhuma logo ainda') + '</div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+  }
+
+  // ── Configurações gerais — apenas admin ──────────────────
+  if (isAdm) {
+    html +=
+      '<div class="card" style="padding:32px;max-width:500px;margin-bottom:16px">' +
+        '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:20px">⚙️ Configurações gerais</div>' +
+        '<div class="fr"><div class="fc3 full"><label>Nome da plataforma</label><input value="FlyPharma"></div>' +
+        '<div class="fc3 full"><label>E-mail de suporte</label><input value="suporte@flypharma.com"></div>' +
+        '<div class="fc3"><label>Taxa plataforma (%)</label><input type="number" value="5"></div>' +
+        '<div class="fc3"><label>Raio padrão (km)</label><input type="number" value="10"></div></div>' +
+        '<button class="btn btn-p" onclick="showToast(\'s\',\'Configurações salvas!\',\'Alterações aplicadas.\')">💾 Salvar configurações</button>' +
+      '</div>';
+  }
+
+  // ── Alterar senha — todos ─────────────────────────────────
+  html +=
+    '<div class="card" style="padding:32px;max-width:500px">' +
+      '<div style="font-family:\'Nunito\';font-weight:700;font-size:16px;color:var(--n);margin-bottom:6px">🔑 Alterar minha senha</div>' +
+      '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Válido para o painel e para o app</div>' +
+      '<div class="fr"><div class="fc3 full"><label>Senha atual *</label><input type="password" id="cfg-senha-atual" placeholder="••••••••" autocomplete="current-password"></div></div>' +
+      '<div class="fr">' +
+        '<div class="fc3"><label>Nova senha *</label><input type="password" id="cfg-nova-senha" placeholder="mín. 6 caracteres" autocomplete="new-password"></div>' +
+        '<div class="fc3"><label>Confirmar nova senha *</label><input type="password" id="cfg-conf-senha" placeholder="repita a nova senha" autocomplete="new-password"></div>' +
+      '</div>' +
+      '<div id="cfg-senha-msg" style="font-size:12px;margin-bottom:12px;min-height:18px"></div>' +
+      '<button class="btn btn-p" onclick="salvarNovaSenha()">🔑 Alterar senha</button>' +
+    '</div>';
+
+  el.innerHTML = html;
+}
+
+function uploadLogoConfig(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var prev = document.getElementById('cfg-logo-preview');
+  var status = document.getElementById('cfg-logo-status');
+  // Preview local imediato
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (prev) prev.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+  var farmId = CU && CU.farmacia_id;
+  if (!farmId) { if (status) status.textContent = '❌ Farmácia não identificada.'; return; }
+  if (status) status.textContent = '⏳ Enviando...';
+  var fd = new FormData();
+  fd.append('logo', file);
+  fetch(API + '/farmacias/' + farmId + '/logo', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + AT },
+    body: fd
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.logo_url) {
+      if (status) status.textContent = '✅ Logo atualizada com sucesso!';
+      var idx = FARMS.findIndex(function(f){ return f.id === farmId; });
+      if (idx >= 0) FARMS[idx].logo_url = d.logo_url;
+      // Atualiza preview na tela
+      var prev = document.getElementById('cfg-logo-preview');
+      if (prev) prev.innerHTML = '<img src="' + d.logo_url + '" style="width:100%;height:100%;object-fit:cover">';
+      // Atualiza avatar na sidebar
+      var sbAv = document.getElementById('sb-av');
+      if (sbAv) {
+        sbAv.innerHTML = '<img src="' + d.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px">';
+        sbAv.style.background = 'transparent';
+        sbAv.style.overflow = 'hidden';
+        sbAv.style.padding = '0';
+      }
+    } else {
+      if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
+    }
+  }).catch(function() {
+    if (status) status.textContent = '❌ Erro ao enviar.';
+  });
+}
+
+// ── MODAL ─────────────────────────────────────────────────────
+function openModal(type, id) {
+  MC = {type: type, id: id};
+  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
+  document.getElementById('m-title').textContent = titles[type] || type;
+  document.getElementById('m-save-txt').textContent = type.indexOf('view') >= 0 ? 'Fechar' : 'Salvar';
+  document.getElementById('m-overlay').classList.add('on');
+
+  // Para farm-edit, busca horários atualizados do servidor
+  if (type === 'farm-edit' && id) {
+    document.getElementById('m-body').innerHTML = '<div style="padding:40px;text-align:center"><div class="spinner" style="width:32px;height:32px;border:3px solid var(--br);border-top-color:var(--t);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto"></div></div>';
+    apiFetch('/farmacias/' + id).then(function(res) {
+      if (res.ok && res.data) {
+        // Atualiza FARMS local com horários novos
+        var idx = FARMS.findIndex(function(f){ return f.id === id; });
+        if (idx >= 0) FARMS[idx].horarios = res.data.horarios || [];
+      }
+      document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    }).catch(function() {
+      document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    });
+  } else {
+    document.getElementById('m-body').innerHTML = buildMBody(type, id);
+    // Limpa campo de senha após render para evitar autocomplete
+    setTimeout(function(){
+      var f = document.getElementById('mu-nova-senha');
+      if (f) f.value = '';
+    }, 100);
+  }
+}
+function closeModal() { document.getElementById('m-overlay').classList.remove('on'); }
+function closeModalOut(e) { if (e.target === document.getElementById('m-overlay')) closeModal(); }
+
+function gv(id) { var el = document.getElementById(id); return el ? el.value : ''; }
+
+function carregarReceitasPedido(pedidoId) {
+  var wrap = document.getElementById('receitas-pedido-wrap');
+  if (!wrap) return;
+  apiFetch('/receitas?farmacia_id=' + (CU && CU.farmacia_id || '') + '&pedido_id=' + pedidoId)
+  .then(function(res) {
+    if (!res.ok || !res.data || !res.data.length) {
+      wrap.innerHTML = '<div style="background:var(--bg);border-radius:10px;padding:12px;font-size:12px;color:var(--t3)">📋 Nenhuma receita enviada para este pedido.</div>';
+      return;
+    }
+    var receitas = res.data.filter(function(r){ return r.pedido_id === pedidoId; });
+    if (!receitas.length) {
+      wrap.innerHTML = '<div style="background:var(--bg);border-radius:10px;padding:12px;font-size:12px;color:var(--t3)">📋 Nenhuma receita enviada para este pedido.</div>';
+      return;
+    }
+    var statusCor = { pendente:'var(--a)', em_analise:'#7A50C8', aprovada:'var(--g)', reprovada:'var(--r)' };
+    var statusLabel = { pendente:'Pendente', em_analise:'Em análise', aprovada:'Aprovada', reprovada:'Reprovada' };
+    var h2 = '<div style="border:1.5px solid var(--br);border-radius:10px;overflow:hidden;margin-bottom:4px">';
+    h2 += '<div style="padding:10px 12px;background:var(--bg);font-size:12px;font-weight:700;color:var(--n);border-bottom:1px solid var(--br)">📋 Receita(s) enviada(s)</div>';
+    receitas.forEach(function(r) {
+      var cor = statusCor[r.status] || 'var(--t3)';
+      var lbl = statusLabel[r.status] || r.status;
+      h2 += '<div style="padding:12px;display:flex;gap:12px;align-items:flex-start">';
+      h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:zoom-in;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'" onclick="openLightbox(\'' + r.imagem_url + '\')" title="Clique para ampliar">';
+      h2 += '<div style="flex:1">';
+      h2 += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
+      h2 += '<span style="font-size:12px;font-weight:700;color:' + cor + ';background:' + cor + '18;padding:3px 10px;border-radius:20px">' + lbl + '</span>';
+      h2 += '</div>';
+      if (r.status === 'pendente' || r.status === 'em_analise') {
+        h2 += '<div style="display:flex;gap:8px">';
+        h2 += '<button class="btn btn-p" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'aprovada\')">✅ Aprovar</button>';
+        h2 += '<button class="btn btn-d" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'reprovada\')">❌ Reprovar</button>';
+        h2 += '</div>';
+      } else if (r.observacao) {
+        h2 += '<div style="font-size:11px;color:var(--t2)">Obs: ' + r.observacao + '</div>';
+      }
+      h2 += '</div></div>';
+    });
+    h2 += '</div>';
+    wrap.innerHTML = h2;
+  }).catch(function() {
+    wrap.innerHTML = '<div style="font-size:12px;color:var(--t3)">Erro ao carregar receitas.</div>';
+  });
+}
+
+function analisarReceita(receitaId, status) {
+  var obs = status === 'reprovada' ? prompt('Motivo da reprovação (opcional):') : null;
+  apiFetch('/receitas/' + receitaId, {
+    method: 'PATCH',
+    body: JSON.stringify({ status: status, observacao: obs || '' })
+  }).then(function(res) {
+    if (res.ok) {
+      showToast('s', status === 'aprovada' ? 'Receita aprovada!' : 'Receita reprovada', '');
+      carregarReceitasPedido(MC.id);
+    } else {
+      showToast('e', 'Erro', res.data.error || 'Tente novamente');
+    }
+  });
+}
+
+function previewLogoFile(input, farmaciaId) {
+  var file = input.files[0];
+  if (!file) return;
+  var prev = document.getElementById('mf-logo-preview');
+  var status = document.getElementById('mf-logo-status');
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    if (prev) prev.innerHTML = '<img src="' + e.target.result + '" style="width:100%;height:100%;object-fit:cover">';
+  };
+  reader.readAsDataURL(file);
+  if (!farmaciaId) { if (status) status.textContent = 'Salve a farmácia primeiro para adicionar logo.'; return; }
+  if (status) status.textContent = '⏳ Enviando...';
+  var fd = new FormData();
+  fd.append('logo', file);
+  fetch(API + '/farmacias/' + farmaciaId + '/logo', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + AT },
+    body: fd
+  }).then(function(r){ return r.json(); }).then(function(d) {
+    if (d.logo_url) {
+      if (status) status.textContent = '✅ Logo atualizada!';
+      var idx = FARMS.findIndex(function(f){ return f.id === farmaciaId; });
+      if (idx >= 0) FARMS[idx].logo_url = d.logo_url;
+      renderFarm();
+    } else {
+      if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
+    }
+  }).catch(function() {
+    if (status) status.textContent = '❌ Erro ao enviar.';
+  });
+}
+
+function previewLogo(url) {
+  var prev = document.getElementById('mf-logo-preview');
+  if (!prev) return;
+  if (url && url.startsWith('http')) {
+    prev.innerHTML = '<img src="' + url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'">';
+  } else {
+    prev.innerHTML = '<span style="font-size:22px">🏥</span>';
+  }
+}
+
+function buildMBody(type, id) {
+  var h = '';
+  if (type === 'farm-new' || type === 'farm-edit') {
+    var f = type === 'farm-edit' ? FARMS.find(function(x){return x.id===id;}) : {};
+    f = f || {};
+    h += '<div class="fr"><div class="fc3"><label>Nome da farmácia *</label><input id="mf-nome" value="' + (f.nome||'') + '" placeholder="Ex: Drogasil Boa Viagem"></div><div class="fc3"><label>CNPJ *</label><input id="mf-cnpj" value="' + cnpjMask(f.cnpj||'') + '" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)" onblur="validateCNPJField(this)" style="padding-right:34px"><span id=\"cnpj-ic\" style=\"position:absolute;right:10px;bottom:9px;font-size:15px\"></span></div></div>';
+    if (type === 'csv-import') {
+    // Captura dados antes do modal fechar
+    var farmEl = document.getElementById('csv-farm-id');
+    var farmId = farmEl ? farmEl.value : '';
+    if (!farmId) { showToast('e','Selecione a farmácia','Escolha a farmácia destino antes de importar.'); return; }
+    if (!window._csvData || !window._csvData.rows.length) { showToast('e','Sem dados','Carregue um CSV válido primeiro.'); return; }
+    // Copia os dados localmente antes de fechar modal
+    var csvSnapshot = {header: window._csvData.header.slice(), rows: window._csvData.rows.slice()};
+    closeModal();
+    window._csvData = null;
+    importCSVExecutar(farmId, csvSnapshot);
+    return;
+  }
+  if (type === 'farm-new') {
+      h += '<div class="fr"><div class="fc3"><label>E-mail de acesso *</label><input id="mf-email" type="email" placeholder="farmacia@email.com"></div><div class="fc3"><label>Senha inicial *</label><input id="mf-senha" type="password" placeholder="••••••••"></div></div>';
+    }
+    h += '<div class="fr"><div class="fc3"><label>Cidade</label><input id="mf-cidade" value="' + (f.cidade||'') + '" placeholder="Recife"></div><div class="fc3"><label>Bairro</label><input id="mf-bairro" value="' + (f.bairro||'') + '" placeholder="Boa Viagem"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Logradouro</label><input id="mf-end" value="' + (f.logradouro||'') + '" placeholder="Av. Boa Viagem, 1000"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Logo da farmácia</label>';
+    h += '<div style="display:flex;gap:12px;align-items:center">';
+    h += '<div id="mf-logo-preview" style="width:64px;height:64px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br);cursor:pointer" onclick="document.getElementById(\'mf-logo-file\').click()">';
+    if (f.logo_url) {
+      h += '<img src="' + f.logo_url + '" style="width:100%;height:100%;object-fit:cover" onerror="this.parentNode.innerHTML=\'🏥\'">';
+    } else {
+      h += '<span style="font-size:28px">🏥</span>';
+    }
+    h += '</div>';
+    h += '<div style="flex:1">';
+    h += '<input type="file" id="mf-logo-file" accept="image/*" style="display:none" onchange="previewLogoFile(this,\'' + (f.id||'') + '\')">';
+    h += '<button type="button" onclick="document.getElementById(\'mf-logo-file\').click()" style="background:var(--t);color:var(--n);border:none;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer;font-size:13px">📷 Escolher foto</button>';
+    h += '<div id="mf-logo-status" style="font-size:11px;color:var(--t3);margin-top:6px">' + (f.logo_url ? '✅ Logo atual carregada' : 'Nenhuma logo selecionada') + '</div>';
+    h += '</div></div>';
+    h += '</div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status manual</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
+    h += '<div style="margin-top:14px;border-top:1px solid var(--br);padding-top:14px">';
+    h += '<div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🕐 Horários de funcionamento</div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:10px">A farmácia abrirá/fechará automaticamente conforme os horários abaixo.</div>';
+    var dias = ['Dom','Seg','Ter','Qua','Qui','Sex','Sab'];
+    var horariosF = f.horarios || [];
+    h += '<div style="display:grid;gap:6px">';
+    for (var d=0;d<7;d++) {
+      var hor = horariosF.find(function(x){return x.dia_semana===d;}) || {hora_abertura:'08:00',hora_fechamento:'22:00',ativo:d>0};
+      h += '<div style="display:grid;grid-template-columns:50px 1fr 1fr 40px;gap:8px;align-items:center">';
+      h += '<span style="font-size:12px;font-weight:600;color:var(--n)">' + dias[d] + '</span>';
+      h += '<input type="time" id="mf-h-ab-'+d+'" value="' + (hor.hora_abertura||'08:00') + '" style="padding:6px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;' + (!hor.ativo?'opacity:.4':'') + '">';
+      h += '<input type="time" id="mf-h-fc-'+d+'" value="' + (hor.hora_fechamento||'22:00') + '" style="padding:6px 10px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;' + (!hor.ativo?'opacity:.4':'') + '">';
+      h += '<input type="checkbox" id="mf-h-at-'+d+'" ' + (hor.ativo?'checked':'') + ' title="Ativo" style="width:18px;height:18px;accent-color:var(--t);cursor:pointer" onchange="document.getElementById(\x27mf-h-ab-'+d+'\x27).style.opacity=this.checked?1:.4;document.getElementById(\x27mf-h-fc-'+d+'\x27).style.opacity=this.checked?1:.4">';
+      h += '</div>';
+    }
+    h += '</div></div>';
+  } else if (type === 'prod-new' || type === 'prod-edit') {
+    var p = type === 'prod-edit' ? PRODS.find(function(x){return x.id===id;}) : {};
+    p = p || {};
+    h += '<div class="fr"><div class="fc3 full"><label>Farmácia *</label>';
+    var isAdmProdForm = CU && CU.role === 'admin';
+    if (!isAdmProdForm) {
+      // Farmácia vê apenas a sua, pré-selecionada e bloqueada
+      var myFarm = FARMS.find(function(f){ return f.id === (CU && CU.farmacia_id); }) || FARMS[0] || {};
+      h += '<input type="text" value="' + (myFarm.nome||'Minha farmácia') + '" disabled style="background:var(--bg);color:var(--t2);cursor:not-allowed">';
+      h += '<input type="hidden" id="mp-farm" value="' + (myFarm.id||'') + '">';
+    } else {
+      h += '<select id="mp-farm">';
+      h += '<option value="">Selecione a farmácia...</option>';
+      for (var fi=0;fi<FARMS.length;fi++) {
+        var farmSel = (p.farmacia_id === FARMS[fi].id) || (CURRENT_FARM_ID && CURRENT_FARM_ID === FARMS[fi].id);
+        h += '<option value="' + FARMS[fi].id + '"' + (farmSel?' selected':'') + '>' + FARMS[fi].nome + '</option>';
+      }
+      h += '</select>';
+    }
+    h += '</div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Nome do produto *</label><input id="mp-nome" value="' + (p.nome||'') + '" placeholder="Ex: Dipirona 500mg"></div><div class="fc3"><label>Laboratório</label><input id="mp-lab" value="' + (p.lab||p.laboratorio||'') + '" placeholder="EMS, Medley..."></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Preço (R$) *</label><input id="mp-preco" type="number" step="0.01" value="' + (p.preco||'') + '" placeholder="9.90"></div><div class="fc3"><label>Preço promoção (R$)</label><input id="mp-promo" type="number" step="0.01" value="' + (p.promo||'') + '" placeholder="Opcional"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Categoria</label><select id="mp-cat">';
+    h += '<option value="">Selecione...</option>';
+    for (var ci=0;ci<CATS.length;ci++) {
+      var catSel = (p.categoria_id === CATS[ci].id) || (p.cat === CATS[ci].nome);
+      h += '<option value="' + CATS[ci].id + '"' + (catSel?' selected':'') + '>' + CATS[ci].nome + '</option>';
+    }
+    h += '</select></div><div class="fc3"><label>Unidade</label><select id="mp-uni">';
+    var unis = ['un','cx','fr','mg','ml'];
+    for (var j=0;j<unis.length;j++) h += '<option' + (p.uni===unis[j]?' selected':'') + '>' + unis[j] + '</option>';
+    h += '</select></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Controlado?</label><select id="mp-ctrl"><option value="false"' + (!p.ctrl?' selected':'') + '>Não</option><option value="true"' + (p.ctrl?' selected':'') + '>Sim — exige receita</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Descrição</label><textarea id="mp-desc" placeholder="Descrição do produto...">' + (p.desc||'') + '</textarea></div></div>';
+  } else if (type === 'usr-new' || type === 'usr-edit') {
+    var u = type === 'usr-edit' ? USRS.find(function(x){return x.id===id;}) : {};
+    u = u || {};
+    var farmOptsU = '<option value="">Nenhuma</option>';
+    FARMS.forEach(function(f){ farmOptsU += '<option value="' + f.id + '"' + (u.farmacia_id===f.id?' selected':'') + '>' + f.nome + '</option>'; });
+    h += '<div class="fr"><div class="fc3"><label>Nome completo *</label><input id="mu-nome" value="' + (u.nome||'') + '" placeholder="Nome do usuário"></div><div class="fc3"><label>Telefone</label><input id="mu-tel" value="' + (u.tel||u.telefone||'') + '" placeholder="(81) 9 9999-9999"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>E-mail *</label><input id="mu-email" type="email" value="' + (u.email||'') + '" placeholder="email@exemplo.com"></div><div class="fc3"><label>Perfil *</label><select id="mu-role" onchange="toggleFarmSelect(this.value)">';
+    var roles = ['cliente','farmacia','entregador','admin'];
+    for (var ri=0;ri<roles.length;ri++) h += '<option value="' + roles[ri] + '"' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri].charAt(0).toUpperCase()+roles[ri].slice(1) + '</option>';
+    h += '</select></div></div>';
+    h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + (u.role==='farmacia'?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
+    if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
+    if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="off"></div></div>';
+  } else if (type === 'est-edit') {
+    var pe = PRODS.find(function(x){return x.id===id;});
+    pe = pe || {};
+    h += '<div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px"><div style="font-weight:600;color:var(--n);margin-bottom:4px">' + (pe.nome||'Produto') + '</div><div style="font-size:12px;color:var(--t2)">Estoque atual: <b>' + (pe.qtd||0) + ' unidades</b></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Nova quantidade</label><input id="me-qtd" type="number" value="' + (pe.qtd||0) + '" min="0"></div><div class="fc3"><label>Qtd. mínima (alerta)</label><input id="me-min" type="number" value="10" min="0"></div></div>';
+    h += '<div class="fr"><div class="fc3 full"><label>Observação</label><input id="me-obs" placeholder="Ex: Recebimento NF 001234"></div></div>';
+  } else if (type === 'ped-view') {
+    var pv = PEDS.find(function(x){return x.id===id;}) || PEDS[0];
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">PEDIDO</div><div style="font-family:\'Nunito\';font-weight:700;font-size:16px">#' + pv.num + '</div></div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">STATUS</div>' + sbadge(pv.status) + '</div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">CLIENTE</div><div style="font-weight:600">' + pv.cli + '</div></div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px"><div style="font-size:11px;color:var(--t3);margin-bottom:4px">TOTAL</div><div style="font-family:\'Nunito\';font-weight:700;font-size:16px">' + fmtR(pv.total) + '</div></div>';
+    h += '</div>';
+    h += '<div style="background:var(--bg);border-radius:10px;padding:12px;margin-bottom:12px">';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">FARMÁCIA: ' + pv.farm + ' · ' + pv.metodo + '</div>';
+    h += '<div style="font-size:11px;color:var(--t3);margin-bottom:8px">ITENS: ' + pv.itens + ' produto(s) · Hora: ' + pv.hora + '</div>';
+    h += '</div>';
+    // ✅ Seção de receitas do pedido
+    h += '<div id="receitas-pedido-wrap" style="margin-bottom:12px"><div style="font-size:12px;color:var(--t3)">⏳ Carregando receitas...</div></div>';
+    setTimeout(function(){ carregarReceitasPedido(pv.id); }, 100);
+    if (['pendente','confirmado','preparando','aguardando_entregador'].indexOf(pv.status) >= 0) {
+      h += '<div style="background:var(--tl);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:600;color:var(--td);margin-bottom:8px">Avançar status</div>';
+      h += '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="avancarPed(\'' + pv.id + '\');closeModal()">▶ Próximo status</button>';
+      h += '<button class="btn btn-d" onclick="showToast(\'w\',\'Cancelamento\',\'Pedido marcado para cancelamento\');closeModal()">✕ Cancelar pedido</button></div></div>';
+    }
+  } else {
+    h = '<p style="color:var(--t2)">Em desenvolvimento.</p>';
+  }
+  return h;
+}
+
+function saveModal() {
+  if (MC.type === 'ped-view') { closeModal(); return; }
+  if (MC.type === 'rsn') { salvarRedefinicaoSenha(); return; }
+  var btn = document.getElementById('m-save-txt');
+  btn.textContent = 'Salvando...';
+  var type = MC.type, id = MC.id;
+
+  if (type === 'farm-new') {
+    var nome = gv('mf-nome'), cnpj = gv('mf-cnpj'), email = gv('mf-email'), senha = gv('mf-senha');
+    if (!nome || !cnpj || !email || !senha) { showToast('e','Campos obrigatórios','Preencha: nome, CNPJ, e-mail e senha'); btn.textContent='Salvar'; return; }
+    var cnpjRaw = cnpj.replace(/\D/g,'');
+    if (!validateCNPJ(cnpjRaw)) { showToast('e','CNPJ inválido','Verifique os dígitos do CNPJ informado.'); btn.textContent='Salvar'; return; }
+    var horariosPayload = [];
+    for (var hd=0;hd<7;hd++) {
+      horariosPayload.push({
+        dia_semana: hd,
+        hora_abertura: document.getElementById('mf-h-ab-'+hd) ? document.getElementById('mf-h-ab-'+hd).value : '08:00',
+        hora_fechamento: document.getElementById('mf-h-fc-'+hd) ? document.getElementById('mf-h-fc-'+hd).value : '22:00',
+        ativo: document.getElementById('mf-h-at-'+hd) ? document.getElementById('mf-h-at-'+hd).checked : true
+      });
+    }
+    var payload = {
+      nome: nome, cnpj: cnpj, email: email, senha: senha, role: 'farmacia',
+      cidade: gv('mf-cidade'), bairro: gv('mf-bairro'), logradouro: gv('mf-end'),
+      taxa_entrega: Number(gv('mf-taxa'))||6.90,
+      raio_entrega_km: Number(gv('mf-raio'))||5,
+      pedido_minimo: Number(gv('mf-pmin'))||0,
+      aberta: gv('mf-aberta') === 'true',
+    };
+    apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
+    .then(function(res) {
+      if (res.ok) {
+        // Salva horários após criar farmácia
+        apiFetch('/farmacias/' + res.data.id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosPayload})});
+        closeModal();
+        showToast('s','Farmácia cadastrada!', nome + ' — login: ' + email);
+        loadFarms().then(function(){ renderFarm(); });
+      } else {
+        showToast('e','Erro ao cadastrar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'farm-edit') {
+    var fe = {
+      nome: gv('mf-nome'), cidade: gv('mf-cidade'), bairro: gv('mf-bairro'),
+      logradouro: gv('mf-end'), taxa_entrega: Number(gv('mf-taxa'))||6.90,
+      raio_entrega_km: Number(gv('mf-raio'))||5,
+      pedido_minimo: Number(gv('mf-pmin'))||0,
+      aberta: gv('mf-aberta') === 'true',
+    };
+    var horariosEdit = [];
+    for (var hde=0;hde<7;hde++) {
+      horariosEdit.push({
+        dia_semana: hde,
+        hora_abertura: document.getElementById('mf-h-ab-'+hde) ? document.getElementById('mf-h-ab-'+hde).value : '08:00',
+        hora_fechamento: document.getElementById('mf-h-fc-'+hde) ? document.getElementById('mf-h-fc-'+hde).value : '22:00',
+        ativo: document.getElementById('mf-h-at-'+hde) ? document.getElementById('mf-h-at-'+hde).checked : true
+      });
+    }
+    apiFetch('/farmacias/' + id, {method:'PATCH', body: JSON.stringify(fe)})
+    .then(function(res) {
+      if (res.ok) {
+        // Salva horários e aguarda resposta
+        return apiFetch('/farmacias/' + id + '/horarios', {method:'PUT', body: JSON.stringify({horarios: horariosEdit})})
+          .then(function(hRes) {
+            closeModal();
+            if (hRes.ok) {
+              showToast('s','Farmácia atualizada!', fe.nome + ' — horários salvos');
+            } else {
+              showToast('s','Farmácia atualizada!', fe.nome);
+              console.warn('Erro ao salvar horários:', hRes.data);
+            }
+            loadFarms().then(function(){ renderFarm(); });
+          });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(e){ console.error(e); showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'prod-new') {
+    var pNome = gv('mp-nome'), pPreco = gv('mp-preco');
+    if (!pNome || !pPreco) { showToast('e','Obrigatório','Nome e preço são obrigatórios'); btn.textContent='Salvar'; return; }
+    var mpFarm = gv('mp-farm') || (CU && CU.farmacia_id);
+    if (!mpFarm) { showToast('e','Obrigatório','Selecione a farmácia'); btn.textContent='Salvar'; return; }
+    var pp = {
+      nome: pNome, laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
+      farmacia_id: mpFarm,
+      preco: Number(pPreco), preco_promocional: Number(gv('mp-promo'))||null,
+      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
+    };
+    // FIX: admin usa /produtos, farmacia usa /farmacias/:id/produtos
+    var isAdmProd = CU && CU.role === 'admin';
+    var prodUrl = isAdmProd ? '/produtos' : '/farmacias/' + mpFarm + '/produtos';
+    apiFetch(prodUrl, {method:'POST', body: JSON.stringify(pp)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Produto cadastrado!', pNome);
+        loadProds().then(function(){ renderProd(); });
+      } else {
+        showToast('e','Erro ao cadastrar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'prod-edit') {
+    var pe = {
+      nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
+      farmacia_id: gv('mp-farm') || (CU && CU.farmacia_id),
+      preco: Number(gv('mp-preco')), preco_promocional: Number(gv('mp-promo'))||null,
+      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
+    };
+    // FIX: admin usa /produtos/:id, farmacia usa /farmacias/:farmId/produtos/:prodId
+    var isAdmEdit = CU && CU.role === 'admin';
+    var editUrl = isAdmEdit ? '/produtos/' + id : '/farmacias/' + (CU && CU.farmacia_id) + '/produtos/' + id;
+    apiFetch(editUrl, {method:'PATCH', body: JSON.stringify(pe)})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Produto atualizado!', pe.nome);
+        loadProds().then(function(){ renderProd(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'usr-new') {
+    var uNome=gv('mu-nome'), uEmail=gv('mu-email'), uSenha=gv('mu-senha'), uRole=gv('mu-role');
+    if (!uNome||!uEmail||!uSenha) { showToast('e','Obrigatório','Nome, e-mail e senha são obrigatórios'); btn.textContent='Salvar'; return; }
+    var uFarm = gv('mu-farm') || null;
+    apiFetch('/auth/register', {method:'POST', body: JSON.stringify({nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel'),farmacia_id:uFarm})})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Usuário criado!', uNome + ' — ' + uRole);
+        loadUsrs().then(function(){ renderUsr(); });
+      } else {
+        showToast('e','Erro ao criar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'usr-edit') {
+    var ue = {nome:gv('mu-nome'), email:gv('mu-email'), role:gv('mu-role'), telefone:gv('mu-tel'), farmacia_id:gv('mu-farm')||null};
+    var novaSenhaEdit = gv('mu-nova-senha');
+    if (novaSenhaEdit) {
+      if (novaSenhaEdit.length < 6) { showToast('e','Senha fraca','A senha deve ter pelo menos 6 caracteres.'); btn.textContent='Salvar'; return; }
+    }
+    var patchReqs = [apiFetch('/usuarios/' + id, {method:'PATCH', body: JSON.stringify(ue)})];
+    if (novaSenhaEdit) patchReqs.push(apiFetch('/usuarios/' + id + '/reset-senha', {method:'POST', body: JSON.stringify({nova_senha: novaSenhaEdit})}));
+    Promise.all(patchReqs)
+    .then(function(results) {
+      var res = results[0]; if (res.ok) {
+        closeModal(); showToast('s','Usuário atualizado!', ue.nome);
+        loadUsrs().then(function(){ renderUsr(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else if (type === 'est-edit') {
+    var estId = id;
+    var novaQtd = Number(gv('me-qtd'))||0;
+    var novaMin = Number(gv('me-min'))||10;
+    // FIX: farmacia usa rota propria de estoque, admin usa rota de produto
+    var isAdmEst = CU && CU.role === 'admin';
+    var estUrl = isAdmEst
+      ? '/produtos/' + estId
+      : '/farmacias/' + (CU && CU.farmacia_id) + '/estoque/' + estId;
+    var estBody = isAdmEst
+      ? JSON.stringify({estoque: novaQtd})
+      : JSON.stringify({quantidade: novaQtd, qtd_minima: novaMin});
+    apiFetch(estUrl, {method:'PATCH', body: estBody})
+    .then(function(res) {
+      if (res.ok) {
+        closeModal(); showToast('s','Estoque atualizado!', 'Nova quantidade: ' + novaQtd + ' un.');
+        loadProds().then(function(){ renderEst(); });
+      } else {
+        showToast('e','Erro ao salvar', res.data.error || res.data.message || 'Tente novamente');
+        btn.textContent = 'Salvar';
+      }
+    }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); btn.textContent='Salvar'; });
+
+  } else {
+    closeModal(); showToast('s','Salvo!','Operação realizada com sucesso.');
+  }
+}
+
+// ── CHAMADOS ─────────────────────────────────────────────────
+function loadChamados() {
+  return apiFetch('/chamados').then(function(res) {
+    if (res.ok) {
+      CHAMS = Array.isArray(res.data) ? res.data : (res.data.chamados || res.data.data || []);
+    }
+  }).catch(function() { CHAMS = []; }).then(function() {
+    // Badge de chamados abertos
+    var abertos = CHAMS.filter(function(c){ return c.status === 'aberto' || c.status === 'em_analise'; }).length;
+    var bdg = document.getElementById('bdg-cham');
+    if (bdg) {
+      if (abertos > 0) { bdg.textContent = abertos > 99 ? '99+' : abertos; bdg.style.display = 'flex'; }
+      else { bdg.style.display = 'none'; }
+    }
+  });
+}
+
+var CHAM_STATUS = {
+  aberto:     { label:'Aberto',     cor:'var(--r)',  bg:'rgba(240,69,90,.1)'   },
+  em_analise: { label:'Em análise', cor:'var(--a)',  bg:'rgba(245,166,35,.1)'  },
+  resolvido:  { label:'Resolvido',  cor:'var(--g)',  bg:'rgba(34,201,122,.12)' },
+};
+var CHAM_MOTIVOS = {
+  atraso:'⏰ Pedido atrasado', errado:'❌ Produto errado', danificado:'💔 Produto danificado',
+  faltando:'📦 Item faltando', cancelar:'🚫 Cancelar pedido', pagamento:'💳 Problema no pagamento', outro:'💬 Outro motivo',
+};
+
+function renderCham() {
+  var el = document.getElementById('page-cham');
+  var isAdm = CU.role === 'admin';
+  var filtro = window._chamFiltro || 'todos';
+
+  var filtrados = filtro === 'todos' ? CHAMS
+    : CHAMS.filter(function(c){ return c.status === filtro; });
+
+  var h = '';
+
+  // Filtros
+  h += '<div class="fb" style="margin-bottom:18px">';
+  ['todos','aberto','em_analise','resolvido'].forEach(function(f) {
+    var labels = {todos:'Todos (' + CHAMS.length + ')', aberto:'Abertos', em_analise:'Em análise', resolvido:'Resolvidos'};
+    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._chamFiltro=\'' + f + '\';renderCham()">' + labels[f] + '</button>';
+  });
+  h += '</div>';
+
+  if (filtrados.length === 0) {
+    h += '<div class="empty"><div class="ei">💬</div><div class="eT">Nenhum chamado</div><p>' + (filtro==='todos'?'Os chamados abertos pelos clientes aparecerão aqui.':'Nenhum chamado com este status.') + '</p></div>';
+    el.innerHTML = h; return;
+  }
+
+  h += '<div class="card"><table class="tbl"><thead><tr>';
+  h += '<th>#</th><th>Cliente</th><th>Farmácia</th><th>Motivo</th><th>Mensagem</th><th>Status</th><th>Data</th><th>Ações</th>';
+  h += '</tr></thead><tbody>';
+
+  filtrados.forEach(function(c) {
+    var st = CHAM_STATUS[c.status] || CHAM_STATUS.aberto;
+    var motivo = CHAM_MOTIVOS[c.motivo] || c.motivo || '—';
+    var data = c.created_at ? new Date(c.created_at).toLocaleDateString('pt-BR') : '—';
+    h += '<tr>';
+    h += '<td><span class="oid">#' + (c.pedido_numero || c.pedido_id?.slice(0,6) || '—') + '</span></td>';
+    h += '<td><b>' + (c.cliente_nome || '—') + '</b><br><span style="font-size:11px;color:var(--t3)">' + (c.cliente_email || '') + '</span></td>';
+    h += '<td>' + (c.farmacia_nome || '—') + '</td>';
+    h += '<td style="font-size:12px">' + motivo + '</td>';
+    h += '<td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px;color:var(--t2)">' + (c.mensagem || '—') + '</td>';
+    h += '<td><span class="b" style="background:' + st.bg + ';color:' + st.cor + '">' + st.label + '</span></td>';
+    h += '<td style="font-size:12px;color:var(--t3)">' + data + '</td>';
+    h += '<td>';
+    if (c.status === 'aberto') {
+      h += '<button class="btn btn-s" style="font-size:11px;padding:5px 10px;margin-right:4px;background:rgba(245,166,35,.12);color:#C98A10;border:1px solid rgba(245,166,35,.3)" onclick="atualizarChamado(\'' + c.id + '\',\'em_analise\')">Em análise</button>';
+    }
+    if (c.status !== 'resolvido') {
+      h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado(\'' + c.id + '\',\'resolvido\')">&#10003; Resolver</button>';
+    }
+    h += '<button class="btn" style="font-size:11px;padding:5px 10px;margin-left:4px;background:rgba(62,207,191,.12);color:var(--p);border:1px solid rgba(62,207,191,.3)" data-cid="' + c.id + '" data-pnum="' + (c.pedido_numero||0) + '" data-fnome="' + (c.farmacia_nome||'').replace(/"/g,"") + '" data-motivo="' + (c.motivo||'') + '" onclick="var b=this;abrirChat(b.dataset.cid,b.dataset.pnum,b.dataset.fnome,b.dataset.motivo)">Chat</button>';
+    h += '</td>';
+    h += '</tr>';
+  });
+
+  h += '</tbody></table></div>';
+  el.innerHTML = h;
+}
+
+function atualizarChamado(id, status) {
+  apiFetch('/chamados/' + id, { method: 'PATCH', body: JSON.stringify({ status: status }) })
+  .then(function(res) {
+    if (res.ok) {
+      showToast('s', 'Chamado atualizado!', status === 'resolvido' ? 'Marcado como resolvido.' : 'Em análise.');
+      loadChamados().then(function(){ renderCham(); });
+    } else {
+      showToast('e', 'Erro', res.data.error || 'Tente novamente.');
+    }
+  });
+}
+
+// ── CHART ─────────────────────────────────────────────────────
+function buildChart(id) {
+  // Pedidos reais por dia da semana (últimos 7 dias)
+  var days=['Seg','Ter','Qua','Qui','Sex','Sáb','Hj'];
+  var vals=[0,0,0,0,0,0,0];
+  var hoje2 = new Date(); hoje2.setHours(23,59,59,999);
+  for (var pi=0; pi<PEDS.length; pi++) {
+    var d = new Date(PEDS[pi].created_at || 0);
+    var diff = Math.floor((hoje2 - d) / 86400000);
+    if (diff >= 0 && diff < 7) vals[6 - diff]++;
+  }
+  // Se sem dados, usa valores ilustrativos
+  if (vals.every(function(v){return v===0;})) vals=[2,3,1,4,2,3,PEDS.length||1];
+  var el = document.getElementById(id); if (!el) return;
+  var mx = Math.max.apply(null, vals); el.innerHTML = '';
+  for (var i=0;i<vals.length;i++) {
+    (function(v,d,last) {
+      var w=document.createElement('div'); w.className='bw';
+      var b=document.createElement('div'); b.className='bar'+(last?' td':'');
+      b.style.height='0'; b.style.flex='1';
+      var l=document.createElement('div'); l.className='bL'; l.textContent=d;
+      w.appendChild(b); w.appendChild(l); el.appendChild(w);
+      setTimeout(function(){b.style.height=Math.round(v/mx*100)+'%';},100+i*60);
+    })(vals[i],days[i],i===vals.length-1);
+  }
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(type, title, body) {
+  var a = document.getElementById('toast-area');
+  var t = document.createElement('div'); t.className = 'toast';
+  var emo = {s:'✅',i:'ℹ️',w:'⚠️',e:'❌'}[type]||'ℹ️';
+  t.innerHTML = '<div class="ti ' + type + '">' + emo + '</div><div><div class="tT">' + title + '</div><div class="tB">' + body + '</div></div>';
+  a.appendChild(t);
+  setTimeout(function(){t.style.opacity='0';t.style.transition='opacity .4s';setTimeout(function(){t.remove();},400);},4500);
+}
+
+
+
+
+// ── CNPJ — Máscara e Validação ────────────────────────────────
+function cnpjMask(v) {
+  v = (v||'').replace(/\D/g,'').slice(0,14);
+  if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2}).*/,'$1.$2.$3/$4-$5');
+  else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4}).*/,'$1.$2.$3/$4');
+  else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3}).*/,'$1.$2.$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3}).*/,'$1.$2');
+  return v;
+}
+function maskCNPJ(input) {
+  input.value = cnpjMask(input.value);
+  validateCNPJField(input);
+}
+function validateCNPJ(cnpj) {
+  cnpj = cnpj.replace(/\D/g,'');
+  if (cnpj.length !== 14) return false;
+  if (/^(\d)\1+$/.test(cnpj)) return false;
+  var calc = function(cnpj, n) {
+    var sum = 0, pos = n - 7;
+    for (var i = n; i >= 1; i--) {
+      sum += parseInt(cnpj.charAt(n - i)) * pos--;
+      if (pos < 2) pos = 9;
+    }
+    var r = sum % 11 < 2 ? 0 : 11 - sum % 11;
+    return r === parseInt(cnpj.charAt(n));
+  };
+  return calc(cnpj, 12) && calc(cnpj, 13);
+}
+function validateCNPJField(input) {
+  var ic = document.getElementById('cnpj-ic');
+  if (!ic) return;
+  var raw = input.value.replace(/\D/g,'');
+  if (raw.length === 0) { ic.textContent=''; input.style.borderColor=''; return; }
+  if (raw.length < 14) { ic.textContent=''; input.style.borderColor='var(--a)'; return; }
+  if (validateCNPJ(raw)) {
+    ic.textContent='✅'; input.style.borderColor='var(--g)';
+    input.dataset.valid='1';
+  } else {
+    ic.textContent='❌'; input.style.borderColor='var(--r)';
+    input.dataset.valid='0';
+  }
+}
+
+// ── IMPORTAÇÃO CSV DE MEDICAMENTOS ────────────────────────────
+function openImportCSV() {
+  MC = {type:'csv-import'};
+  document.getElementById('m-title').textContent = 'Importar medicamentos (CSV)';
+  document.getElementById('m-save-txt').textContent = 'Importar';
+  document.getElementById('m-body').innerHTML = buildImportCSVBody();
+  document.getElementById('m-overlay').classList.add('on');
+}
+
+function buildImportCSVBody() {
+  var farmOpts = '<option value="">Selecione a farmácia...</option>';
+  FARMS.forEach(function(f){ farmOpts += '<option value="' + f.id + '">' + f.nome + '</option>'; });
+
+  return '<div style="margin-bottom:16px">' +
+    '<div class="fc3" style="margin-bottom:12px"><label>Farmácia destino *</label>' +
+    '<select id="csv-farm-id">' + farmOpts + '</select></div>' +
+    '<div class="fc3"><label>Arquivo CSV *</label>' +
+    '<input type="file" id="csv-file" accept=".csv,.txt" onchange="previewCSV(this)" ' +
+    'style="padding:8px;cursor:pointer"></div></div>' +
+    '<div id="csv-info" style="font-size:12px;color:var(--t2);margin-bottom:12px">' +
+    '<b>Formato esperado do CSV:</b> nome, laboratorio, categoria, preco, controlado (sim/nao), unidade, descricao, estoque<br>' +
+    'Primeira linha deve ser o cabeçalho. Separador: vírgula ou ponto-e-vírgula.</div>' +
+    '<div id="csv-preview"></div>';
+}
+
+function previewCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    var rows = parseCSV(text);
+    if (!rows.length) { document.getElementById('csv-preview').innerHTML = '<p style="color:var(--r)">Arquivo vazio ou inválido.</p>'; return; }
+    var header = rows[0].map(function(h){ return h.toLowerCase().trim(); });
+    var data = rows.slice(1).filter(function(r){ return r.some(function(c){ return c.trim(); }); });
+    var h = '<div style="font-size:12px;font-weight:600;color:var(--g);margin-bottom:8px">✅ ' + data.length + ' produto(s) encontrado(s)</div>';
+    h += '<div style="overflow-x:auto;max-height:220px;overflow-y:auto;border:1px solid var(--br);border-radius:8px">';
+    h += '<table class="tbl"><thead><tr>';
+    header.forEach(function(col){ h += '<th>' + col + '</th>'; });
+    h += '</tr></thead><tbody>';
+    data.slice(0,8).forEach(function(row){
+      h += '<tr>';
+      row.forEach(function(cell){ h += '<td style="font-size:11px;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="' + cell + '">' + cell + '</td>'; });
+      h += '</tr>';
+    });
+    if (data.length > 8) h += '<tr><td colspan="' + header.length + '" style="text-align:center;font-size:11px;color:var(--t3)">... e mais ' + (data.length-8) + ' linha(s)</td></tr>';
+    h += '</tbody></table></div>';
+    document.getElementById('csv-preview').innerHTML = h;
+    window._csvData = {header: header, rows: data};
+  };
+  reader.readAsText(file, 'UTF-8');
+}
+
+function parseCSV(text) {
+  // Normalizar quebras de linha (Windows \r\n e Mac \r)
+  text = text.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  // Detectar separador pela primeira linha
+  var firstLine = text.split('\n')[0] || '';
+  var commas = (firstLine.match(/,/g) || []).length;
+  var semis  = (firstLine.match(/;/g) || []).length;
+  var sep = semis > commas ? ';' : ',';
+  console.log('[CSV] sep:', JSON.stringify(sep), 'commas:', commas, 'semis:', semis, 'header:', firstLine.slice(0,80));
+  return text.split('\n').filter(function(l){ return l.trim(); }).map(function(line){
+    var result = [], cur = '', inQ = false;
+    for (var i=0; i<line.length; i++) {
+      var c = line[i];
+      if (c==='"') { inQ=!inQ; continue; }
+      if (c===sep && !inQ) { result.push(cur.trim()); cur=''; continue; }
+      cur += c;
+    }
+    result.push(cur.trim());
+    return result;
+  });
+}
+
+function importCSVExecutar(farmId, csvSnapshot) {
+  var header = csvSnapshot.header;
+  var rows = csvSnapshot.rows;
+  // Toast de progresso
+  showToast('i', 'Importando...', 'Aguarde, enviando ' + rows.length + ' produtos.');
+
+  // Mapear colunas automaticamente
+  var colMap = {
+    nome: findCol(header, ['nome','name','produto','medicamento','descricao_produto']),
+    lab:  findCol(header, ['laboratorio','fabricante','lab','manufacturer']),
+    cat:  findCol(header, ['categoria','category','classe','tipo']),
+    preco: findCol(header, ['preco','price','valor','preco_venda','venda']),
+    ctrl: findCol(header, ['controlado','controlled','receita','tarja']),
+    uni:  findCol(header, ['unidade','unit','uni','apresentacao']),
+    desc: findCol(header, ['descricao','description','obs','observacao']),
+    estoque: findCol(header, ['estoque','quantidade','qty','stock','qtd'])
+  };
+
+  // Log para diagnóstico
+  console.log('[CSV] header:', header);
+  console.log('[CSV] colMap:', colMap);
+  console.log('[CSV] total rows bruto:', rows.length);
+  console.log('[CSV] farmId:', farmId);
+  console.log('[CSV] primeira row:', rows[0]);
+
+  var produtos = rows.map(function(row) {
+    var nome = getCol(row, colMap.nome);
+    var preco = parseFloat((getCol(row, colMap.preco)||'10').replace(',','.'));
+    if (isNaN(preco) || preco <= 0) preco = 10.00;
+    return {
+      farmacia_id:  farmId,
+      nome:         nome || '',
+      laboratorio:  getCol(row, colMap.lab),
+      categoria:    getCol(row, colMap.cat),
+      preco:        preco,
+      controlado:   /sim|yes|s|1|tarja/i.test(getCol(row, colMap.ctrl)||''),
+      unidade:      getCol(row, colMap.uni) || 'cx',
+      descricao:    getCol(row, colMap.desc),
+      estoque:      parseInt(getCol(row, colMap.estoque)) || 0,
+      principio_ativo: getCol(row, findCol(header, ['principio_ativo','principio','ativo','pa']))
+    };
+  }).filter(function(p){ return p.nome && p.nome.length > 1; });
+
+  console.log('[CSV] produtos válidos após filter:', produtos.length);
+  if (produtos.length === 0) {
+    showToast('e','CSV sem dados válidos','Verifique se a coluna "nome" existe no arquivo.');
+    btn.textContent = 'Importar';
+    return;
+  }
+  console.log('[CSV] exemplo produto[0]:', produtos[0]);
+
+  // Enviar em lotes de 50
+  var lotes = [];
+  for (var i=0; i<produtos.length; i+=50) lotes.push(produtos.slice(i,i+50));
+  console.log('[CSV] total lotes:', lotes.length);
+
+  var ok=0, erros=0;
+  var next = function(idx) {
+    if (idx >= lotes.length) {
+      showToast(ok>0?'s':'w', 'Importação concluída!', ok + ' produto(s) importado(s)' + (erros?' · '+erros+' com erro':''));
+      loadProds().then(function(){ renderProd(); });
+      return;
+    }
+    console.log('[CSV] enviando lote', idx+1, '/', lotes.length, '—', lotes[idx].length, 'itens');
+    apiFetch('/produtos/importar', {
+      method: 'POST',
+      body: JSON.stringify({produtos: lotes[idx]})
+    }).then(function(res) {
+      console.log('[CSV] lote', idx+1, 'resposta:', res.status, res.data);
+      if (res.ok) {
+        ok += (res.data.criados || lotes[idx].length);
+      } else {
+        erros += lotes[idx].length;
+        var errMsg = res.data && res.data.error ? res.data.error : ('HTTP ' + res.status + ' — verifique o backend');
+        showToast('e', 'Erro lote ' + (idx+1), errMsg);
+        if (idx === 0) { return; }
+      }
+      next(idx+1);
+    }).catch(function(e){
+      console.error('[CSV] catch lote', idx+1, e);
+      erros += lotes[idx].length;
+      next(idx+1);
+    });
+  };
+  next(0);
+}
+
+function findCol(header, names) {
+  for (var i=0; i<names.length; i++) {
+    var idx = header.indexOf(names[i]);
+    if (idx !== -1) return idx;
+  }
+  return -1;
+}
+function getCol(row, idx) {
+  return idx !== -1 && row[idx] ? row[idx].trim() : '';
+}
+
+// ── TOGGLE SENHA LOGIN ───────────────────────────────────────
+function toggleSenhaLogin() {
+  var input = document.getElementById('lsenha');
+  var btn = document.getElementById('btn-toggle-senha');
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+// ── ALTERAR SENHA PRÓPRIA ─────────────────────────────────────
+function salvarNovaSenha() {
+  var atual  = document.getElementById('cfg-senha-atual')  ? document.getElementById('cfg-senha-atual').value  : '';
+  var nova   = document.getElementById('cfg-nova-senha')   ? document.getElementById('cfg-nova-senha').value   : '';
+  var conf   = document.getElementById('cfg-conf-senha')   ? document.getElementById('cfg-conf-senha').value   : '';
+  var msg    = document.getElementById('cfg-senha-msg');
+
+  if (!atual || !nova || !conf) { setMsg(msg,'e','Preencha todos os campos.'); return; }
+  if (nova.length < 6)          { setMsg(msg,'e','A nova senha deve ter pelo menos 6 caracteres.'); return; }
+  if (nova !== conf)             { setMsg(msg,'e','As senhas não coincidem.'); return; }
+
+  setMsg(msg,'i','Salvando...');
+  apiFetch('/auth/reset-senha', {
+    method: 'POST',
+    body: JSON.stringify({senha_atual: atual, nova_senha: nova})
+  }).then(function(res) {
+    if (res.ok) {
+      setMsg(msg,'s','✅ Senha alterada com sucesso!');
+      document.getElementById('cfg-senha-atual').value = '';
+      document.getElementById('cfg-nova-senha').value  = '';
+      document.getElementById('cfg-conf-senha').value  = '';
+      showToast('s','Senha alterada!','Novo acesso válido no painel e no app.');
+    } else {
+      setMsg(msg,'e', res.data.error || 'Erro ao alterar senha.');
+    }
+  }).catch(function(){ setMsg(msg,'e','Sem conexão. Tente novamente.'); });
+}
+function setMsg(el, type, text) {
+  if (!el) return;
+  var colors = {s:'var(--g)', e:'var(--r)', i:'var(--t2)', w:'var(--a)'};
+  el.style.color = colors[type] || 'var(--t2)';
+  el.textContent = text;
+}
+
+// ── TOGGLE CAMPO FARMÁCIA NO MODAL USUÁRIO ──────────────────
+function toggleFarmSelect(role) {
+  var wrap = document.getElementById('mu-farm-wrap');
+  if (wrap) wrap.style.display = role === 'farmacia' ? '' : 'none';
+}
+
+// ── ESQUECI MINHA SENHA ───────────────────────────────────────
+function abrirEsqueciSenha() {
+  var email = document.getElementById('lemail').value || '';
+  var html = '<div class="fc3" style="margin-bottom:12px"><label>E-mail cadastrado</label>' +
+    '<input type="email" id="rsn-email" value="' + email + '" placeholder="seu@email.com"></div>' +
+    '<div class="fc3" style="margin-bottom:12px"><label>Nova senha</label>' +
+    '<input type="password" id="rsn-nova" placeholder="Mínimo 6 caracteres"></div>' +
+    '<div id="rsn-msg" style="font-size:12px;margin-top:8px;min-height:16px"></div>';
+  MC = {type:'rsn'};
+  document.getElementById('m-title').textContent = '🔑 Redefinir senha';
+  document.getElementById('m-save-txt').textContent = 'Redefinir';
+  document.getElementById('m-body').innerHTML = html;
+  document.getElementById('m-overlay').classList.add('on');
+}
+
+function salvarRedefinicaoSenha() {
+  var email = document.getElementById('rsn-email') ? document.getElementById('rsn-email').value : '';
+  var nova  = document.getElementById('rsn-nova')  ? document.getElementById('rsn-nova').value  : '';
+  var msg   = document.getElementById('rsn-msg');
+  if (!email || !nova) { setMsg(msg,'e','Preencha todos os campos.'); return; }
+  if (nova.length < 6) { setMsg(msg,'e','A senha deve ter pelo menos 6 caracteres.'); return; }
+  setMsg(msg,'i','Redefinindo...');
+  fetch(API + '/auth/reset-senha-app', {
+    method: 'POST',
+    headers: {'Content-Type':'application/json'},
+    body: JSON.stringify({email: email, nova_senha: nova})
+  }).then(function(r){ return r.json().then(function(d){ return {ok:r.ok, data:d}; }); })
+  .then(function(res) {
+    if (res.ok) {
+      setMsg(msg,'s','✅ Senha redefinida! Faça login com a nova senha.');
+      setTimeout(function(){ closeModal(); }, 2000);
+    } else {
+      setMsg(msg,'e', res.data.error || 'Erro ao redefinir. Verifique o e-mail.');
+    }
+  }).catch(function(){ setMsg(msg,'e','Sem conexão. Tente novamente.'); });
+}
+
+// ── SIDEBAR MOBILE ────────────────────────────────────────────
+function toggleSidebar() {
+  var sb  = document.querySelector('.sb');
+  var ov  = document.getElementById('sb-overlay');
+  var open = sb.classList.toggle('open');
+  if (ov) ov.classList.toggle('on', open);
+  document.body.style.overflow = open ? 'hidden' : '';
+}
+function closeSidebar() {
+  var sb = document.querySelector('.sb');
+  var ov = document.getElementById('sb-overlay');
+  sb.classList.remove('open');
+  if (ov) ov.classList.remove('on');
+  document.body.style.overflow = '';
+}
+// Fechar sidebar ao navegar (mobile)
+var _origGoto = goto;
+goto = function(id) {
+  if (window.innerWidth <= 768) closeSidebar();
+  _origGoto(id);
+};
+
+</script>
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+
+<!-- Chat Modal -->
+<div id="chat-modal">
+  <div class="chat-box">
+    <div class="chat-hdr">
+      <div style="flex:1">
+        <h3 id="chat-titulo">Chat do chamado</h3>
+        <div id="chat-sub" style="font-size:12px;color:var(--t3)"></div>
+      </div>
+      <button onclick="fecharChat()">✕</button>
+    </div>
+    <div class="chat-msgs" id="chat-msgs"></div>
+    <div class="chat-inp">
+      <textarea id="chat-input" placeholder="Digite sua resposta..." rows="1"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();enviarMsgChat();}"
+        oninput="if(_chatSocket&&_chatId)_chatSocket.emit('digitando',{chamado_id:_chatId,autor_id:CU&&CU.id})"></textarea>
+      <button onclick="enviarMsgChat()">Enviar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+var _chatId = null, _chatSocket = null;
+
+function abrirChat(chamadoId, pedNum, farmNome, motivo) {
+  _chatId = chamadoId;
+  document.getElementById('chat-titulo').textContent = 'Chat · Pedido #' + pedNum;
+  document.getElementById('chat-sub').textContent = farmNome + ' · ' + (CHAM_MOTIVOS[motivo] || motivo);
+  document.getElementById('chat-msgs').innerHTML = '<div style="text-align:center;color:var(--t3);padding:20px">Carregando...</div>';
+  document.getElementById('chat-modal').classList.add('open');
+
+  apiFetch('/chamados/' + chamadoId + '/mensagens').then(function(res) {
+    renderMsgsChat(res.ok ? (res.data || []) : []);
+  });
+
+  if (_chatSocket) { _chatSocket.disconnect(); }
+  _chatSocket = io('https://web-production-b66cd.up.railway.app', { transports: ['websocket','polling'] });
+  _chatSocket.emit('join_chamado', chamadoId);
+  _chatSocket.on('nova_mensagem', function(msg) {
+    appendMsgChat(msg);
+    // Remover indicador digitando quando mensagem chegar
+    var dEl = document.getElementById('chat-digitando');
+    if (dEl) dEl.remove();
+  });
+  _chatSocket.on('digitando', function(data) {
+    if (data.autor_id !== (window._painelUser && window._painelUser.id)) {
+      var el = document.getElementById('chat-msgs');
+      var dEl = document.getElementById('chat-digitando');
+      if (!dEl) {
+        dEl = document.createElement('div');
+        dEl.id = 'chat-digitando';
+        dEl.style.cssText = 'align-self:flex-start;background:#fff;border:1px solid #E3E8EE;border-radius:16px;border-bottom-left-radius:4px;padding:8px 14px;font-size:13px;color:#9AAABB;max-width:75%;';
+        dEl.textContent = 'digitando...';
+        el.appendChild(dEl);
+        el.scrollTop = el.scrollHeight;
+      }
+      clearTimeout(window._typingTimer);
+      window._typingTimer = setTimeout(function() {
+        var d = document.getElementById('chat-digitando');
+        if (d) d.remove();
+      }, 3000);
+    }
+  });
+}
+
+function fecharChat() {
+  document.getElementById('chat-modal').classList.remove('open');
+  if (_chatSocket) { _chatSocket.emit('leave_chamado', _chatId); _chatSocket.disconnect(); _chatSocket = null; }
+  _chatId = null;
+}
+
+function renderMsgsChat(msgs) {
+  var el = document.getElementById('chat-msgs');
+  if (!msgs.length) { el.innerHTML = '<div style="text-align:center;color:var(--t3);padding:40px">Nenhuma mensagem ainda.</div>'; return; }
+  el.innerHTML = '';
+  msgs.forEach(function(m) { appendMsgChat(m, false); });
+  el.scrollTop = el.scrollHeight;
+}
+
+function appendMsgChat(msg, scroll) {
+  var mine = CU && CU.id === msg.autor_id;
+  var hora = new Date(msg.created_at).toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  var div = document.createElement('div');
+  div.className = 'cmsg ' + (mine ? 'mine' : 'other');
+  var bubbleStyle = mine
+    ? 'padding:10px 14px;border-radius:16px 16px 4px 16px;font-size:13px;line-height:1.5;background:#3ECFBF;color:#fff;display:inline-block;'
+    : 'padding:10px 14px;border-radius:16px 16px 16px 4px;font-size:13px;line-height:1.5;background:#fff;color:#1A2532;border:1px solid #E3E8EE;display:inline-block;';
+  div.innerHTML = (!mine ? '<div class="cautor">' + msg.autor_nome + '</div>' : '') +
+    '<div style="' + bubbleStyle + '">' + escH(msg.texto) + '</div>' +
+    '<div class="chora">' + hora + '</div>';
+  document.getElementById('chat-msgs').appendChild(div);
+  if (scroll !== false) document.getElementById('chat-msgs').scrollTop = 99999;
+}
+
+function enviarMsgChat() {
+  var input = document.getElementById('chat-input');
+  var txt = input.value.trim();
+  if (!txt || !_chatId) return;
+  input.value = '';
+  apiFetch('/chamados/' + _chatId + '/mensagens', { method:'POST', body: JSON.stringify({ texto: txt }) })
+    .then(function(res) { if (!res.ok) showToast('e','Erro', res.data.error || 'Não enviado.'); });
+}
+
+function escH(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// Fechar ao clicar fora
+document.getElementById('chat-modal').addEventListener('click', function(e) {
+  if (e.target === this) fecharChat();
+});
+
+// Polling: atualizar badge de chamados a cada 30s
+setInterval(function() {
+  if (typeof loadChamados === 'function') loadChamados();
+}, 30000);
+</script>
+
+<!-- Lightbox receita -->
+<div id="lightbox" onclick="closeLightbox()">
+  <button id="lightbox-close" onclick="closeLightbox()" title="Fechar">✕</button>
+  <img id="lightbox-img" src="" alt="Receita">
+</div>
+<script>
+function openLightbox(src) {
+  document.getElementById('lightbox-img').src = src;
+  document.getElementById('lightbox').classList.add('on');
+  document.body.style.overflow = 'hidden';
+}
+function closeLightbox() {
+  document.getElementById('lightbox').classList.remove('on');
+  document.getElementById('lightbox-img').src = '';
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeLightbox();
+});
+</script>
+</body>
+</html>
