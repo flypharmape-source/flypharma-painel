@@ -518,7 +518,13 @@ function loadCats() {
   }).catch(function() {});
 }
 function loadAll() {
-  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats()]);
+  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats()]).then(function() {
+    // Garante CU.farmacia_id — fallback busca no FARMS pelo user_id
+    if (CU && CU.role === 'farmacia' && !CU.farmacia_id) {
+      var mf = FARMS.find(function(f){ return f.user_id === CU.id || f.email === CU.email; });
+      if (mf) { CU.farmacia_id = mf.id; localStorage.setItem('fly_cu', JSON.stringify(CU)); }
+    }
+  });
 }
 
 // ── AUTH ──────────────────────────────────────────────────────
@@ -629,6 +635,7 @@ var NAV_FRM = [
     {id:'cham',lbl:'Chamados',bdg:true},
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
+    {id:'rel',lbl:'Relatórios'},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -663,7 +670,10 @@ function startApp(novoLogin) {
   document.getElementById('sb-nm').textContent = CU.nome;
   var isAdm = CU.role === 'admin';
   document.getElementById('sb-role').className = 'sb-role ' + (isAdm ? 'adm' : 'frm');
-  document.getElementById('sb-role').textContent = isAdm ? '👑 Admin Mestre' : '🏥 ' + CU.nome;
+  var myfarmRole = !isAdm ? (FARMS.find(function(f){ return f.id === CU.farmacia_id; }) || {}) : {};
+  var roleEmoji = isAdm ? '👑' : (myfarmRole.tipo === 'petshop' ? '🐾' : '🏥');
+  var roleLabel = isAdm ? 'Admin Mestre' : (myfarmRole.nome || CU.nome);
+  document.getElementById('sb-role').textContent = roleEmoji + ' ' + roleLabel;
   var nav = isAdm ? NAV_ADM : NAV_FRM;
   var html = '';
   for (var i = 0; i < nav.length; i++) {
@@ -760,7 +770,11 @@ function renderDash() {
   // ── Calcular métricas reais ──────────────────────────────────
   var hoje = new Date(); hoje.setHours(0,0,0,0);
   // Aplica filtro de farmácia nos pedidos
-  var PEDS_DASH = dashFarmFiltro ? PEDS.filter(function(p){ return p.farmacia_id === dashFarmFiltro || p.farm === (FARMS.find(function(f){return f.id===dashFarmFiltro;})||{}).nome; }) : PEDS;
+  var myFarmIdDash = (!isAdm && CU && CU.farmacia_id) ? CU.farmacia_id : null;
+  var PEDS_DASH = dashFarmFiltro
+    ? PEDS.filter(function(p){ var fn=(FARMS.find(function(f){return f.id===dashFarmFiltro;})||{}).nome||''; return p.farmacia_id===dashFarmFiltro||p.farm===fn; })
+    : (myFarmIdDash ? PEDS.filter(function(p){ var fn=(FARMS.find(function(f){return f.id===myFarmIdDash;})||{}).nome||''; return p.farmacia_id===myFarmIdDash||p.farm===fn; }) : PEDS);
+  var PRODS_DASH = myFarmIdDash ? PRODS.filter(function(p){ return p.farmacia_id===myFarmIdDash; }) : PRODS;
   var pedsHoje = PEDS_DASH.filter(function(p) {
     var d = new Date(p.created_at || p.hora || 0); d.setHours(0,0,0,0);
     return d.getTime() === hoje.getTime();
@@ -771,7 +785,7 @@ function renderDash() {
   var fatHoje = pedsHoje.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
   var fatTotal = PEDS_DASH.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
   var farmsAtivas = FARMS.filter(function(f) { return f.ativo !== false; }).length;
-  var estoquesCriticos = PRODS.filter(function(p) { return (p.qtd || 0) <= 10; });
+  var estoquesCriticos = PRODS_DASH.filter(function(p) { return (p.qtd || 0) <= 10; });
   var clientesUnicos = [];
   PEDS_DASH.forEach(function(p) { if (p.cli && clientesUnicos.indexOf(p.cli) === -1) clientesUnicos.push(p.cli); });
 
@@ -841,7 +855,7 @@ function renderDash() {
     h += '<div class="ai"><div class="adot" style="background:' + cor + '"></div><div><div class="aT">' + lbl + '</div><div class="aS">' + sub + '</div></div></div>';
   }
   // Alertas de estoque crítico
-  var criticos = PRODS.filter(function(p){ return (p.qtd||0) <= 10; }).slice(0,2);
+  var criticos = PRODS_DASH.filter(function(p){ return (p.qtd||0) <= 10; }).slice(0,2);
   for (var ci = 0; ci < criticos.length; ci++) {
     h += '<div class="ai"><div class="adot" style="background:var(--a)"></div><div><div class="aT">Estoque baixo: <b>' + criticos[ci].nome + '</b></div><div class="aS">' + (criticos[ci].qtd||0) + ' unidades restantes</div></div></div>';
   }
@@ -859,7 +873,7 @@ function renderDash() {
     }
     h += '</tbody></table></div>';
   } else {
-    var criticosReal = PRODS.filter(function(p){ return (p.qtd||0) <= 10; });
+    var criticosReal = PRODS_DASH.filter(function(p){ return (p.qtd||0) <= 10; });
     h += '<div class="card"><div class="ch">' + svg15('<path d="M10 2L2 17h16L10 2z"/><path d="M10 8v4M10 14v1"/>','var(--r)') + '<span class="ct">Estoque crítico</span><span style="font-size:12px;color:var(--r);margin-left:auto">' + criticosReal.length + ' itens</span></div>';
     if (criticosReal.length === 0) {
       h += '<div style="padding:16px 18px;font-size:13px;color:var(--g)">✅ Todos os produtos com estoque OK</div>';
@@ -1020,9 +1034,10 @@ function filtrarProdsPorFarmacia(farmId) {
 function renderProd() {
   var el = document.getElementById('page-prod');
   // Filtra por farmácia se selecionada
-  var prodsFiltrados = CURRENT_FARM_ID
-    ? PRODS.filter(function(p){ return p.farmacia_id === CURRENT_FARM_ID; })
-    : PRODS;
+  var myFarmIdProd = (CU.role !== 'admin' && CU.farmacia_id) ? CU.farmacia_id : null;
+  var prodsFiltrados = myFarmIdProd
+    ? PRODS.filter(function(p){ return p.farmacia_id === myFarmIdProd; })
+    : (CURRENT_FARM_ID ? PRODS.filter(function(p){ return p.farmacia_id === CURRENT_FARM_ID; }) : PRODS);
   var nomeFarm = CURRENT_FARM_ID ? (FARMS.find(function(f){return f.id===CURRENT_FARM_ID;}) || {}).nome || '' : '';
 
   var h = '<div class="fb">';
@@ -1091,8 +1106,10 @@ function renderPed() {
   h += '<div class="card"><table class="tbl"><thead><tr><th>ID</th><th>Cliente</th>';
   if (CU.role === 'admin') h += '<th>Farmácia</th>';
   h += '<th>Itens</th><th>Valor</th><th>Pgto</th><th>Status</th><th>Hora</th><th>Ações</th></tr></thead><tbody>';
-  for (var pi=0;pi<PEDS.length;pi++) {
-    var p = PEDS[pi];
+  var myFarmIdPed = (CU.role !== 'admin' && CU.farmacia_id) ? CU.farmacia_id : null;
+  var PEDS_SHOW = myFarmIdPed ? PEDS.filter(function(p){ var fn=(FARMS.find(function(f){return f.id===myFarmIdPed;})||{}).nome||''; return p.farmacia_id===myFarmIdPed||p.farm===fn; }) : PEDS;
+  for (var pi=0;pi<PEDS_SHOW.length;pi++) {
+    var p = PEDS_SHOW[pi];
     h += '<tr><td><span class="oid">#' + p.num + '</span></td>';
     h += '<td>' + p.cli + '</td>';
     if (CU.role === 'admin') h += '<td>' + p.farm + '</td>';
@@ -1136,12 +1153,14 @@ function renderEst() {
   var el = document.getElementById('page-est');
   var h = '<div class="fb">';
   h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar produto..."></div>';
-  var crit = PRODS.filter(function(p){return p.qtd<=10;}).length;
-  h += '<div class="fc on">Todos (' + PRODS.length + ')</div>';
+  var myFarmIdEst = (CU.role !== 'admin' && CU.farmacia_id) ? CU.farmacia_id : null;
+  var PRODS_EST = myFarmIdEst ? PRODS.filter(function(p){return p.farmacia_id===myFarmIdEst;}) : (CURRENT_FARM_ID ? PRODS.filter(function(p){return p.farmacia_id===CURRENT_FARM_ID;}) : PRODS);
+  var crit = PRODS_EST.filter(function(p){return p.qtd<=10;}).length;
+  h += '<div class="fc on">Todos (' + PRODS_EST.length + ')</div>';
   h += '<div class="fc" style="color:var(--r)">Crítico (' + crit + ')</div>';
   h += '</div>';
   h += '<div class="card"><table class="tbl"><thead><tr><th>Produto</th><th>Qtd. atual</th><th>Qtd. mínima</th><th>Situação</th><th>Ações</th></tr></thead><tbody>';
-  var PRODS_SHOW = CURRENT_FARM_ID ? PRODS.filter(function(p){return p.farmacia_id===CURRENT_FARM_ID;}) : PRODS;
+  var PRODS_SHOW = PRODS_EST;
   for (var i=0;i<PRODS_SHOW.length;i++) {
     var p = PRODS_SHOW[i];
     var q = p.qtd||0, m = 10;
@@ -1401,7 +1420,11 @@ function uploadLogoConfig(input) {
   };
   reader.readAsDataURL(file);
   var farmId = CU && CU.farmacia_id;
-  if (!farmId) { if (status) status.textContent = '❌ Farmácia não identificada.'; return; }
+  if (!farmId && CU) {
+    var mfUp = FARMS.find(function(f){ return f.user_id === CU.id || f.email === CU.email; });
+    if (mfUp) { farmId = mfUp.id; CU.farmacia_id = mfUp.id; localStorage.setItem('fly_cu', JSON.stringify(CU)); }
+  }
+  if (!farmId) { if (status) status.textContent = '❌ Farmácia não identificada. Recarregue a página.'; return; }
   if (status) status.textContent = '⏳ Enviando...';
   var fd = new FormData();
   fd.append('logo', file);
@@ -1943,15 +1966,17 @@ function renderCham() {
   var isAdm = CU.role === 'admin';
   var filtro = window._chamFiltro || 'todos';
 
-  var filtrados = filtro === 'todos' ? CHAMS
-    : CHAMS.filter(function(c){ return c.status === filtro; });
+  var myFarmIdCham = (CU.role !== 'admin' && CU.farmacia_id) ? CU.farmacia_id : null;
+  var CHAMS_BASE = myFarmIdCham ? CHAMS.filter(function(c){ return c.farmacia_id === myFarmIdCham; }) : CHAMS;
+  var filtrados = filtro === 'todos' ? CHAMS_BASE
+    : CHAMS_BASE.filter(function(c){ return c.status === filtro; });
 
   var h = '';
 
   // Filtros
   h += '<div class="fb" style="margin-bottom:18px">';
   ['todos','aberto','em_analise','resolvido'].forEach(function(f) {
-    var labels = {todos:'Todos (' + CHAMS.length + ')', aberto:'Abertos', em_analise:'Em análise', resolvido:'Resolvidos'};
+    var labels = {todos:'Todos (' + CHAMS_BASE.length + ')', aberto:'Abertos', em_analise:'Em análise', resolvido:'Resolvidos'};
     h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._chamFiltro=\'' + f + '\';renderCham()">' + labels[f] + '</button>';
   });
   h += '</div>';
