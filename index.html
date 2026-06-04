@@ -699,7 +699,7 @@ function goto(id) {
   var pg = document.getElementById('page-' + id);
   if (pg) pg.classList.add('on');
   document.getElementById('tb-title').textContent = PTL[id] || id;
-  var actMap = {farm:'Nova farmácia',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:'',cham:''};
+  var actMap = {farm:'',prod:'Novo produto',usr:'Novo usuário',ped:'',dash:'',est:'',rel:'',cfg:'',cham:''};
   var lbl = actMap[id] !== undefined ? actMap[id] : '';
   var ab = document.getElementById('act-btn');
   ab.style.display = lbl ? 'flex' : 'none';
@@ -740,24 +740,43 @@ function renderDash() {
   var isAdm = CU.role === 'admin';
   var h = '';
 
+  // ── Filtro de estabelecimento (admin) ────────────────────────
+  var dashFarmFiltro = window._dashFarmFiltro || '';
+  if (isAdm) {
+    h += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;flex-wrap:wrap">';
+    h += '<span style="font-size:13px;font-weight:600;color:var(--t2)">Filtrar por:</span>';
+    h += '<select id="dash-farm-sel" onchange="window._dashFarmFiltro=this.value;renderDash()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n);background:var(--w)">';
+    h += '<option value="">🏠 Todos os estabelecimentos</option>';
+    FARMS.forEach(function(f) {
+      h += '<option value="' + f.id + '"' + (dashFarmFiltro===f.id?' selected':'') + '>' + (f.tipo==='petshop'?'🐾 ':'🏥 ') + f.nome + '</option>';
+    });
+    h += '</select>';
+    if (dashFarmFiltro) {
+      h += '<button onclick="window._dashFarmFiltro=\'\';renderDash()" style="background:none;border:1.5px solid var(--br);border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;color:var(--t2)">✕ Limpar filtro</button>';
+    }
+    h += '</div>';
+  }
+
   // ── Calcular métricas reais ──────────────────────────────────
   var hoje = new Date(); hoje.setHours(0,0,0,0);
-  var pedsHoje = PEDS.filter(function(p) {
+  // Aplica filtro de farmácia nos pedidos
+  var PEDS_DASH = dashFarmFiltro ? PEDS.filter(function(p){ return p.farmacia_id === dashFarmFiltro || p.farm === (FARMS.find(function(f){return f.id===dashFarmFiltro;})||{}).nome; }) : PEDS;
+  var pedsHoje = PEDS_DASH.filter(function(p) {
     var d = new Date(p.created_at || p.hora || 0); d.setHours(0,0,0,0);
     return d.getTime() === hoje.getTime();
   });
   // fallback: se nenhum pedido tiver data, usa todos
-  if (pedsHoje.length === 0) pedsHoje = PEDS;
+  if (pedsHoje.length === 0) pedsHoje = PEDS_DASH;
 
   var fatHoje = pedsHoje.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
-  var fatTotal = PEDS.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
+  var fatTotal = PEDS_DASH.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
   var farmsAtivas = FARMS.filter(function(f) { return f.ativo !== false; }).length;
   var estoquesCriticos = PRODS.filter(function(p) { return (p.qtd || 0) <= 10; });
   var clientesUnicos = [];
-  PEDS.forEach(function(p) { if (p.cli && clientesUnicos.indexOf(p.cli) === -1) clientesUnicos.push(p.cli); });
+  PEDS_DASH.forEach(function(p) { if (p.cli && clientesUnicos.indexOf(p.cli) === -1) clientesUnicos.push(p.cli); });
 
   // Tempo médio entrega (estimado por pedidos entregues)
-  var entregues = PEDS.filter(function(p){ return p.status === 'entregue'; });
+  var entregues = PEDS_DASH.filter(function(p){ return p.status === 'entregue'; });
   var tempoMedio = entregues.length > 0 ? Math.round(18 + Math.random() * 5) : '--'; // placeholder até ter timestamps reais
 
   // Stats
@@ -782,8 +801,8 @@ function renderDash() {
   h += '<div class="card">';
   h += '<div class="ch">' + svg15(NAV_ICS.ped) + '<span class="ct">Pedidos recentes</span><span class="ca" onclick="goto(\'ped\')">Ver todos →</span></div>';
   h += '<table class="tbl"><thead><tr><th>ID</th><th>Cliente</th><th>' + (isAdm ? 'Farmácia' : 'Endereço') + '</th><th>Valor</th><th>Status</th></tr></thead><tbody>';
-  for (var i = 0; i < Math.min(5, PEDS.length); i++) {
-    var p = PEDS[i];
+  for (var i = 0; i < Math.min(5, PEDS_DASH.length); i++) {
+    var p = PEDS_DASH[i];
     h += '<tr onclick="openModal(\'ped-view\',\'' + p.id + '\')">';
     h += '<td><span class="oid">#' + p.num + '</span></td>';
     h += '<td>' + p.cli + '</td>';
@@ -810,7 +829,7 @@ function renderDash() {
   h += '<div class="card"><div class="ch">' + svg15('<circle cx="10" cy="10" r="8"/><path d="M10 6v4l3 3"/>') + '<span class="ct">Atividade recente</span></div><div class="al">';
   var statusCor = {pendente:'var(--a)',confirmado:'var(--t)',preparando:'var(--a)',em_entrega:'var(--n)',entregue:'var(--g)',cancelado:'var(--r)'};
   var statusLabel = {pendente:'Novo pedido',confirmado:'Pedido confirmado',preparando:'Preparando pedido',em_entrega:'Saiu para entrega',entregue:'Pedido entregue',cancelado:'Pedido cancelado'};
-  var ultimos = PEDS.slice(0, 5);
+  var ultimos = PEDS_DASH.slice(0, 5);
   if (ultimos.length === 0) {
     h += '<div class="ai"><div style="color:var(--t3);font-size:13px;padding:8px">Nenhum pedido ainda.</div></div>';
   }
@@ -1167,7 +1186,17 @@ function renderUsr() {
 // RELATÓRIOS
 function renderRel() {
   var el = document.getElementById('page-rel');
-  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px"><div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">📊 Relatórios</div><div style="margin-left:auto;display:flex;gap:8px"><select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
+  var isAdmRel = CU && CU.role === 'admin';
+  var farmSelOpts = '';
+  if (isAdmRel) {
+    farmSelOpts = '<option value="">Todos os estabelecimentos</option>';
+    FARMS.forEach(function(f) {
+      farmSelOpts += '<option value="' + f.id + '">' + (f.tipo==='petshop'?'🐾 ':'🏥 ') + f.nome + '</option>';
+    });
+  }
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap"><div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">📊 Relatórios</div><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">' +
+    (isAdmRel ? '<select id="rel-farm" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)">' + farmSelOpts + '</select>' : '') +
+    '<select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
     '<div id="rel-stats" class="sg" style="margin-bottom:16px"></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
       '<div class="card" id="rel-top-produtos"><div class="ch"><span class="ct">🏆 Produtos mais vendidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
@@ -1181,9 +1210,15 @@ function carregarRelatorio() {
   var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
   var isAdm = CU && CU.role === 'admin';
   var farmId = CU && CU.farmacia_id;
+  // Admin filtra pelo select; farmácia filtra automaticamente pelos seus pedidos
+  var relFarmSel = isAdm ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmId;
   var pedsFiltrados = PEDS.filter(function(p) {
-    if (!p.created_at && !p.hora) return true;
-    return true; // usa todos os pedidos disponíveis
+    if (relFarmSel) {
+      var farmNome = (FARMS.find(function(f){return f.id===relFarmSel;})||{}).nome || '';
+      return p.farmacia_id === relFarmSel || p.farm === farmNome;
+    }
+    if (!isAdm && farmId) return p.farmacia_id === farmId || p.farm === (FARMS.find(function(f){return f.id===farmId;})||{}).nome;
+    return true;
   });
 
   // Stats
@@ -1210,7 +1245,8 @@ function carregarRelatorio() {
   if (topEl) {
     var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Pedidos</th><th>Status</th></tr></thead><tbody>';
     // Usa PRODS disponíveis
-    var prodsList = PRODS.slice(0, 8);
+    var prodsRel = relFarmSel ? PRODS.filter(function(p){return p.farmacia_id===relFarmSel;}) : (!isAdm && farmId ? PRODS.filter(function(p){return p.farmacia_id===farmId;}) : PRODS);
+    var prodsList = prodsRel.slice(0, 8);
     if (prodsList.length === 0) {
       h += '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Nenhum produto cadastrado</td></tr>';
     } else {
@@ -1262,8 +1298,16 @@ function carregarRelatorio() {
 }
 
 function exportarRelatorioCSV() {
+  var isAdmCsv = CU && CU.role === 'admin';
+  var farmIdCsv = CU && CU.farmacia_id;
+  var relFarmSelCsv = isAdmCsv ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmIdCsv;
+  var pedsCsv = PEDS.filter(function(p) {
+    if (relFarmSelCsv) { var fn = (FARMS.find(function(f){return f.id===relFarmSelCsv;})||{}).nome||''; return p.farmacia_id===relFarmSelCsv||p.farm===fn; }
+    if (!isAdmCsv && farmIdCsv) { var fn2=(FARMS.find(function(f){return f.id===farmIdCsv;})||{}).nome||''; return p.farmacia_id===farmIdCsv||p.farm===fn2; }
+    return true;
+  });
   var rows = [['ID','Cliente','Farmácia','Total','Método','Status','Hora']];
-  PEDS.forEach(function(p) {
+  pedsCsv.forEach(function(p) {
     rows.push([
       '#' + p.num,
       p.cli || '—',
@@ -1282,7 +1326,7 @@ function exportarRelatorioCSV() {
   a.download = 'flypharma-pedidos-' + new Date().toISOString().slice(0,10) + '.csv';
   a.click();
   URL.revokeObjectURL(url);
-  showToast('s', 'CSV exportado!', rows.length - 1 + ' pedidos exportados');
+  showToast('s', 'CSV exportado!', (rows.length - 1) + ' pedidos exportados');
 }
 
 // CONFIG
