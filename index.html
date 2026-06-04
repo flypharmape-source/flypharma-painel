@@ -643,7 +643,18 @@ var PTL = {dash:'Dashboard',farm:'Farmácias',prod:'Produtos',ped:'Pedidos',est:
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
   document.getElementById('app').style.display = 'flex';
-  document.getElementById('sb-av').textContent = CU.nome[0].toUpperCase();
+  // Avatar na sidebar: logo da farmácia ou inicial
+  var sbAv = document.getElementById('sb-av');
+  var myfarmSb = (CU.role !== 'admin') ? (FARMS.find(function(f){ return f.id === CU.farmacia_id; }) || {}) : {};
+  if (myfarmSb.logo_url) {
+    sbAv.innerHTML = '<img src="' + myfarmSb.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px" onerror="this.parentNode.innerHTML=\'' + CU.nome[0].toUpperCase() + '\';this.parentNode.style.background=\'\';">';
+    sbAv.style.background = 'transparent';
+    sbAv.style.overflow = 'hidden';
+    sbAv.style.padding = '0';
+  } else {
+    sbAv.textContent = CU.nome[0].toUpperCase();
+    sbAv.style.background = '';
+  }
   document.getElementById('sb-nm').textContent = CU.nome;
   var isAdm = CU.role === 'admin';
   document.getElementById('sb-role').className = 'sb-role ' + (isAdm ? 'adm' : 'frm');
@@ -1286,13 +1297,13 @@ function renderCfg() {
         '<div style="font-size:12px;color:var(--t2);margin-bottom:18px">Essa imagem aparece no app para os clientes</div>' +
         '<div style="margin-bottom:16px">' +
           '<div style="display:flex;align-items:center;gap:14px">' +
-            '<div id="cfg-logo-preview" style="width:72px;height:72px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br);position:relative">' +
-              (logoAtual ? '<img src="' + logoAtual + '" style="width:72px;height:72px;object-fit:cover;border-radius:12px" onerror="this.style.display=\'none\'">' : '<span style="font-size:28px">🏥</span>') +
+            '<div id="cfg-logo-preview" style="width:72px;height:72px;border-radius:12px;background:var(--tl);display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;border:1.5px solid var(--br)">' +
+              (logoAtual ? '<img src="' + logoAtual + '" style="width:100%;height:100%;object-fit:cover" onerror="this.style.display=\'none\'">' : '<span style="font-size:28px">🏥</span>') +
             '</div>' +
-            '<div>' +
+            '<div style="display:flex;flex-direction:column;gap:6px">' +
               '<input type="file" id="cfg-logo-file" accept="image/*" style="display:none" onchange="uploadLogoConfig(this)">' +
               '<button class="btn btn-p" onclick="document.getElementById(\'cfg-logo-file\').click()" style="font-size:13px;padding:8px 16px">📷 Escolher foto</button>' +
-              '<div id="cfg-logo-status" style="font-size:11px;color:var(--t3);margin-top:6px">' + (logoAtual ? '✅ Logo carregada' : 'Nenhuma logo ainda') + '</div>' +
+              '<div id="cfg-logo-status" style="font-size:11px;color:var(--t3)">' + (logoAtual ? '✅ Logo carregada' : 'Nenhuma logo ainda') + '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -1357,6 +1368,14 @@ function uploadLogoConfig(input) {
       // Atualiza preview na tela
       var prev = document.getElementById('cfg-logo-preview');
       if (prev) prev.innerHTML = '<img src="' + d.logo_url + '" style="width:100%;height:100%;object-fit:cover">';
+      // Atualiza avatar na sidebar
+      var sbAv = document.getElementById('sb-av');
+      if (sbAv) {
+        sbAv.innerHTML = '<img src="' + d.logo_url + '" style="width:100%;height:100%;object-fit:cover;border-radius:8px">';
+        sbAv.style.background = 'transparent';
+        sbAv.style.overflow = 'hidden';
+        sbAv.style.padding = '0';
+      }
     } else {
       if (status) status.textContent = '❌ Erro: ' + (d.error || 'Tente novamente');
     }
