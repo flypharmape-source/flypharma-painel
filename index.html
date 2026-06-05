@@ -470,12 +470,14 @@ function loadPeds() {
           id: p.id || p._id,
           num: p.numero || p.num || p.id,
           farm: p.farmacia_nome || p.farmacia || p.farm || '',
+          farmacia_id: p.farmacia_id || '',
           cli: p.cliente_nome || p.cliente || p.cli || '',
           itens: p.quantidade_itens || p.itens || 0,
           total: p.total || p.valor_total || 0,
           status: p.status || 'pendente',
           metodo: p.metodo_pagamento || p.metodo || 'PIX',
-          hora: hora
+          hora: hora,
+          endereco: p.endereco_resumo || p.endereco || ''
         };
       });
     }
@@ -1112,8 +1114,9 @@ function renderPed() {
   h += '<div class="card"><table class="tbl"><thead><tr><th>ID</th><th>Cliente</th>';
   if (CU.role === 'admin') h += '<th>Farmácia</th>';
   h += '<th>Itens</th><th>Valor</th><th>Pgto</th><th>Status</th><th>Hora</th><th>Ações</th></tr></thead><tbody>';
-  var myFarmIdPed = (CU.role !== 'admin' && CU.farmacia_id) ? CU.farmacia_id : null;
-  var PEDS_SHOW = myFarmIdPed ? PEDS.filter(function(p){ var fn=(FARMS.find(function(f){return f.id===myFarmIdPed;})||{}).nome||''; return p.farmacia_id===myFarmIdPed||p.farm===fn; }) : PEDS;
+  // Para farmácia: API já retorna só os pedidos dela — não precisa filtrar
+  // Para admin: mostra todos
+  var PEDS_SHOW = PEDS;
   for (var pi=0;pi<PEDS_SHOW.length;pi++) {
     var p = PEDS_SHOW[pi];
     h += '<tr><td><span class="oid">#' + p.num + '</span></td>';
