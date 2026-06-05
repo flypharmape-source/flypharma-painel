@@ -477,7 +477,7 @@ function loadPeds() {
           itens: p.quantidade_itens || p.itens || 0,
           total: p.total || p.valor_total || 0,
           status: p.status || 'pendente',
-          metodo: p.metodo_pagamento || p.metodo || 'PIX',
+          metodo: p.metodo_pagamento || p.metodo || (p.pagamentos && p.pagamentos[0] && p.pagamentos[0].metodo) || (p.pagamento && p.pagamento.metodo) || '—',
           hora: hora,
           endereco: p.endereco_resumo || p.endereco || ''
         };
@@ -489,6 +489,29 @@ function loadPeds() {
     if (bdg) {
       if (pendentes > 0) { bdg.textContent = pendentes > 99 ? '99+' : pendentes; bdg.style.display = 'flex'; }
       else { bdg.style.display = 'none'; }
+    }
+    // Som de novo pedido
+    var novosIds = PEDS.filter(function(p){ return p.status === 'pendente'; }).map(function(p){ return p.id; });
+    if (window._pedIdsConhecidos === undefined) { window._pedIdsConhecidos = novosIds; }
+    else {
+      var realmente_novos = novosIds.filter(function(id){ return window._pedIdsConhecidos.indexOf(id) < 0; });
+      if (realmente_novos.length > 0) {
+        try {
+          var ctx = new (window.AudioContext || window.webkitAudioContext)();
+          [0, 150, 300].forEach(function(delay) {
+            var o = ctx.createOscillator();
+            var g = ctx.createGain();
+            o.connect(g); g.connect(ctx.destination);
+            o.frequency.value = 880;
+            g.gain.setValueAtTime(0.3, ctx.currentTime + delay/1000);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay/1000 + 0.15);
+            o.start(ctx.currentTime + delay/1000);
+            o.stop(ctx.currentTime + delay/1000 + 0.15);
+          });
+        } catch(e) {}
+        showToast('s', '🛒 Novo pedido!', realmente_novos.length + ' novo(s) pedido(s) chegou!');
+      }
+      window._pedIdsConhecidos = novosIds;
     }
   }).catch(function() {});
 }
@@ -644,7 +667,6 @@ var NAV_FRM = [
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
-    {id:'entr',lbl:'Entregadores',bdg:true},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
