@@ -369,7 +369,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 
 <script>
 // FlyPharma Painel - JavaScript completo
-const API = 'https://api.flypharma.com.br/api';
+const API = 'https://web-production-b66cd.up.railway.app/api';
 let CU = null, AT = null, MC = {};
 
 // ── ESTADO DA APLICAÇÃO (carregado da API, nunca hardcoded) ────
@@ -2693,7 +2693,7 @@ function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   });
 
   if (_chatSocket) { _chatSocket.disconnect(); }
-  _chatSocket = io('https://api.flypharma.com.br', { transports: ['websocket','polling'] });
+  _chatSocket = io('https://web-production-b66cd.up.railway.app', { transports: ['websocket','polling'] });
   _chatSocket.emit('join_chamado', chamadoId);
   _chatSocket.on('nova_mensagem', function(msg) {
     appendMsgChat(msg);
