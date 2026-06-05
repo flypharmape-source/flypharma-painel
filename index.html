@@ -340,6 +340,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-prod" class="page"></div>
     <div id="page-ped"  class="page"></div>
     <div id="page-manip" class="page"></div>
+    <div id="page-entr" class="page"></div>
     <div id="page-est"  class="page"></div>
     <div id="page-usr"  class="page"></div>
     <div id="page-rel"  class="page"></div>
@@ -521,7 +522,7 @@ function loadCats() {
   }).catch(function() {});
 }
 function loadAll() {
-  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats(), loadManip()]).then(function() {
+  return Promise.all([loadFarms(), loadProds(), loadPeds(), loadUsrs(), loadCats(), loadManip(), loadEntregadores()]).then(function() {
     // Garante CU.farmacia_id — fallback busca no FARMS pelo user_id
     if (CU && CU.role === 'farmacia' && !CU.farmacia_id) {
       var mf = FARMS.find(function(f){ return f.user_id === CU.id || f.email === CU.email; });
@@ -629,6 +630,7 @@ var NAV_ADM = [
     {id:'usr',lbl:'Usuários'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
+    {id:'entr',lbl:'Entregadores',bdg:true},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -641,6 +643,7 @@ var NAV_FRM = [
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
+    {id:'entr',lbl:'Entregadores',bdg:true},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -655,9 +658,11 @@ var NAV_ICS = {
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
   cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
   manip:'<path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>',
+  entr:'<path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>',
 };
 var PTL = {
-  manip:'Manipulados',dash:'Dashboard',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
+  manip:'Manipulados',
+  entr:'Entregadores',dash:'Dashboard',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
 
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
@@ -704,7 +709,7 @@ function startApp(novoLogin) {
     loadChamados();
     loadPeds();
     if (window._badgeInterval) clearInterval(window._badgeInterval);
-    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); loadManip(); }, 60000);
+    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); loadManip(); loadEntregadores(); }, 60000);
   }, 500);
 }
 
@@ -723,7 +728,7 @@ function goto(id) {
   document.getElementById('act-lbl').textContent = lbl;
   document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
   // Mostra loading e recarrega dados frescos da API antes de renderizar
-  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip};
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip, entr: loadEntregadores};
   if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
   var loader = loadMap[id];
   if (loader) {
@@ -745,6 +750,7 @@ function renderPage(id) {
   else if (id === 'cfg')  renderCfg();
   else if (id === 'cham') renderCham();
   else if (id === 'manip') renderManip();
+  else if (id === 'entr')  renderEntregadores();
 }
 
 function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
@@ -1964,6 +1970,109 @@ function saveModal() {
 }
 
 // ── CHAMADOS ─────────────────────────────────────────────────
+// ── ENTREGADORES ──────────────────────────────────────────────
+var ENTREGADORES = [];
+function loadEntregadores() {
+  if (!CU || CU.role !== 'admin') { ENTREGADORES = []; return Promise.resolve(); }
+  return apiFetch('/admin/entregadores').then(function(res) {
+    if (res.ok && Array.isArray(res.data)) ENTREGADORES = res.data;
+    else ENTREGADORES = [];
+    var pendentes = ENTREGADORES.filter(function(e){ return e.status_entregador === 'pendente'; }).length;
+    var bdg = document.getElementById('bdg-entr');
+    if (bdg) { bdg.textContent = pendentes; bdg.style.display = pendentes > 0 ? 'flex' : 'none'; }
+  }).catch(function() { ENTREGADORES = []; });
+}
+
+function renderEntregadores() {
+  var el = document.getElementById('page-entr');
+  if (!el) return;
+  var filtro = window._entrFiltro || 'pendente';
+  var filtrados = filtro === 'todos' ? ENTREGADORES : ENTREGADORES.filter(function(e){ return e.status_entregador === filtro; });
+
+  var statusLabel = {
+    pendente:  '<span class="b pend">⏳ Pendente</span>',
+    aprovado:  '<span class="b cok">✅ Aprovado</span>',
+    reprovado: '<span class="b" style="background:#fee;color:#c00">❌ Reprovado</span>',
+  };
+
+  var h2 = '<div class="fb">';
+  var filtros2 = ['pendente','aprovado','reprovado','todos'];
+  var labels2 = {pendente:'Pendentes ('+ENTREGADORES.filter(function(e){return e.status_entregador==='pendente';}).length+')',aprovado:'Aprovados',reprovado:'Reprovados',todos:'Todos ('+ENTREGADORES.length+')'};
+  filtros2.forEach(function(f) {
+    h2 += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._entrFiltro=\'' + f + '\';renderEntregadores()">' + labels2[f] + '</button>';
+  });
+  h2 += '</div>';
+
+  if (filtrados.length === 0) {
+    h2 += '<div style="padding:60px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🛵</div><div style="color:var(--t2);font-size:14px">Nenhum entregador nesta categoria</div></div>';
+  } else {
+    h2 += '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px">';
+    filtrados.forEach(function(e) {
+      h2 += '<div class="card" style="padding:16px">';
+      h2 += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">';
+      if (e.foto_rosto) {
+        h2 += '<img src="'+e.foto_rosto+'" style="width:52px;height:52px;border-radius:50%;object-fit:cover;border:2px solid var(--br)">';
+      } else {
+        h2 += '<div style="width:52px;height:52px;border-radius:50%;background:var(--t);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:var(--n)">'+e.nome[0]+'</div>';
+      }
+      h2 += '<div style="flex:1"><div style="font-weight:700;color:var(--n)">'+e.nome+'</div>';
+      h2 += '<div style="font-size:12px;color:var(--t3)">'+e.email+'</div>';
+      h2 += '<div style="font-size:12px;color:var(--t3)">📱 '+(e.telefone||'—')+'</div></div>';
+      h2 += statusLabel[e.status_entregador] || e.status_entregador;
+      h2 += '</div>';
+
+      // Dados da moto
+      if (e.placa_moto || e.modelo_moto) {
+        h2 += '<div style="background:var(--tl);border-radius:8px;padding:8px 12px;margin-bottom:10px;font-size:12px">';
+        h2 += '🏍️ '+(e.modelo_moto||'—')+' · Placa: '+(e.placa_moto||'—');
+        h2 += '</div>';
+      }
+
+      // Documentos
+      h2 += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">';
+      if (e.cnh_frente) h2 += '<img src="'+e.cnh_frente+'" style="height:60px;border-radius:6px;cursor:zoom-in;border:1px solid var(--br)" onclick="openLightbox(this.src)" title="CNH Frente">';
+      if (e.cnh_verso)  h2 += '<img src="'+e.cnh_verso+'"  style="height:60px;border-radius:6px;cursor:zoom-in;border:1px solid var(--br)" onclick="openLightbox(this.src)" title="CNH Verso">';
+      if (e.crlv)       h2 += '<img src="'+e.crlv+'"       style="height:60px;border-radius:6px;cursor:zoom-in;border:1px solid var(--br)" onclick="openLightbox(this.src)" title="CRLV">';
+      if (e.foto_moto)  h2 += '<img src="'+e.foto_moto+'"  style="height:60px;border-radius:6px;cursor:zoom-in;border:1px solid var(--br)" onclick="openLightbox(this.src)" title="Foto da moto">';
+      h2 += '</div>';
+
+      if (e.obs_admin) h2 += '<div style="font-size:12px;color:var(--t2);margin-bottom:10px;padding:8px;background:#fff8e1;border-radius:6px">📝 '+e.obs_admin+'</div>';
+
+      // Ações
+      if (e.status_entregador === 'pendente') {
+        h2 += '<div style="display:flex;gap:8px">';
+        h2 += '<button class="btn btn-p" style="flex:1;justify-content:center" onclick="aprovarEntregador(\'' + e.id + '\')">✅ Aprovar</button>';
+        h2 += '<button class="btn btn-d" style="flex:1;justify-content:center" onclick="reprovarEntregador(\'' + e.id + '\')">❌ Reprovar</button>';
+        h2 += '</div>';
+      } else if (e.status_entregador === 'aprovado') {
+        h2 += '<button class="btn btn-d" style="width:100%;justify-content:center" onclick="reprovarEntregador(\'' + e.id + '\')">🚫 Suspender</button>';
+      } else {
+        h2 += '<button class="btn btn-p" style="width:100%;justify-content:center" onclick="aprovarEntregador(\'' + e.id + '\')">✅ Reativar</button>';
+      }
+      h2 += '</div>';
+    });
+    h2 += '</div>';
+  }
+  el.innerHTML = h2;
+}
+
+function aprovarEntregador(id) {
+  if (!confirm('Aprovar este entregador?')) return;
+  apiFetch('/admin/entregadores/' + id + '/aprovar', { method: 'PATCH' }).then(function(res) {
+    if (res.ok) { showToast('s','Entregador aprovado!','Ele já pode receber pedidos.'); loadEntregadores().then(renderEntregadores); }
+    else showToast('e','Erro', res.data.error || 'Tente novamente');
+  });
+}
+
+function reprovarEntregador(id) {
+  var motivo = prompt('Motivo da reprovação (opcional):');
+  if (motivo === null) return;
+  apiFetch('/admin/entregadores/' + id + '/reprovar', { method: 'PATCH', body: JSON.stringify({ motivo: motivo }) }).then(function(res) {
+    if (res.ok) { showToast('s','Entregador reprovado','Notificação enviada.'); loadEntregadores().then(renderEntregadores); }
+    else showToast('e','Erro', res.data.error || 'Tente novamente');
+  });
+}
+
 // ── MANIPULADOS ───────────────────────────────────────────────
 var MANIPS = [];
 function loadManip() {
