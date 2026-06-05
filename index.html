@@ -1999,7 +1999,7 @@ function renderManip() {
   var filtros = ['todos','aguardando_orcamento','orcamento_enviado','orcamento_aprovado','orcamento_recusado'];
   var labels = {todos:'Todos ('+MANIPS_SHOW.length+')',aguardando_orcamento:'Aguardando',orcamento_enviado:'Enviados',orcamento_aprovado:'Aprovados',orcamento_recusado:'Recusados'};
   filtros.forEach(function(f) {
-    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._manipFiltro='' + f + '';renderManip()">' + labels[f] + '</button>';
+    h += '<button class="fc' + (filtro===f?' on':'') + '" onclick="window._manipFiltro=\'' + f + '\';renderManip()">' + labels[f] + '</button>';
   });
   h += '</div>';
 
@@ -2017,9 +2017,9 @@ function renderManip() {
       h += '<td>' + (m.prazo_dias ? m.prazo_dias+' dias' : '—') + '</td>';
       h += '<td style="font-size:11px">' + (m.created_at ? new Date(m.created_at).toLocaleDateString('pt-BR') : '—') + '</td>';
       h += '<td><div style="display:flex;gap:6px">';
-      h += '<button class="btn btn-o" style="padding:4px 8px;font-size:12px" onclick="openModal('manip-view','' + m.id + '')">👁️</button>';
+      h += '<button class="btn btn-o" style="padding:4px 8px;font-size:12px" onclick="openModal(\'manip-view\',\'' + m.id + '\')">👁️</button>';
       if (m.status === 'aguardando_orcamento') {
-        h += '<button class="btn btn-p" style="padding:4px 8px;font-size:12px" onclick="openModal('manip-orcamento','' + m.id + '')">💰 Orçar</button>';
+        h += '<button class="btn btn-p" style="padding:4px 8px;font-size:12px" onclick="openModal(\'manip-orcamento\',\'' + m.id + '\')">💰 Orçar</button>';
       }
       h += '</div></td>';
       h += '</tr>';
