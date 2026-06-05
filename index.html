@@ -684,7 +684,7 @@ function startApp(novoLogin) {
   var isAdm = CU.role === 'admin';
   document.getElementById('sb-role').className = 'sb-role ' + (isAdm ? 'adm' : 'frm');
   var myfarmRole = !isAdm ? (FARMS.find(function(f){ return f.id === CU.farmacia_id; }) || {}) : {};
-  var roleEmoji = isAdm ? '👑' : (myfarmRole.tipo === 'petshop' ? '🐾' : '🏥');
+  var roleEmoji = isAdm ? '👑' : (myfarmRole.tipo === 'petshop' ? '🐾' : myfarmRole.tipo === 'manipulado' ? '🧪' : '🏥');
   var roleLabel = isAdm ? 'Admin Mestre' : (myfarmRole.nome || CU.nome);
   document.getElementById('sb-role').textContent = roleEmoji + ' ' + roleLabel;
   var nav = isAdm ? NAV_ADM : NAV_FRM;
@@ -773,7 +773,7 @@ function renderDash() {
     h += '<select id="dash-farm-sel" onchange="window._dashFarmFiltro=this.value;renderDash()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n);background:var(--w)">';
     h += '<option value="">🏠 Todos os estabelecimentos</option>';
     FARMS.forEach(function(f) {
-      h += '<option value="' + f.id + '"' + (dashFarmFiltro===f.id?' selected':'') + '>' + (f.tipo==='petshop'?'🐾 ':'🏥 ') + f.nome + '</option>';
+      h += '<option value="' + f.id + '"' + (dashFarmFiltro===f.id?' selected':'') + '>' + (f.tipo==='petshop'?'🐾 ':f.tipo==='manipulado'?'🧪 ':'🏥 ') + f.nome + '</option>';
     });
     h += '</select>';
     if (dashFarmFiltro) {
@@ -946,7 +946,7 @@ function farmCard(f) {
     : '<div class="flogo">' + f.nome[0] + '</div>';
   return '<div class="fcard" id="fc-' + f.id + '">' +
     '<div class="ftop"><div style="display:flex;align-items:center;justify-content:center">' + logoHtml + '</div>' +
-    '<div style="position:absolute;top:8px;right:8px">' + (f.tipo==='petshop'?'<span class="b" style="background:#FF7043;color:#fff;margin-right:4px">🐾</span>':'') + '<span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
+    '<div style="position:absolute;top:8px;right:8px">' + (f.tipo==='petshop'?'<span class="b" style="background:#FF7043;color:#fff;margin-right:4px">🐾</span>':f.tipo==='manipulado'?'<span class="b" style="background:#6C63FF;color:#fff;margin-right:4px">🧪</span>':'') + '<span class="b ' + (f.aberta?'aberta':'fechada') + '">' + (f.aberta?'Aberta':'Fechada') + '</span></div>' +
     (!f.ativo ? '<div style="position:absolute;top:8px;left:8px"><span class="b inativo">Inativa</span></div>' : '') +
     '</div>' +
     '<div class="fbody">' +
@@ -1250,7 +1250,7 @@ function renderRel() {
   if (isAdmRel) {
     farmSelOpts = '<option value="">Todos os estabelecimentos</option>';
     FARMS.forEach(function(f) {
-      farmSelOpts += '<option value="' + f.id + '">' + (f.tipo==='petshop'?'🐾 ':'🏥 ') + f.nome + '</option>';
+      farmSelOpts += '<option value="' + f.id + '">' + (f.tipo==='petshop'?'🐾 ':f.tipo==='manipulado'?'🧪 ':'🏥 ') + f.nome + '</option>';
     });
   }
   el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap"><div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">📊 Relatórios</div><div style="margin-left:auto;display:flex;gap:8px;flex-wrap:wrap">' +
@@ -1642,7 +1642,7 @@ function buildMBody(type, id) {
   if (type === 'farm-new' || type === 'farm-edit') {
     var f = type === 'farm-edit' ? FARMS.find(function(x){return x.id===id;}) : {};
     f = f || {};
-    h += '<div class="fr"><div class="fc3"><label>Tipo de estabelecimento *</label><select id="mf-tipo" onchange="togglePetFields(this.value)"><option value="farmacia"' + ((f.tipo||'farmacia')==='farmacia'?' selected':'') + '>🏥 Farmácia</option><option value="petshop"' + (f.tipo==='petshop'?' selected':'') + '>🐾 Pet Shop</option></select></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Tipo de estabelecimento *</label><select id="mf-tipo" onchange="togglePetFields(this.value)"><option value="farmacia"' + ((f.tipo||'farmacia')==='farmacia'?' selected':'') + '>🏥 Farmácia</option><option value="petshop"' + (f.tipo==='petshop'?' selected':'') + '>🐾 Pet Shop</option><option value="manipulado"' + (f.tipo==='manipulado'?' selected':'') + '>🧪 Farmácia de Manipulados</option></select></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Nome do estabelecimento *</label><input id="mf-nome" value="' + (f.nome||'') + '" placeholder="Ex: Drogasil Boa Viagem"></div><div class="fc3" style="position:relative"><label>CNPJ *</label><input id="mf-cnpj" value="' + cnpjMask(f.cnpj||'') + '" placeholder="00.000.000/0001-00" maxlength="18" oninput="maskCNPJ(this)" onblur="validateCNPJField(this)" style="padding-right:34px"><span id=\"cnpj-ic\" style=\"position:absolute;right:10px;bottom:9px;font-size:15px\"></span></div></div>';
     if (type === 'csv-import') {
     // Captura dados antes do modal fechar
