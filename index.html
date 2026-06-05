@@ -689,6 +689,17 @@ var NAV_FRM = [
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
+  ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+];
+var NAV_MANIP = [
+  {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
+  {g:'Operações', items:[
+    {id:'ped',lbl:'Pedidos',bdg:true},
+    {id:'cham',lbl:'Chamados',bdg:true},
+    {id:'est',lbl:'Estoque'},
+    {id:'prod',lbl:'Produtos'},
+    {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
@@ -732,7 +743,7 @@ function startApp(novoLogin) {
   var roleEmoji = isAdm ? '👑' : (myfarmRole.tipo === 'petshop' ? '🐾' : myfarmRole.tipo === 'manipulado' ? '🧪' : '🏥');
   var roleLabel = isAdm ? 'Admin Mestre' : (myfarmRole.nome || CU.nome);
   document.getElementById('sb-role').textContent = roleEmoji + ' ' + roleLabel;
-  var nav = isAdm ? NAV_ADM : NAV_FRM;
+  var nav = isAdm ? NAV_ADM : (myfarmRole.tipo === 'manipulado' ? NAV_MANIP : NAV_FRM);
   var html = '';
   for (var i = 0; i < nav.length; i++) {
     html += '<div class="sb-sec"><div class="sb-lbl">' + nav[i].g + '</div>';
