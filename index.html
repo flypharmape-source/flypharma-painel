@@ -344,6 +344,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-est"  class="page"></div>
     <div id="page-usr"  class="page"></div>
     <div id="page-rel"  class="page"></div>
+    <div id="page-cupons" class="page"></div>
     <div id="page-cfg"  class="page"></div>
     <div id="page-cham" class="page"></div>
   </div>
@@ -667,6 +668,7 @@ var NAV_FRM = [
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
+    {id:'cupons',lbl:'Cupons'},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -680,12 +682,13 @@ var NAV_ICS = {
   rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
   cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
+  cupons:'<path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7M1 9l3-6h16l3 6H1z"/><circle cx="12" cy="15" r="1"/>',
   manip:'<path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>',
   entr:'<path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>',
 };
 var PTL = {
   manip:'Manipulados',
-  entr:'Entregadores',dash:'Dashboard',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
+  entr:'Entregadores',dash:'Dashboard',cupons:'Cupons',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
 
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
@@ -751,7 +754,7 @@ function goto(id) {
   document.getElementById('act-lbl').textContent = lbl;
   document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
   // Mostra loading e recarrega dados frescos da API antes de renderizar
-  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip, entr: loadEntregadores};
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip, entr: loadEntregadores, cupons: function(){}};
   if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
   var loader = loadMap[id];
   if (loader) {
@@ -774,6 +777,7 @@ function renderPage(id) {
   else if (id === 'cham') renderCham();
   else if (id === 'manip') renderManip();
   else if (id === 'entr')  renderEntregadores();
+  else if (id === 'cupons') renderCupons();
 }
 
 function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
@@ -1497,6 +1501,130 @@ function exportarRelatorioCSV() {
   showToast('s', 'CSV exportado!', (rows.length - 1) + ' pedidos exportados');
 }
 
+
+// ── CUPONS ────────────────────────────────────────────────────
+var CUPONS_DATA = [];
+
+function loadCuponsData() {
+  var farmId = CU && CU.farmacia_id;
+  if (!farmId && CU && CU.role !== 'admin') return Promise.resolve();
+  var fid = farmId || (FARMS[0] && FARMS[0].id);
+  if (!fid) return Promise.resolve();
+  return apiFetch('/farmacias/' + fid + '/cupons', AT).then(function(res) {
+    if (res.ok) CUPONS_DATA = Array.isArray(res.data) ? res.data : [];
+  }).catch(function(){});
+}
+
+function renderCupons() {
+  var el = document.getElementById('page-cupons');
+  var isAdm = CU && CU.role === 'admin';
+  var farmId = CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id);
+
+  var farmSelOpts = '';
+  if (isAdm) {
+    FARMS.forEach(function(f) {
+      farmSelOpts += '<option value="' + f.id + '">' + (f.tipo==='petshop'?'🐾 ':f.tipo==='manipulado'?'🧪 ':'🏥 ') + f.nome + '</option>';
+    });
+  }
+
+  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">' +
+    '<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:18px;color:var(--n)">🎟️ Cupons</div>' +
+    (isAdm ? '<select id="cupons-farm-sel" onchange="loadCuponsView()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px">' + farmSelOpts + '</select>' : '') +
+    '<button class="btn btn-p" onclick="abrirModalCupom()" style="margin-left:auto">+ Novo cupom</button>' +
+    '</div>' +
+    '<div id="cupons-lista"></div>' +
+    '<div class="card" style="margin-top:16px"><div class="ch"><span class="ct">📣 Notificação de promoção</span></div>' +
+    '<div style="padding:16px;display:flex;flex-direction:column;gap:12px">' +
+    '<input id="promo-titulo" placeholder="Título da promoção ex: 🔥 Oferta especial hoje!" style="padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px">' +
+    '<textarea id="promo-msg" placeholder="Mensagem ex: 20% OFF em todos os produtos hoje! Use o cupom PROMO20" style="padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;resize:vertical;min-height:80px"></textarea>' +
+    '<button class="btn btn-p" onclick="enviarPromocao()" style="align-self:flex-start">📣 Enviar para clientes</button>' +
+    '<span style="font-size:12px;color:var(--t3)">Será enviado para todos os clientes que já pediram nesta farmácia.</span>' +
+    '</div></div>';
+
+  loadCuponsView();
+}
+
+function loadCuponsView() {
+  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
+  if (!farmId) return;
+  apiFetch('/farmacias/' + farmId + '/cupons', AT).then(function(res) {
+    CUPONS_DATA = res.ok ? (Array.isArray(res.data) ? res.data : []) : [];
+    var el = document.getElementById('cupons-lista');
+    if (!el) return;
+    if (!CUPONS_DATA.length) {
+      el.innerHTML = '<div class="card" style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🎟️</div><div style="color:var(--t3)">Nenhum cupom criado ainda</div></div>';
+      return;
+    }
+    var h = '<div style="display:grid;gap:10px">';
+    CUPONS_DATA.forEach(function(c) {
+      var expira = new Date(c.valido_ate).toLocaleDateString('pt-BR');
+      var vencido = new Date(c.valido_ate) < new Date();
+      h += '<div class="card" style="padding:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
+      h += '<div style="background:' + (c.ativo && !vencido ? 'var(--tl)' : '#F5F7F9') + ';border-radius:10px;padding:12px 16px;min-width:100px;text-align:center">';
+      h += '<div style="font-family:\'Nunito\';font-weight:800;font-size:16px;color:' + (c.ativo && !vencido ? 'var(--t)' : 'var(--t3)') + '">' + c.codigo + '</div>';
+      h += '<div style="font-size:11px;color:var(--t3)">' + (c.tipo === 'percentual' ? c.valor + '%' : 'R$' + Number(c.valor).toFixed(2)) + ' OFF</div></div>';
+      h += '<div style="flex:1;min-width:160px"><div style="font-size:13px;font-weight:600;color:var(--n)">' + (c.descricao || '—') + '</div>';
+      h += '<div style="font-size:12px;color:var(--t3);margin-top:4px">Mínimo: R$' + Number(c.pedido_minimo||0).toFixed(2) + ' · Usos: ' + c.usos_atual + '/' + (c.uso_maximo || '∞') + ' · Expira: ' + expira + '</div></div>';
+      h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
+      h += '<button class="btn ' + (c.ativo && !vencido ? 'btn-p' : '') + '" onclick="toggleCupom(\''+c.id+'\','+c.ativo+')" style="padding:6px 14px;font-size:12px">' + (c.ativo ? '⏸ Pausar' : '▶ Ativar') + '</button>';
+      h += '<button class="btn" onclick="deletarCupom(\''+c.id+'\' )" style="padding:6px 14px;font-size:12px;color:var(--r);border-color:var(--r)">🗑</button>';
+      h += '</div></div>';
+    });
+    h += '</div>';
+    el.innerHTML = h;
+  });
+}
+
+function abrirModalCupom() {
+  openModal('cupom-new', null);
+}
+
+function toggleCupom(id, ativo) {
+  apiFetch('/cupons/' + id, AT, { method:'PATCH', body: JSON.stringify({ ativo: !ativo }) }).then(function(res) {
+    if (res.ok) { showToast('s', ativo ? 'Cupom pausado' : 'Cupom ativado', ''); loadCuponsView(); }
+  });
+}
+
+function deletarCupom(id) {
+  if (!confirm('Excluir este cupom?')) return;
+  apiFetch('/cupons/' + id, AT, { method:'DELETE' }).then(function(res) {
+    if (res.ok) { showToast('s', 'Cupom excluído', ''); loadCuponsView(); }
+  });
+}
+
+function salvarCupom() {
+  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
+  var data = {
+    codigo:         (document.getElementById('cf-codigo')||{}).value || '',
+    descricao:      (document.getElementById('cf-desc')||{}).value || '',
+    tipo:           (document.getElementById('cf-tipo')||{}).value || 'fixo',
+    valor:          Number((document.getElementById('cf-valor')||{}).value || 0),
+    pedido_minimo:  Number((document.getElementById('cf-minimo')||{}).value || 0),
+    uso_maximo:     Number((document.getElementById('cf-max')||{}).value || 0) || null,
+    uso_por_usuario:Number((document.getElementById('cf-maxusr')||{}).value || 1),
+    valido_ate:     (document.getElementById('cf-expira')||{}).value || '',
+  };
+  if (!data.codigo || !data.valor || !data.valido_ate) { showToast('e','Campos obrigatórios','Código, valor e validade são obrigatórios.'); return; }
+  apiFetch('/farmacias/' + farmId + '/cupons', AT, { method:'POST', body: JSON.stringify(data) }).then(function(res) {
+    if (res.ok) { showToast('s','Cupom criado!',''); closeModal(); loadCuponsView(); }
+    else { showToast('e','Erro',res.data && res.data.error || 'Tente novamente.'); }
+  });
+}
+
+function enviarPromocao() {
+  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
+  var titulo = (document.getElementById('promo-titulo')||{}).value || '';
+  var mensagem = (document.getElementById('promo-msg')||{}).value || '';
+  if (!titulo || !mensagem) { showToast('e','Campos obrigatórios','Preencha título e mensagem.'); return; }
+  apiFetch('/farmacias/' + farmId + '/notificar-clientes', AT, { method:'POST', body: JSON.stringify({ titulo, mensagem }) }).then(function(res) {
+    if (res.ok) {
+      showToast('s','Promoção enviada!', res.data.enviados + ' clientes notificados');
+      document.getElementById('promo-titulo').value = '';
+      document.getElementById('promo-msg').value = '';
+    } else { showToast('e','Erro','Não foi possível enviar.'); }
+  });
+}
+
 // CONFIG
 function renderCfg() {
   var el = document.getElementById('page-cfg');
@@ -1613,10 +1741,26 @@ function togglePetFields(tipo) {
 }
 function openModal(type, id) {
   MC = {type: type, id: id};
-  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
+  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido','cupom-new':'Novo cupom'};
   document.getElementById('m-title').textContent = titles[type] || type;
   document.getElementById('m-save-txt').textContent = type.indexOf('view') >= 0 ? 'Fechar' : 'Salvar';
   document.getElementById('m-overlay').classList.add('on');
+  if (type === 'cupom-new') {
+    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
+    var expDefault = hoje.toISOString().slice(0,10);
+    document.getElementById('m-body').innerHTML =
+      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
+      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
+      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
+      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
+      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
+      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
+      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
+      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
+    document.getElementById('m-save-txt').textContent = 'Criar cupom';
+    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
+    return;
+  }
 
   // Para farm-edit, busca horários atualizados do servidor
   if (type === 'farm-edit' && id) {
@@ -2486,6 +2630,22 @@ function openImportCSV() {
   document.getElementById('m-save-txt').textContent = 'Importar';
   document.getElementById('m-body').innerHTML = buildImportCSVBody();
   document.getElementById('m-overlay').classList.add('on');
+  if (type === 'cupom-new') {
+    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
+    var expDefault = hoje.toISOString().slice(0,10);
+    document.getElementById('m-body').innerHTML =
+      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
+      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
+      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
+      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
+      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
+      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
+      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
+      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
+    document.getElementById('m-save-txt').textContent = 'Criar cupom';
+    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
+    return;
+  }
 }
 
 function buildImportCSVBody() {
@@ -2718,6 +2878,22 @@ function abrirEsqueciSenha() {
   document.getElementById('m-save-txt').textContent = 'Redefinir';
   document.getElementById('m-body').innerHTML = html;
   document.getElementById('m-overlay').classList.add('on');
+  if (type === 'cupom-new') {
+    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
+    var expDefault = hoje.toISOString().slice(0,10);
+    document.getElementById('m-body').innerHTML =
+      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
+      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
+      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
+      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
+      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
+      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
+      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
+      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
+    document.getElementById('m-save-txt').textContent = 'Criar cupom';
+    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
+    return;
+  }
 }
 
 function salvarRedefinicaoSenha() {
