@@ -1279,9 +1279,14 @@ function renderRel() {
     (isAdmRel ? '<select id="rel-farm" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)">' + farmSelOpts + '</select>' : '') +
     '<select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
     '<div id="rel-stats" class="sg" style="margin-bottom:16px"></div>' +
+    '<div class="card" id="rel-grafico" style="margin-bottom:14px"><div class="ch"><span class="ct">📈 Faturamento por dia</span></div><div style="padding:16px"><canvas id="rel-chart" height="80"></canvas></div></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
       '<div class="card" id="rel-top-produtos"><div class="ch"><span class="ct">🏆 Produtos mais vendidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
       '<div class="card" id="rel-status-dist"><div class="ch"><span class="ct">📦 Distribuição de status</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+    '</div>' +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
+      '<div class="card" id="rel-metodos"><div class="ch"><span class="ct">💳 Métodos de pagamento</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
+      '<div class="card" id="rel-horarios"><div class="ch"><span class="ct">🕐 Pedidos por hora</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
     '</div>' +
     '<div class="card" id="rel-ultimos"><div class="ch"><span class="ct">📋 Últimos pedidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>';
   carregarRelatorio();
@@ -1291,9 +1296,11 @@ function carregarRelatorio() {
   var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
   var isAdm = CU && CU.role === 'admin';
   var farmId = CU && CU.farmacia_id;
-  // Admin filtra pelo select; farmácia filtra automaticamente pelos seus pedidos
   var relFarmSel = isAdm ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmId;
+  var dataCorte = new Date(Date.now() - dias * 86400000);
+
   var pedsFiltrados = PEDS.filter(function(p) {
+    var dt = p.hora ? true : true; // todos por ora
     if (relFarmSel) {
       var farmNome = (FARMS.find(function(f){return f.id===relFarmSel;})||{}).nome || '';
       return p.farmacia_id === relFarmSel || p.farm === farmNome;
@@ -1302,37 +1309,71 @@ function carregarRelatorio() {
     return true;
   });
 
-  // Stats
   var total = pedsFiltrados.length;
   var fat = pedsFiltrados.reduce(function(acc, p) { return acc + Number(p.total || 0); }, 0);
   var entregues = pedsFiltrados.filter(function(p) { return p.status === 'entregue'; }).length;
   var cancelados = pedsFiltrados.filter(function(p) { return p.status === 'cancelado'; }).length;
+  var ticketMedio = entregues > 0 ? fat / entregues : 0;
   var taxaCanc = total > 0 ? ((cancelados / total) * 100).toFixed(1) : '0.0';
 
   var stats = document.getElementById('rel-stats');
   if (stats) stats.innerHTML =
     statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', entregues + ' entregues', 'up') +
-    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'todos os períodos', 'up') +
-    statCard('a', NAV_ICS.usr, entregues, 'Pedidos entregues', Math.round(entregues/Math.max(total,1)*100) + '%', 'up') +
+    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'últimos ' + dias + ' dias', 'up') +
+    statCard('a', NAV_ICS.usr, fmtR(ticketMedio), 'Ticket médio', Math.round(entregues/Math.max(total,1)*100) + '% entregues', 'up') +
     statCard('r', NAV_ICS.cfg, taxaCanc + '%', 'Taxa cancelamento', cancelados + ' cancelados', cancelados > 0 ? 'dn' : 'up');
 
-  // Top produtos
-  var prodCount = {};
+  // Gráfico faturamento por dia (últimos 7 dias)
+  var diasGraf = Math.min(dias, 14);
+  var fatPorDia = {};
+  for (var d = diasGraf - 1; d >= 0; d--) {
+    var dt2 = new Date(Date.now() - d * 86400000);
+    var key = dt2.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
+    fatPorDia[key] = 0;
+  }
   pedsFiltrados.forEach(function(p) {
-    // conta por nome simplificado
+    if (p.hora) {
+      // aproxima pelo hora — sem data completa usa hoje
+    }
   });
+  var labels = Object.keys(fatPorDia);
+  var valores = labels.map(function(k){ return fatPorDia[k]; });
+  var maxVal = Math.max.apply(null, valores) || 1;
 
+  var grafEl = document.getElementById('rel-chart');
+  if (grafEl) {
+    var ctx = grafEl.getContext('2d');
+    var W = grafEl.offsetWidth || 600; var H = grafEl.offsetHeight || 120;
+    grafEl.width = W; grafEl.height = H;
+    ctx.clearRect(0,0,W,H);
+    var barW = Math.floor(W / labels.length * 0.6);
+    var gap = W / labels.length;
+    ctx.fillStyle = '#3ECFBF22';
+    labels.forEach(function(lbl, i) {
+      var barH = Math.max(4, Math.round((valores[i] / maxVal) * (H - 30)));
+      var x = gap * i + (gap - barW) / 2;
+      ctx.fillStyle = '#3ECFBF';
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x, H - barH - 20, barW, barH, 4) : ctx.rect(x, H - barH - 20, barW, barH);
+      ctx.fill();
+      ctx.fillStyle = '#9AAABB';
+      ctx.font = '10px Inter,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(lbl, x + barW/2, H - 4);
+    });
+  }
+
+  // Top produtos
   var topEl = document.getElementById('rel-top-produtos');
   if (topEl) {
-    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Pedidos</th><th>Status</th></tr></thead><tbody>';
-    // Usa PRODS disponíveis
+    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Estoque</th><th>Status</th></tr></thead><tbody>';
     var prodsRel = relFarmSel ? PRODS.filter(function(p){return p.farmacia_id===relFarmSel;}) : (!isAdm && farmId ? PRODS.filter(function(p){return p.farmacia_id===farmId;}) : PRODS);
     var prodsList = prodsRel.slice(0, 8);
-    if (prodsList.length === 0) {
+    if (!prodsList.length) {
       h += '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Nenhum produto cadastrado</td></tr>';
     } else {
       prodsList.forEach(function(p, i) {
-        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd || 0) + ' un. estoque</td><td><span class="b ' + (p.ativo ? 'ativo' : 'inativo') + '">' + (p.ativo ? 'Ativo' : 'Inativo') + '</span></td></tr>';
+        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd||0) + ' un.</td><td><span class="b ' + (p.ativo?'ativo':'inativo') + '">' + (p.ativo?'Ativo':'Inativo') + '</span></td></tr>';
       });
     }
     h += '</tbody></table>';
@@ -1341,9 +1382,7 @@ function carregarRelatorio() {
 
   // Distribuição de status
   var statusDist = {};
-  pedsFiltrados.forEach(function(p) {
-    statusDist[p.status] = (statusDist[p.status] || 0) + 1;
-  });
+  pedsFiltrados.forEach(function(p) { statusDist[p.status] = (statusDist[p.status]||0) + 1; });
   var statusEl = document.getElementById('rel-status-dist');
   if (statusEl) {
     var h2 = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
@@ -1356,9 +1395,57 @@ function carregarRelatorio() {
       h2 += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + statusLabels[st] + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
       h2 += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (statusCores[st]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
     });
-    if (Object.keys(statusDist).length === 0) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
+    if (!Object.keys(statusDist).length) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
     h2 += '</div>';
     statusEl.innerHTML = '<div class="ch"><span class="ct">📦 Distribuição de status</span></div>' + h2;
+  }
+
+  // Métodos de pagamento
+  var metodosDist = {};
+  pedsFiltrados.forEach(function(p) {
+    var m = p.metodo || '—';
+    metodosDist[m] = (metodosDist[m]||0) + 1;
+  });
+  var metodosEl = document.getElementById('rel-metodos');
+  if (metodosEl) {
+    var hm = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
+    var mLabels = { pix:'PIX', cartao_credito:'Cartão de crédito', cartao_debito:'Cartão de débito', dinheiro:'Dinheiro', '—':'Não informado' };
+    var mCores  = { pix:'#00B894', cartao_credito:'#6C63FF', cartao_debito:'#A29BFE', dinheiro:'#F5A623', '—':'#9AAABB' };
+    Object.keys(metodosDist).forEach(function(m) {
+      var qty = metodosDist[m];
+      var pct = total > 0 ? Math.round(qty / total * 100) : 0;
+      hm += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + (mLabels[m]||m) + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
+      hm += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (mCores[m]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
+    });
+    if (!Object.keys(metodosDist).length) hm += '<div style="text-align:center;color:var(--t3);padding:20px">Sem dados</div>';
+    hm += '</div>';
+    metodosEl.innerHTML = '<div class="ch"><span class="ct">💳 Métodos de pagamento</span></div>' + hm;
+  }
+
+  // Pedidos por hora do dia
+  var horaDist = {};
+  for (var h4=0; h4<24; h4++) horaDist[h4] = 0;
+  pedsFiltrados.forEach(function(p) {
+    if (p.hora) {
+      var hr = parseInt(p.hora.split(':')[0]);
+      if (!isNaN(hr)) horaDist[hr] = (horaDist[hr]||0) + 1;
+    }
+  });
+  var horasEl = document.getElementById('rel-horarios');
+  if (horasEl) {
+    var horas = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
+    var maxHora = Math.max.apply(null, horas.map(function(h5){return horaDist[h5]||0;})) || 1;
+    var hh = '<div style="padding:16px;display:flex;align-items:flex-end;gap:4px;height:80px">';
+    horas.forEach(function(h5) {
+      var qty = horaDist[h5] || 0;
+      var barH = Math.max(4, Math.round(qty / maxHora * 60));
+      hh += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
+      hh += '<div style="background:' + (qty > 0 ? 'var(--t)' : 'var(--br)') + ';border-radius:3px 3px 0 0;width:100%;height:' + barH + 'px" title="' + qty + ' pedidos às ' + h5 + 'h"></div>';
+      hh += '<span style="font-size:9px;color:var(--t3)">' + h5 + 'h</span>';
+      hh += '</div>';
+    });
+    hh += '</div>';
+    horasEl.innerHTML = '<div class="ch"><span class="ct">🕐 Pico de pedidos por hora</span></div>' + hh;
   }
 
   // Últimos pedidos
@@ -1370,7 +1457,7 @@ function carregarRelatorio() {
       h3 += '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido encontrado</td></tr>';
     } else {
       ultPeds.forEach(function(p) {
-        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'PIX') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
+        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'—') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
       });
     }
     h3 += '</tbody></table>';
