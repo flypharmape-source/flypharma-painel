@@ -437,6 +437,7 @@ function loadProds() {
     if (res.ok) {
       var raw = Array.isArray(res.data) ? res.data : (res.data.data || res.data.produtos || []);
       PRODS = raw.map(function(p) {
+        p.destaque = p.destaque || false;
         return {
           id: p.id || p._id,
           nome: p.nome || p.name || '',
@@ -1138,6 +1139,23 @@ function prodRow(p) {
     '<button class="btn btn-d" style="padding:4px 10px;font-size:12px" onclick="delProd(\'' + p.id + '\')">🗑️</button>' +
     '</div></td></tr>';
 }
+function toggleDestaque(id, atual) {
+  apiFetch('/produtos/' + id + '/destaque', AT, {
+    method: 'PATCH',
+    body: JSON.stringify({ destaque: !atual })
+  }).then(function(res) {
+    if (res.ok) {
+      var p = PRODS.find(function(p){ return p.id === id; });
+      if (p) {
+        p.destaque = !atual;
+        var tr = document.getElementById('pr-' + id);
+        if (tr) tr.outerHTML = prodRow(p);
+      }
+      showToast('s', atual ? 'Destaque removido' : '⭐ Produto em destaque!', '');
+    }
+  });
+}
+
 function filterProd(q) {
   var data = PRODS.filter(function(p){return p.nome.toLowerCase().includes(q.toLowerCase());});
   document.getElementById('prod-body').innerHTML = data.map(prodRow).join('');
