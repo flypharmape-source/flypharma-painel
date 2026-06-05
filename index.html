@@ -344,7 +344,6 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-est"  class="page"></div>
     <div id="page-usr"  class="page"></div>
     <div id="page-rel"  class="page"></div>
-    <div id="page-cupons" class="page"></div>
     <div id="page-cfg"  class="page"></div>
     <div id="page-cham" class="page"></div>
   </div>
@@ -491,26 +490,48 @@ function loadPeds() {
       if (pendentes > 0) { bdg.textContent = pendentes > 99 ? '99+' : pendentes; bdg.style.display = 'flex'; }
       else { bdg.style.display = 'none'; }
     }
-    // Som de novo pedido
+    // Som + Flash no painel quando chega pedido novo
     var novosIds = PEDS.filter(function(p){ return p.status === 'pendente'; }).map(function(p){ return p.id; });
     if (window._pedIdsConhecidos === undefined) { window._pedIdsConhecidos = novosIds; }
     else {
       var realmente_novos = novosIds.filter(function(id){ return window._pedIdsConhecidos.indexOf(id) < 0; });
       if (realmente_novos.length > 0) {
+        // Som urgente estilo iFood
         try {
           var ctx = new (window.AudioContext || window.webkitAudioContext)();
-          [0, 150, 300].forEach(function(delay) {
-            var o = ctx.createOscillator();
-            var g = ctx.createGain();
+          var tocar = function(freq, inicio, dur) {
+            var o = ctx.createOscillator(); var g = ctx.createGain();
             o.connect(g); g.connect(ctx.destination);
-            o.frequency.value = 880;
-            g.gain.setValueAtTime(0.3, ctx.currentTime + delay/1000);
-            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + delay/1000 + 0.15);
-            o.start(ctx.currentTime + delay/1000);
-            o.stop(ctx.currentTime + delay/1000 + 0.15);
-          });
+            o.frequency.value = freq; o.type = 'sine';
+            g.gain.setValueAtTime(0.4, ctx.currentTime + inicio);
+            g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + inicio + dur);
+            o.start(ctx.currentTime + inicio); o.stop(ctx.currentTime + inicio + dur);
+          };
+          tocar(880, 0, 0.12); tocar(1046, 0.15, 0.12);
+          tocar(880, 0.30, 0.12); tocar(1046, 0.45, 0.12);
+          tocar(1318, 0.60, 0.3);
         } catch(e) {}
-        showToast('s', '🛒 Novo pedido!', realmente_novos.length + ' novo(s) pedido(s) chegou!');
+        // Flash na tela
+        var flash = document.createElement('div');
+        flash.style.cssText = 'position:fixed;inset:0;background:rgba(62,207,191,0.25);z-index:9999;pointer-events:none;animation:fadeFlash 0.8s ease-out forwards';
+        if (!document.getElementById('flash-style')) {
+          var style = document.createElement('style');
+          style.id = 'flash-style';
+          style.textContent = '@keyframes fadeFlash{0%{opacity:1}100%{opacity:0}}';
+          document.head.appendChild(style);
+        }
+        document.body.appendChild(flash);
+        setTimeout(function(){ flash.remove(); }, 800);
+        // Toast
+        showToast('s', '🛒 ' + realmente_novos.length + ' novo(s) pedido(s)!', 'Clique em Pedidos para ver');
+        // Título da aba pisca
+        var _origTitle = document.title;
+        var _blink = 0;
+        var _blinkInt = setInterval(function() {
+          document.title = _blink % 2 === 0 ? '🔔 NOVO PEDIDO!' : _origTitle;
+          _blink++;
+          if (_blink > 8) { clearInterval(_blinkInt); document.title = _origTitle; }
+        }, 500);
       }
       window._pedIdsConhecidos = novosIds;
     }
@@ -668,7 +689,6 @@ var NAV_FRM = [
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
-    {id:'cupons',lbl:'Cupons'},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -682,13 +702,12 @@ var NAV_ICS = {
   rel:'<path d="M3 17V7l7-4 7 4v10"/><path d="M8 17v-5h4v5"/>',
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
   cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
-  cupons:'<path d="M20 12v7a1 1 0 01-1 1H5a1 1 0 01-1-1v-7M1 9l3-6h16l3 6H1z"/><circle cx="12" cy="15" r="1"/>',
   manip:'<path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>',
   entr:'<path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>',
 };
 var PTL = {
   manip:'Manipulados',
-  entr:'Entregadores',dash:'Dashboard',cupons:'Cupons',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
+  entr:'Entregadores',dash:'Dashboard',farm:'Farmácias / Pet Shops',prod:'Produtos',ped:'Pedidos',est:'Estoque',usr:'Usuários',rel:'Relatórios',cfg:'Configurações',cham:'Chamados'};
 
 function startApp(novoLogin) {
   document.getElementById('lp').classList.add('hide');
@@ -735,7 +754,8 @@ function startApp(novoLogin) {
     loadChamados();
     loadPeds();
     if (window._badgeInterval) clearInterval(window._badgeInterval);
-    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); loadManip(); loadEntregadores(); }, 60000);
+    window._badgeInterval = setInterval(function() { loadChamados(); loadPeds(); loadManip(); loadEntregadores(); verificarHorarioFarmacias(); }, 60000);
+    verificarHorarioFarmacias();
   }, 500);
 }
 
@@ -754,7 +774,7 @@ function goto(id) {
   document.getElementById('act-lbl').textContent = lbl;
   document.getElementById('act-btn').onclick = function() { openModal(id + '-new'); };
   // Mostra loading e recarrega dados frescos da API antes de renderizar
-  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip, entr: loadEntregadores, cupons: function(){}};
+  var loadMap = {farm: loadFarms, prod: loadProds, ped: loadPeds, usr: loadUsrs, est: loadProds, cham: loadChamados, manip: loadManip, entr: loadEntregadores};
   if (pg) pg.innerHTML = '<div class="empty"><div class="ei"><span class="spin" style="width:28px;height:28px;border-color:var(--t);border-top-color:var(--td)"></span></div></div>';
   var loader = loadMap[id];
   if (loader) {
@@ -777,7 +797,6 @@ function renderPage(id) {
   else if (id === 'cham') renderCham();
   else if (id === 'manip') renderManip();
   else if (id === 'entr')  renderEntregadores();
-  else if (id === 'cupons') renderCupons();
 }
 
 function svg18(d) { return '<svg width="18" height="18" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6">' + d + '</svg>'; }
@@ -1283,14 +1302,9 @@ function renderRel() {
     (isAdmRel ? '<select id="rel-farm" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)">' + farmSelOpts + '</select>' : '') +
     '<select id="rel-periodo" onchange="carregarRelatorio()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n)"><option value="7">Últimos 7 dias</option><option value="30" selected>Últimos 30 dias</option><option value="90">Últimos 90 dias</option></select><button class="btn btn-p" onclick="exportarRelatorioCSV()" style="padding:7px 14px;font-size:13px">⬇️ Exportar CSV</button></div></div>' +
     '<div id="rel-stats" class="sg" style="margin-bottom:16px"></div>' +
-    '<div class="card" id="rel-grafico" style="margin-bottom:14px"><div class="ch"><span class="ct">📈 Faturamento por dia</span></div><div style="padding:16px"><canvas id="rel-chart" height="80"></canvas></div></div>' +
     '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
       '<div class="card" id="rel-top-produtos"><div class="ch"><span class="ct">🏆 Produtos mais vendidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
       '<div class="card" id="rel-status-dist"><div class="ch"><span class="ct">📦 Distribuição de status</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
-    '</div>' +
-    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">' +
-      '<div class="card" id="rel-metodos"><div class="ch"><span class="ct">💳 Métodos de pagamento</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
-      '<div class="card" id="rel-horarios"><div class="ch"><span class="ct">🕐 Pedidos por hora</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>' +
     '</div>' +
     '<div class="card" id="rel-ultimos"><div class="ch"><span class="ct">📋 Últimos pedidos</span></div><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>';
   carregarRelatorio();
@@ -1300,11 +1314,9 @@ function carregarRelatorio() {
   var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
   var isAdm = CU && CU.role === 'admin';
   var farmId = CU && CU.farmacia_id;
+  // Admin filtra pelo select; farmácia filtra automaticamente pelos seus pedidos
   var relFarmSel = isAdm ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmId;
-  var dataCorte = new Date(Date.now() - dias * 86400000);
-
   var pedsFiltrados = PEDS.filter(function(p) {
-    var dt = p.hora ? true : true; // todos por ora
     if (relFarmSel) {
       var farmNome = (FARMS.find(function(f){return f.id===relFarmSel;})||{}).nome || '';
       return p.farmacia_id === relFarmSel || p.farm === farmNome;
@@ -1313,71 +1325,37 @@ function carregarRelatorio() {
     return true;
   });
 
+  // Stats
   var total = pedsFiltrados.length;
   var fat = pedsFiltrados.reduce(function(acc, p) { return acc + Number(p.total || 0); }, 0);
   var entregues = pedsFiltrados.filter(function(p) { return p.status === 'entregue'; }).length;
   var cancelados = pedsFiltrados.filter(function(p) { return p.status === 'cancelado'; }).length;
-  var ticketMedio = entregues > 0 ? fat / entregues : 0;
   var taxaCanc = total > 0 ? ((cancelados / total) * 100).toFixed(1) : '0.0';
 
   var stats = document.getElementById('rel-stats');
   if (stats) stats.innerHTML =
     statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', entregues + ' entregues', 'up') +
-    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'últimos ' + dias + ' dias', 'up') +
-    statCard('a', NAV_ICS.usr, fmtR(ticketMedio), 'Ticket médio', Math.round(entregues/Math.max(total,1)*100) + '% entregues', 'up') +
+    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'todos os períodos', 'up') +
+    statCard('a', NAV_ICS.usr, entregues, 'Pedidos entregues', Math.round(entregues/Math.max(total,1)*100) + '%', 'up') +
     statCard('r', NAV_ICS.cfg, taxaCanc + '%', 'Taxa cancelamento', cancelados + ' cancelados', cancelados > 0 ? 'dn' : 'up');
 
-  // Gráfico faturamento por dia (últimos 7 dias)
-  var diasGraf = Math.min(dias, 14);
-  var fatPorDia = {};
-  for (var d = diasGraf - 1; d >= 0; d--) {
-    var dt2 = new Date(Date.now() - d * 86400000);
-    var key = dt2.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-    fatPorDia[key] = 0;
-  }
-  pedsFiltrados.forEach(function(p) {
-    if (p.hora) {
-      // aproxima pelo hora — sem data completa usa hoje
-    }
-  });
-  var labels = Object.keys(fatPorDia);
-  var valores = labels.map(function(k){ return fatPorDia[k]; });
-  var maxVal = Math.max.apply(null, valores) || 1;
-
-  var grafEl = document.getElementById('rel-chart');
-  if (grafEl) {
-    var ctx = grafEl.getContext('2d');
-    var W = grafEl.offsetWidth || 600; var H = grafEl.offsetHeight || 120;
-    grafEl.width = W; grafEl.height = H;
-    ctx.clearRect(0,0,W,H);
-    var barW = Math.floor(W / labels.length * 0.6);
-    var gap = W / labels.length;
-    ctx.fillStyle = '#3ECFBF22';
-    labels.forEach(function(lbl, i) {
-      var barH = Math.max(4, Math.round((valores[i] / maxVal) * (H - 30)));
-      var x = gap * i + (gap - barW) / 2;
-      ctx.fillStyle = '#3ECFBF';
-      ctx.beginPath();
-      ctx.roundRect ? ctx.roundRect(x, H - barH - 20, barW, barH, 4) : ctx.rect(x, H - barH - 20, barW, barH);
-      ctx.fill();
-      ctx.fillStyle = '#9AAABB';
-      ctx.font = '10px Inter,sans-serif';
-      ctx.textAlign = 'center';
-      ctx.fillText(lbl, x + barW/2, H - 4);
-    });
-  }
-
   // Top produtos
+  var prodCount = {};
+  pedsFiltrados.forEach(function(p) {
+    // conta por nome simplificado
+  });
+
   var topEl = document.getElementById('rel-top-produtos');
   if (topEl) {
-    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Estoque</th><th>Status</th></tr></thead><tbody>';
+    var h = '<table class="tbl"><thead><tr><th>#</th><th>Produto</th><th>Pedidos</th><th>Status</th></tr></thead><tbody>';
+    // Usa PRODS disponíveis
     var prodsRel = relFarmSel ? PRODS.filter(function(p){return p.farmacia_id===relFarmSel;}) : (!isAdm && farmId ? PRODS.filter(function(p){return p.farmacia_id===farmId;}) : PRODS);
     var prodsList = prodsRel.slice(0, 8);
-    if (!prodsList.length) {
+    if (prodsList.length === 0) {
       h += '<tr><td colspan="4" style="text-align:center;color:var(--t3);padding:20px">Nenhum produto cadastrado</td></tr>';
     } else {
       prodsList.forEach(function(p, i) {
-        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd||0) + ' un.</td><td><span class="b ' + (p.ativo?'ativo':'inativo') + '">' + (p.ativo?'Ativo':'Inativo') + '</span></td></tr>';
+        h += '<tr><td><b style="color:var(--t)">' + (i+1) + '</b></td><td>' + p.nome + '</td><td>' + (p.qtd || 0) + ' un. estoque</td><td><span class="b ' + (p.ativo ? 'ativo' : 'inativo') + '">' + (p.ativo ? 'Ativo' : 'Inativo') + '</span></td></tr>';
       });
     }
     h += '</tbody></table>';
@@ -1386,7 +1364,9 @@ function carregarRelatorio() {
 
   // Distribuição de status
   var statusDist = {};
-  pedsFiltrados.forEach(function(p) { statusDist[p.status] = (statusDist[p.status]||0) + 1; });
+  pedsFiltrados.forEach(function(p) {
+    statusDist[p.status] = (statusDist[p.status] || 0) + 1;
+  });
   var statusEl = document.getElementById('rel-status-dist');
   if (statusEl) {
     var h2 = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
@@ -1399,57 +1379,9 @@ function carregarRelatorio() {
       h2 += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + statusLabels[st] + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
       h2 += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (statusCores[st]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
     });
-    if (!Object.keys(statusDist).length) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
+    if (Object.keys(statusDist).length === 0) h2 += '<div style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido ainda</div>';
     h2 += '</div>';
     statusEl.innerHTML = '<div class="ch"><span class="ct">📦 Distribuição de status</span></div>' + h2;
-  }
-
-  // Métodos de pagamento
-  var metodosDist = {};
-  pedsFiltrados.forEach(function(p) {
-    var m = p.metodo || '—';
-    metodosDist[m] = (metodosDist[m]||0) + 1;
-  });
-  var metodosEl = document.getElementById('rel-metodos');
-  if (metodosEl) {
-    var hm = '<div style="padding:16px;display:flex;flex-direction:column;gap:10px">';
-    var mLabels = { pix:'PIX', cartao_credito:'Cartão de crédito', cartao_debito:'Cartão de débito', dinheiro:'Dinheiro', '—':'Não informado' };
-    var mCores  = { pix:'#00B894', cartao_credito:'#6C63FF', cartao_debito:'#A29BFE', dinheiro:'#F5A623', '—':'#9AAABB' };
-    Object.keys(metodosDist).forEach(function(m) {
-      var qty = metodosDist[m];
-      var pct = total > 0 ? Math.round(qty / total * 100) : 0;
-      hm += '<div><div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:12px;color:var(--t2)">' + (mLabels[m]||m) + '</span><span style="font-size:12px;font-weight:700;color:var(--n)">' + qty + ' (' + pct + '%)</span></div>';
-      hm += '<div style="height:6px;background:var(--br);border-radius:3px"><div style="height:6px;background:' + (mCores[m]||'var(--t)') + ';border-radius:3px;width:' + pct + '%"></div></div></div>';
-    });
-    if (!Object.keys(metodosDist).length) hm += '<div style="text-align:center;color:var(--t3);padding:20px">Sem dados</div>';
-    hm += '</div>';
-    metodosEl.innerHTML = '<div class="ch"><span class="ct">💳 Métodos de pagamento</span></div>' + hm;
-  }
-
-  // Pedidos por hora do dia
-  var horaDist = {};
-  for (var h4=0; h4<24; h4++) horaDist[h4] = 0;
-  pedsFiltrados.forEach(function(p) {
-    if (p.hora) {
-      var hr = parseInt(p.hora.split(':')[0]);
-      if (!isNaN(hr)) horaDist[hr] = (horaDist[hr]||0) + 1;
-    }
-  });
-  var horasEl = document.getElementById('rel-horarios');
-  if (horasEl) {
-    var horas = [7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22];
-    var maxHora = Math.max.apply(null, horas.map(function(h5){return horaDist[h5]||0;})) || 1;
-    var hh = '<div style="padding:16px;display:flex;align-items:flex-end;gap:4px;height:80px">';
-    horas.forEach(function(h5) {
-      var qty = horaDist[h5] || 0;
-      var barH = Math.max(4, Math.round(qty / maxHora * 60));
-      hh += '<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:2px">';
-      hh += '<div style="background:' + (qty > 0 ? 'var(--t)' : 'var(--br)') + ';border-radius:3px 3px 0 0;width:100%;height:' + barH + 'px" title="' + qty + ' pedidos às ' + h5 + 'h"></div>';
-      hh += '<span style="font-size:9px;color:var(--t3)">' + h5 + 'h</span>';
-      hh += '</div>';
-    });
-    hh += '</div>';
-    horasEl.innerHTML = '<div class="ch"><span class="ct">🕐 Pico de pedidos por hora</span></div>' + hh;
   }
 
   // Últimos pedidos
@@ -1461,7 +1393,7 @@ function carregarRelatorio() {
       h3 += '<tr><td colspan="6" style="text-align:center;color:var(--t3);padding:20px">Nenhum pedido encontrado</td></tr>';
     } else {
       ultPeds.forEach(function(p) {
-        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'—') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
+        h3 += '<tr><td><span class="oid">#' + p.num + '</span></td><td>' + (p.cli||'—') + '</td><td><b>' + fmtR(p.total) + '</b></td><td>' + (p.metodo||'PIX') + '</td><td>' + sbadge(p.status) + '</td><td>' + (p.hora||'—') + '</td></tr>';
       });
     }
     h3 += '</tbody></table>';
@@ -1499,130 +1431,6 @@ function exportarRelatorioCSV() {
   a.click();
   URL.revokeObjectURL(url);
   showToast('s', 'CSV exportado!', (rows.length - 1) + ' pedidos exportados');
-}
-
-
-// ── CUPONS ────────────────────────────────────────────────────
-var CUPONS_DATA = [];
-
-function loadCuponsData() {
-  var farmId = CU && CU.farmacia_id;
-  if (!farmId && CU && CU.role !== 'admin') return Promise.resolve();
-  var fid = farmId || (FARMS[0] && FARMS[0].id);
-  if (!fid) return Promise.resolve();
-  return apiFetch('/farmacias/' + fid + '/cupons', AT).then(function(res) {
-    if (res.ok) CUPONS_DATA = Array.isArray(res.data) ? res.data : [];
-  }).catch(function(){});
-}
-
-function renderCupons() {
-  var el = document.getElementById('page-cupons');
-  var isAdm = CU && CU.role === 'admin';
-  var farmId = CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id);
-
-  var farmSelOpts = '';
-  if (isAdm) {
-    FARMS.forEach(function(f) {
-      farmSelOpts += '<option value="' + f.id + '">' + (f.tipo==='petshop'?'🐾 ':f.tipo==='manipulado'?'🧪 ':'🏥 ') + f.nome + '</option>';
-    });
-  }
-
-  el.innerHTML = '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">' +
-    '<div style="font-family:Nunito,sans-serif;font-weight:800;font-size:18px;color:var(--n)">🎟️ Cupons</div>' +
-    (isAdm ? '<select id="cupons-farm-sel" onchange="loadCuponsView()" style="padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px">' + farmSelOpts + '</select>' : '') +
-    '<button class="btn btn-p" onclick="abrirModalCupom()" style="margin-left:auto">+ Novo cupom</button>' +
-    '</div>' +
-    '<div id="cupons-lista"></div>' +
-    '<div class="card" style="margin-top:16px"><div class="ch"><span class="ct">📣 Notificação de promoção</span></div>' +
-    '<div style="padding:16px;display:flex;flex-direction:column;gap:12px">' +
-    '<input id="promo-titulo" placeholder="Título da promoção ex: 🔥 Oferta especial hoje!" style="padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px">' +
-    '<textarea id="promo-msg" placeholder="Mensagem ex: 20% OFF em todos os produtos hoje! Use o cupom PROMO20" style="padding:10px 14px;border:1.5px solid var(--br);border-radius:8px;font-size:14px;resize:vertical;min-height:80px"></textarea>' +
-    '<button class="btn btn-p" onclick="enviarPromocao()" style="align-self:flex-start">📣 Enviar para clientes</button>' +
-    '<span style="font-size:12px;color:var(--t3)">Será enviado para todos os clientes que já pediram nesta farmácia.</span>' +
-    '</div></div>';
-
-  loadCuponsView();
-}
-
-function loadCuponsView() {
-  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
-  if (!farmId) return;
-  apiFetch('/farmacias/' + farmId + '/cupons', AT).then(function(res) {
-    CUPONS_DATA = res.ok ? (Array.isArray(res.data) ? res.data : []) : [];
-    var el = document.getElementById('cupons-lista');
-    if (!el) return;
-    if (!CUPONS_DATA.length) {
-      el.innerHTML = '<div class="card" style="padding:40px;text-align:center"><div style="font-size:48px;margin-bottom:12px">🎟️</div><div style="color:var(--t3)">Nenhum cupom criado ainda</div></div>';
-      return;
-    }
-    var h = '<div style="display:grid;gap:10px">';
-    CUPONS_DATA.forEach(function(c) {
-      var expira = new Date(c.valido_ate).toLocaleDateString('pt-BR');
-      var vencido = new Date(c.valido_ate) < new Date();
-      h += '<div class="card" style="padding:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">';
-      h += '<div style="background:' + (c.ativo && !vencido ? 'var(--tl)' : '#F5F7F9') + ';border-radius:10px;padding:12px 16px;min-width:100px;text-align:center">';
-      h += '<div style="font-family:\'Nunito\';font-weight:800;font-size:16px;color:' + (c.ativo && !vencido ? 'var(--t)' : 'var(--t3)') + '">' + c.codigo + '</div>';
-      h += '<div style="font-size:11px;color:var(--t3)">' + (c.tipo === 'percentual' ? c.valor + '%' : 'R$' + Number(c.valor).toFixed(2)) + ' OFF</div></div>';
-      h += '<div style="flex:1;min-width:160px"><div style="font-size:13px;font-weight:600;color:var(--n)">' + (c.descricao || '—') + '</div>';
-      h += '<div style="font-size:12px;color:var(--t3);margin-top:4px">Mínimo: R$' + Number(c.pedido_minimo||0).toFixed(2) + ' · Usos: ' + c.usos_atual + '/' + (c.uso_maximo || '∞') + ' · Expira: ' + expira + '</div></div>';
-      h += '<div style="display:flex;gap:8px;flex-wrap:wrap">';
-      h += '<button class="btn ' + (c.ativo && !vencido ? 'btn-p' : '') + '" onclick="toggleCupom(\''+c.id+'\','+c.ativo+')" style="padding:6px 14px;font-size:12px">' + (c.ativo ? '⏸ Pausar' : '▶ Ativar') + '</button>';
-      h += '<button class="btn" onclick="deletarCupom(\''+c.id+'\' )" style="padding:6px 14px;font-size:12px;color:var(--r);border-color:var(--r)">🗑</button>';
-      h += '</div></div>';
-    });
-    h += '</div>';
-    el.innerHTML = h;
-  });
-}
-
-function abrirModalCupom() {
-  openModal('cupom-new', null);
-}
-
-function toggleCupom(id, ativo) {
-  apiFetch('/cupons/' + id, AT, { method:'PATCH', body: JSON.stringify({ ativo: !ativo }) }).then(function(res) {
-    if (res.ok) { showToast('s', ativo ? 'Cupom pausado' : 'Cupom ativado', ''); loadCuponsView(); }
-  });
-}
-
-function deletarCupom(id) {
-  if (!confirm('Excluir este cupom?')) return;
-  apiFetch('/cupons/' + id, AT, { method:'DELETE' }).then(function(res) {
-    if (res.ok) { showToast('s', 'Cupom excluído', ''); loadCuponsView(); }
-  });
-}
-
-function salvarCupom() {
-  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
-  var data = {
-    codigo:         (document.getElementById('cf-codigo')||{}).value || '',
-    descricao:      (document.getElementById('cf-desc')||{}).value || '',
-    tipo:           (document.getElementById('cf-tipo')||{}).value || 'fixo',
-    valor:          Number((document.getElementById('cf-valor')||{}).value || 0),
-    pedido_minimo:  Number((document.getElementById('cf-minimo')||{}).value || 0),
-    uso_maximo:     Number((document.getElementById('cf-max')||{}).value || 0) || null,
-    uso_por_usuario:Number((document.getElementById('cf-maxusr')||{}).value || 1),
-    valido_ate:     (document.getElementById('cf-expira')||{}).value || '',
-  };
-  if (!data.codigo || !data.valor || !data.valido_ate) { showToast('e','Campos obrigatórios','Código, valor e validade são obrigatórios.'); return; }
-  apiFetch('/farmacias/' + farmId + '/cupons', AT, { method:'POST', body: JSON.stringify(data) }).then(function(res) {
-    if (res.ok) { showToast('s','Cupom criado!',''); closeModal(); loadCuponsView(); }
-    else { showToast('e','Erro',res.data && res.data.error || 'Tente novamente.'); }
-  });
-}
-
-function enviarPromocao() {
-  var farmId = document.getElementById('cupons-farm-sel') ? document.getElementById('cupons-farm-sel').value : (CU && CU.farmacia_id || (FARMS[0] && FARMS[0].id));
-  var titulo = (document.getElementById('promo-titulo')||{}).value || '';
-  var mensagem = (document.getElementById('promo-msg')||{}).value || '';
-  if (!titulo || !mensagem) { showToast('e','Campos obrigatórios','Preencha título e mensagem.'); return; }
-  apiFetch('/farmacias/' + farmId + '/notificar-clientes', AT, { method:'POST', body: JSON.stringify({ titulo, mensagem }) }).then(function(res) {
-    if (res.ok) {
-      showToast('s','Promoção enviada!', res.data.enviados + ' clientes notificados');
-      document.getElementById('promo-titulo').value = '';
-      document.getElementById('promo-msg').value = '';
-    } else { showToast('e','Erro','Não foi possível enviar.'); }
-  });
 }
 
 // CONFIG
@@ -1741,26 +1549,10 @@ function togglePetFields(tipo) {
 }
 function openModal(type, id) {
   MC = {type: type, id: id};
-  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido','cupom-new':'Novo cupom'};
+  var titles = {'farm-new':'Nova farmácia','farm-edit':'Editar farmácia','prod-new':'Novo produto','prod-edit':'Editar produto','usr-new':'Novo usuário','usr-edit':'Editar usuário','est-edit':'Ajustar estoque','ped-view':'Detalhes do pedido'};
   document.getElementById('m-title').textContent = titles[type] || type;
   document.getElementById('m-save-txt').textContent = type.indexOf('view') >= 0 ? 'Fechar' : 'Salvar';
   document.getElementById('m-overlay').classList.add('on');
-  if (type === 'cupom-new') {
-    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
-    var expDefault = hoje.toISOString().slice(0,10);
-    document.getElementById('m-body').innerHTML =
-      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
-      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
-      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
-      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
-      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
-      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
-      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
-      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
-    document.getElementById('m-save-txt').textContent = 'Criar cupom';
-    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
-    return;
-  }
 
   // Para farm-edit, busca horários atualizados do servidor
   if (type === 'farm-edit' && id) {
@@ -2630,22 +2422,6 @@ function openImportCSV() {
   document.getElementById('m-save-txt').textContent = 'Importar';
   document.getElementById('m-body').innerHTML = buildImportCSVBody();
   document.getElementById('m-overlay').classList.add('on');
-  if (type === 'cupom-new') {
-    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
-    var expDefault = hoje.toISOString().slice(0,10);
-    document.getElementById('m-body').innerHTML =
-      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
-      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
-      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
-      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
-      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
-      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
-      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
-      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
-    document.getElementById('m-save-txt').textContent = 'Criar cupom';
-    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
-    return;
-  }
 }
 
 function buildImportCSVBody() {
@@ -2878,22 +2654,6 @@ function abrirEsqueciSenha() {
   document.getElementById('m-save-txt').textContent = 'Redefinir';
   document.getElementById('m-body').innerHTML = html;
   document.getElementById('m-overlay').classList.add('on');
-  if (type === 'cupom-new') {
-    var hoje = new Date(); hoje.setMonth(hoje.getMonth()+1);
-    var expDefault = hoje.toISOString().slice(0,10);
-    document.getElementById('m-body').innerHTML =
-      '<div class="fr"><div class="fc3"><label>Código *</label><input id="cf-codigo" placeholder="EX: PROMO10" style="text-transform:uppercase"></div>' +
-      '<div class="fc3"><label>Tipo *</label><select id="cf-tipo"><option value="fixo">R$ Fixo</option><option value="percentual">% Percentual</option></select></div>' +
-      '<div class="fc3"><label>Valor *</label><input id="cf-valor" type="number" step="0.01" placeholder="10.00"></div></div>' +
-      '<div class="fr"><div class="fc3"><label>Pedido mínimo</label><input id="cf-minimo" type="number" step="0.01" placeholder="0.00"></div>' +
-      '<div class="fc3"><label>Uso máximo total</label><input id="cf-max" type="number" placeholder="Ilimitado"></div>' +
-      '<div class="fc3"><label>Uso por cliente</label><input id="cf-maxusr" type="number" value="1"></div></div>' +
-      '<div class="fr"><div class="fc2"><label>Descrição</label><input id="cf-desc" placeholder="Ex: Desconto de boas-vindas"></div>' +
-      '<div class="fc2"><label>Validade *</label><input id="cf-expira" type="date" value="' + expDefault + '"></div></div>';
-    document.getElementById('m-save-txt').textContent = 'Criar cupom';
-    document.getElementById('m-overlay').querySelector && (document.getElementById('m-save').onclick = salvarCupom);
-    return;
-  }
 }
 
 function salvarRedefinicaoSenha() {
@@ -3051,6 +2811,38 @@ function escH(t) { return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/
 document.getElementById('chat-modal').addEventListener('click', function(e) {
   if (e.target === this) fecharChat();
 });
+
+
+// ── Horário automático de funcionamento ──────────────────────
+function verificarHorarioFarmacias() {
+  var agora = new Date();
+  var diaSemana = agora.getDay(); // 0=dom, 1=seg...
+  var horaAtual = agora.getHours() * 60 + agora.getMinutes();
+
+  FARMS.forEach(function(farm) {
+    if (!farm.horarios || !farm.horarios.length) return;
+    var horarioDia = farm.horarios.find(function(h) {
+      return h.dia_semana === diaSemana && h.ativo;
+    });
+    var deveAbrir = false;
+    if (horarioDia) {
+      var partsAb = horarioDia.hora_abertura.split(':');
+      var partsFe = horarioDia.hora_fechamento.split(':');
+      var ab = parseInt(partsAb[0]) * 60 + parseInt(partsAb[1]);
+      var fe = parseInt(partsFe[0]) * 60 + parseInt(partsFe[1]);
+      deveAbrir = horaAtual >= ab && horaAtual < fe;
+    }
+    if (farm.aberta !== deveAbrir) {
+      // Atualiza automaticamente
+      apiFetch('/farmacias/' + farm.id, AT, {
+        method: 'PATCH',
+        body: JSON.stringify({ aberta: deveAbrir })
+      }).then(function() {
+        farm.aberta = deveAbrir;
+      }).catch(function(){});
+    }
+  });
+}
 
 // Polling: atualizar badge de chamados a cada 30s
 setInterval(function() {
