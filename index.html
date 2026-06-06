@@ -621,6 +621,15 @@ document.addEventListener('keydown', function(e) {
 
 // Verifica token salvo
 window.addEventListener('load', function() {
+
+  // ── Tela de rastreamento pública ─────────────────────────
+  // Acessível via: painel.flypharma.com.br?pedido=ID
+  var params = new URLSearchParams(window.location.search);
+  var pedidoPublicoId = params.get('pedido');
+  if (pedidoPublicoId) {
+    mostrarRastreamentoPublico(pedidoPublicoId);
+    return; // não inicializa o painel
+  }
   var savedAT = localStorage.getItem('fly_at');
   var savedCU = localStorage.getItem('fly_cu');
   if (!savedAT || !savedCU) return;
@@ -1262,6 +1271,63 @@ function avancarPed(id) {
   }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
 }
 
+function cancelarPedidoPainel(id) {
+  var p = PEDS.find(function(x){return x.id===id;});
+  if (!p) return;
+
+  // Modal de confirmação com motivo
+  var overlay = document.createElement('div');
+  overlay.id = 'cancel-overlay';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:10000;display:flex;align-items:center;justify-content:center;padding:16px';
+
+  overlay.innerHTML = [
+    '<div style="background:#fff;border-radius:16px;padding:24px;width:100%;max-width:400px;box-shadow:0 20px 60px rgba(0,0,0,0.3)">',
+      '<div style="font-size:24px;text-align:center;margin-bottom:12px">⚠️</div>',
+      '<div style="font-size:16px;font-weight:700;color:#1E2D3D;text-align:center;margin-bottom:8px">Cancelar pedido #' + (p.numero||id.slice(0,6)) + '?</div>',
+      '<div style="font-size:13px;color:#5A6A7E;text-align:center;margin-bottom:16px">Esta ação não pode ser desfeita. O cliente será notificado.</div>',
+      '<div style="margin-bottom:16px">',
+        '<label style="font-size:12px;font-weight:700;color:#5A6A7E;text-transform:uppercase;letter-spacing:0.5px;display:block;margin-bottom:6px">Motivo do cancelamento</label>',
+        '<select id="cancel-motivo" style="width:100%;padding:10px;border:1.5px solid #E3E8EE;border-radius:8px;font-size:13px;color:#1A2532">',
+          '<option value="Produto em falta">📦 Produto em falta</option>',
+          '<option value="Endereço fora da área de entrega">📍 Endereço fora da área</option>',
+          '<option value="Farmácia fechada">🏥 Farmácia fechada</option>',
+          '<option value="Pedido duplicado">🔄 Pedido duplicado</option>',
+          '<option value="Solicitado pelo cliente">👤 Solicitado pelo cliente</option>',
+          '<option value="Outro motivo">💬 Outro motivo</option>',
+        '</select>',
+      '</div>',
+      '<div style="display:flex;gap:10px">',
+        '<button onclick="document.getElementById(\'cancel-overlay\').remove()" style="flex:1;padding:12px;border:1.5px solid #E3E8EE;border-radius:10px;background:#fff;font-size:14px;font-weight:600;color:#5A6A7E;cursor:pointer">Voltar</button>',
+        '<button onclick="confirmarCancelamentoPainel(\'' + id + '\')" style="flex:1;padding:12px;border:none;border-radius:10px;background:#F0455A;font-size:14px;font-weight:700;color:#fff;cursor:pointer">✕ Confirmar cancelamento</button>',
+      '</div>',
+    '</div>'
+  ].join('');
+
+  document.body.appendChild(overlay);
+  overlay.addEventListener('click', function(e){ if(e.target===overlay) overlay.remove(); });
+}
+
+function confirmarCancelamentoPainel(id) {
+  var motivo = (document.getElementById('cancel-motivo')||{}).value || 'Cancelado pela farmácia';
+  var overlay = document.getElementById('cancel-overlay');
+  if (overlay) overlay.remove();
+  closeModal();
+
+  apiFetch('/pedidos/' + id + '/status', {
+    method: 'PATCH',
+    body: JSON.stringify({ status: 'cancelado', motivo: motivo })
+  }).then(function(res) {
+    if (res.ok) {
+      var p = PEDS.find(function(x){return x.id===id;});
+      if (p) p.status = 'cancelado';
+      showToast('s', '✅ Pedido cancelado', 'Motivo: ' + motivo);
+      renderPed();
+    } else {
+      showToast('e', 'Erro ao cancelar', (res.data&&res.data.error) || 'Tente novamente');
+    }
+  }).catch(function(){ showToast('e','Sem conexão','Verifique a conexão'); });
+}
+
 // ESTOQUE
 function renderEst() {
   var el = document.getElementById('page-est');
@@ -1866,7 +1932,7 @@ function buildMBody(type, id) {
     if (['pendente','confirmado','preparando','aguardando_entregador'].indexOf(pv.status) >= 0) {
       h += '<div style="background:var(--tl);border-radius:10px;padding:12px"><div style="font-size:12px;font-weight:600;color:var(--td);margin-bottom:8px">Avançar status</div>';
       h += '<div style="display:flex;gap:8px"><button class="btn btn-p" onclick="avancarPed(\'' + pv.id + '\');closeModal()">▶ Próximo status</button>';
-      h += '<button class="btn btn-d" onclick="showToast(\'w\',\'Cancelamento\',\'Pedido marcado para cancelamento\');closeModal()">✕ Cancelar pedido</button></div></div>';
+      h += '<button class="btn btn-d" onclick="cancelarPedidoPainel(\'' + pv.id + '\')">✕ Cancelar pedido</button></div></div>';
     }
   } else {
     h = '<p style="color:var(--t2)">Em desenvolvimento.</p>';
@@ -2877,6 +2943,81 @@ function verificarHorarioFarmacias() {
 setInterval(function() {
   if (typeof loadChamados === 'function') loadChamados();
 }, 30000);
+
+// ── Rastreamento público ──────────────────────────────────────
+function mostrarRastreamentoPublico(pedidoId) {
+  var API_PUB = 'https://web-production-b66cd.up.railway.app/api';
+  var lp = document.getElementById('lp');
+  var ap = document.getElementById('ap');
+  if (lp) lp.classList.add('hide');
+  if (ap) ap.classList.add('hide');
+
+  var wrap = document.createElement('div');
+  wrap.id = 'rastrear-wrap';
+  wrap.style.cssText = 'min-height:100vh;background:#F5F7F9;display:flex;align-items:center;justify-content:center;padding:16px;font-family:Nunito,sans-serif';
+  wrap.innerHTML = '<div style="width:100%;max-width:420px"><div style="text-align:center;margin-bottom:24px"><span style="font-size:32px">🛵</span><div style="font-size:20px;font-weight:800;color:#1E2D3D;margin-top:8px">FlyPharma</div><div style="font-size:13px;color:#9AAABB">Rastreamento de pedido</div></div><div id="rastrear-card" style="background:#fff;border-radius:16px;padding:24px;border:1px solid #E3E8EE;text-align:center"><div style="color:#9AAABB;font-size:13px">⏳ Carregando...</div></div></div>';
+  document.body.appendChild(wrap);
+
+  var STATUS_INFO = {
+    pendente:              { emoji:'⏳', label:'Aguardando pagamento', cor:'#C98A10' },
+    confirmado:            { emoji:'✅', label:'Pedido confirmado',     cor:'#1E2D3D' },
+    preparando:            { emoji:'💊', label:'Preparando seu pedido', cor:'#C98A10' },
+    aguardando_entregador: { emoji:'🔍', label:'Buscando entregador',   cor:'#7A50C8' },
+    em_entrega:            { emoji:'🛵', label:'A caminho!',             cor:'#3ECFBF' },
+    entregue:              { emoji:'🎉', label:'Entregue!',              cor:'#22C97A' },
+    cancelado:             { emoji:'❌', label:'Cancelado',              cor:'#F0455A' },
+  };
+
+  function renderCard(p) {
+    var s = STATUS_INFO[p.status] || { emoji:'📦', label:p.status, cor:'#9AAABB' };
+    var card = document.getElementById('rastrear-card');
+    if (!card) return;
+    var etapas = ['confirmado','preparando','aguardando_entregador','em_entrega','entregue'];
+    var etapaAtual = etapas.indexOf(p.status);
+    var html = '';
+    html += '<div style="display:inline-flex;align-items:center;gap:8px;background:' + s.cor + '22;border-radius:20px;padding:8px 16px;margin-bottom:16px">';
+    html += '<span style="font-size:20px">' + s.emoji + '</span><span style="font-size:14px;font-weight:700;color:' + s.cor + '">' + s.label + '</span></div>';
+    html += '<div style="font-size:22px;font-weight:800;color:#1E2D3D;margin-bottom:4px">Pedido #' + (p.numero||pedidoId.slice(0,6)) + '</div>';
+    html += '<div style="font-size:13px;color:#5A6A7E;margin-bottom:20px">' + (p.farmacia_nome||'Farmácia') + '</div>';
+    if (p.status === 'em_entrega' && p.lat_entregador && p.lng_entregador) {
+      html += '<div style="border-radius:12px;overflow:hidden;margin-bottom:16px;border:1px solid #E3E8EE;height:180px">';
+      html += '<iframe width="100%" height="180" frameborder="0" src="https://www.openstreetmap.org/export/embed.html?bbox=' + (p.lng_entregador-0.005) + ',' + (p.lat_entregador-0.005) + ',' + (p.lng_entregador+0.005) + ',' + (p.lat_entregador+0.005) + '&layer=mapnik&marker=' + p.lat_entregador + ',' + p.lng_entregador + '" style="border:0"></iframe>';
+      html += '</div>';
+    }
+    html += '<div style="text-align:left;background:#F5F7F9;border-radius:12px;padding:16px;margin-bottom:16px">';
+    etapas.forEach(function(e, i) {
+      var si = STATUS_INFO[e] || {};
+      var ok = etapaAtual >= i;
+      html += '<div style="display:flex;align-items:center;gap:12px;' + (i<etapas.length-1?'margin-bottom:12px':'') + '">';
+      html += '<div style="width:24px;height:24px;border-radius:50%;background:' + (ok?'#3ECFBF':'#E3E8EE') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:11px;color:' + (ok?'#1E2D3D':'#9AAABB') + '">' + (ok?'✓':'·') + '</div>';
+      html += '<span style="font-size:13px;font-weight:' + (etapaAtual===i?'700':'500') + ';color:' + (ok?'#1E2D3D':'#9AAABB') + '">' + (si.emoji||'') + ' ' + (si.label||e) + '</span></div>';
+    });
+    html += '</div>';
+    html += '<a href="flypharma://pedido/' + pedidoId + '" style="display:block;background:#3ECFBF;color:#1E2D3D;text-decoration:none;font-weight:800;font-size:14px;padding:14px;border-radius:12px;text-align:center">📱 Abrir no app FlyPharma</a>';
+    card.innerHTML = html;
+  }
+
+  fetch(API_PUB + '/pedidos/' + pedidoId + '/publico')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      if (d && d.status) {
+        renderCard(d);
+        if (['entregue','cancelado'].indexOf(d.status) < 0) {
+          setInterval(function() {
+            fetch(API_PUB + '/pedidos/' + pedidoId + '/publico')
+              .then(function(r) { return r.json(); })
+              .then(function(d2) { if (d2 && d2.status) renderCard(d2); })
+              .catch(function(){});
+          }, 10000);
+        }
+      } else {
+        document.getElementById('rastrear-card').innerHTML = '<div style="color:#F0455A;font-size:14px">❌ Pedido não encontrado.</div>';
+      }
+    })
+    .catch(function() {
+      document.getElementById('rastrear-card').innerHTML = '<div style="color:#F0455A;font-size:14px">❌ Não foi possível carregar o pedido.</div>';
+    });
+}
 
 // ── Socket principal da farmácia ─────────────────────────────
 // Conecta após login e entra na sala da farmácia para receber eventos em tempo real
