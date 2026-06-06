@@ -2877,6 +2877,74 @@ function verificarHorarioFarmacias() {
 setInterval(function() {
   if (typeof loadChamados === 'function') loadChamados();
 }, 30000);
+
+// ── Socket principal da farmácia ─────────────────────────────
+// Conecta após login e entra na sala da farmácia para receber eventos em tempo real
+(function iniciarSocketPainel() {
+  if (typeof io === 'undefined') return;
+  var token = localStorage.getItem('fly_token') || (typeof AT !== 'undefined' ? AT : null);
+  if (!token) { setTimeout(iniciarSocketPainel, 2000); return; }
+
+  var _mainSocket = io('https://web-production-b66cd.up.railway.app', {
+    transports: ['websocket', 'polling'],
+    reconnection: true,
+    reconnectionAttempts: 20,
+    reconnectionDelay: 3000,
+  });
+
+  _mainSocket.on('connect', function() {
+    // Entra na sala da farmácia para receber eventos
+    var farmId = typeof CU !== 'undefined' && CU && CU.farmacia_id ? CU.farmacia_id : null;
+    if (farmId) _mainSocket.emit('join_farmacia', farmId);
+    // Admin entra em todas as salas das farmácias
+    if (typeof CU !== 'undefined' && CU && CU.role === 'admin' && typeof FARMS !== 'undefined') {
+      FARMS.forEach(function(f) { _mainSocket.emit('join_farmacia', f.id); });
+    }
+  });
+
+  // ── Estoque baixo ─────────────────────────────────────────
+  _mainSocket.on('estoque_baixo', function(data) {
+    // Toast de alerta
+    if (typeof showToast === 'function') {
+      showToast('w', '⚠️ Estoque baixo: ' + data.total + ' produto(s)', data.produtos);
+    }
+    // Badge de alerta no menu de produtos
+    var menuProd = document.querySelector('[onclick*="produtos"]') || document.querySelector('[data-page="produtos"]');
+    if (menuProd && !menuProd.querySelector('.estoque-badge')) {
+      var badge = document.createElement('span');
+      badge.className = 'estoque-badge';
+      badge.style.cssText = 'background:#F0455A;color:#fff;font-size:9px;font-weight:700;border-radius:8px;padding:2px 6px;margin-left:6px';
+      badge.textContent = data.total;
+      menuProd.appendChild(badge);
+    }
+    // Notificação do browser se permitido
+    if (window.Notification && Notification.permission === 'granted') {
+      new Notification('⚠️ FlyPharma — Estoque baixo', {
+        body: data.total + ' produto(s) abaixo do mínimo: ' + (data.produtos || ''),
+        icon: '/favicon.png',
+      });
+    }
+  });
+
+  // ── Pedido sem entregador ─────────────────────────────────
+  _mainSocket.on('pedido_sem_entregador', function(data) {
+    if (typeof showToast === 'function') {
+      showToast('w',
+        '🛵 Pedido #' + data.numero + ' sem entregador',
+        'R$' + Number(data.total).toFixed(2) + ' · já passaram 10 minutos'
+      );
+    }
+    // Recarrega pedidos para atualizar o badge
+    if (typeof loadPeds === 'function') loadPeds();
+  });
+
+  // ── Status atualizado em tempo real ──────────────────────
+  _mainSocket.on('status_atualizado', function(data) {
+    if (typeof loadPeds === 'function') loadPeds();
+  });
+
+  window._mainSocket = _mainSocket;
+})();
 </script>
 
 <!-- Lightbox receita -->
