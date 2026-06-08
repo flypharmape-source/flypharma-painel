@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Política de Privacidade — FlyPharma</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background:#F5F7F9; color:#1A2532; line-height:1.7; }
+    header { background:#1E2D3D; padding:24px 20px; text-align:center; }
+    header img { height:40px; margin-bottom:12px; display:block; margin:0 auto 12px; }
+    header h1 { color:#3ECFBF; font-size:22px; font-weight:800; }
+    header p  { color:rgba(255,255,255,0.6); font-size:13px; margin-top:4px; }
+    .container { max-width:760px; margin:0 auto; padding:32px 20px 64px; }
+    h2 { font-size:17px; font-weight:700; color:#1E2D3D; margin:32px 0 10px;
+      padding-bottom:8px; border-bottom:2px solid #3ECFBF; }
+    h2:first-of-type { margin-top:0; }
+    p  { font-size:14px; color:#3A4A5E; margin-bottom:12px; }
+    ul { padding-left:20px; margin-bottom:12px; }
+    ul li { font-size:14px; color:#3A4A5E; margin-bottom:6px; }
+    .badge { display:inline-block; background:#E8FAF8; color:#2AB5A6; font-size:12px;
+      font-weight:700; border-radius:20px; padding:4px 12px; margin-bottom:24px; }
+    .card { background:#fff; border-radius:14px; padding:20px; border:1px solid #E3E8EE;
+      margin-bottom:16px; }
+    .contact { background:#1E2D3D; color:#fff; border-radius:14px; padding:20px;
+      margin-top:32px; text-align:center; }
+    .contact p { color:rgba(255,255,255,0.75); margin-bottom:8px; }
+    .contact a { color:#3ECFBF; font-weight:700; text-decoration:none; }
+    footer { text-align:center; padding:24px; font-size:12px; color:#9AAABB; }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>🛵 FlyPharma</h1>
+  <p>Política de Privacidade</p>
+</header>
+
+<div class="container">
+  <div style="margin:24px 0">
+    <span class="badge">Última atualização: Junho de 2026</span>
+    <p>A FlyPharma valoriza a privacidade dos seus usuários. Esta Política de Privacidade descreve como coletamos, usamos, armazenamos e protegemos suas informações pessoais ao utilizar nossos aplicativos e serviços.</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Informações que Coletamos</h2>
+    <p>Coletamos as seguintes informações ao usar nossos serviços:</p>
+    <ul>
+      <li><strong>Dados de cadastro:</strong> nome, e-mail, telefone e foto de perfil fornecidos no momento do registro.</li>
+      <li><strong>Dados de localização:</strong> localização em tempo real dos entregadores durante entregas ativas, e localização aproximada dos clientes para calcular estimativas de entrega.</li>
+      <li><strong>Dados de pedidos:</strong> histórico de compras, endereços de entrega, itens adquiridos e informações de pagamento (apenas confirmação — não armazenamos dados completos de cartão).</li>
+      <li><strong>Dados de dispositivo:</strong> token de notificação push para envio de alertas sobre pedidos.</li>
+      <li><strong>Documentos dos entregadores:</strong> CNH, CRLV e foto do veículo para fins de verificação e aprovação.</li>
+      <li><strong>Fotos de receitas médicas:</strong> enviadas pelo cliente para pedidos de medicamentos controlados.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>2. Como Usamos suas Informações</h2>
+    <p>Utilizamos suas informações para:</p>
+    <ul>
+      <li>Processar e entregar seus pedidos de forma eficiente.</li>
+      <li>Enviar notificações sobre o status dos seus pedidos.</li>
+      <li>Calcular estimativas de tempo e distância de entrega.</li>
+      <li>Verificar a identidade e habilitação dos entregadores.</li>
+      <li>Melhorar continuamente nossos serviços e experiência do usuário.</li>
+      <li>Cumprir obrigações legais e regulatórias.</li>
+      <li>Prevenir fraudes e garantir a segurança da plataforma.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3. Compartilhamento de Informações</h2>
+    <p>Não vendemos suas informações pessoais a terceiros. Compartilhamos dados apenas nas seguintes situações:</p>
+    <ul>
+      <li><strong>Com farmácias parceiras:</strong> nome, endereço de entrega e itens do pedido para processamento.</li>
+      <li><strong>Com entregadores:</strong> nome do cliente, endereço de entrega e número de telefone mascarado para contato durante a entrega.</li>
+      <li><strong>Com processadores de pagamento:</strong> dados necessários para processar transações via PIX (AbacatePay).</li>
+      <li><strong>Por obrigação legal:</strong> quando exigido por lei, ordem judicial ou autoridade competente.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>4. Localização em Tempo Real</h2>
+    <p>O aplicativo do entregador coleta sua localização em tempo real <strong>somente durante entregas ativas</strong>, para permitir o rastreamento pelo cliente. Após a conclusão da entrega, o compartilhamento de localização é interrompido automaticamente.</p>
+    <p>O aplicativo do cliente solicita permissão de localização apenas para calcular estimativas de distância e entrega. Você pode desativar o acesso à localização nas configurações do seu dispositivo a qualquer momento.</p>
+  </div>
+
+  <div class="card">
+    <h2>5. Armazenamento e Segurança</h2>
+    <p>Seus dados são armazenados em servidores seguros hospedados na Railway (infraestrutura em nuvem). Adotamos as seguintes medidas de segurança:</p>
+    <ul>
+      <li>Criptografia de senhas com bcrypt.</li>
+      <li>Autenticação via tokens JWT com expiração automática.</li>
+      <li>Comunicação criptografada via HTTPS/TLS.</li>
+      <li>Acesso restrito aos dados por função (cliente, entregador, farmácia, admin).</li>
+    </ul>
+    <p>Fotos e documentos são armazenados em formato base64 diretamente no banco de dados, sem exposição pública.</p>
+  </div>
+
+  <div class="card">
+    <h2>6. Retenção de Dados</h2>
+    <p>Mantemos seus dados enquanto sua conta estiver ativa. Você pode solicitar a exclusão da sua conta e dados a qualquer momento através dos nossos canais de contato. Documentos de entregadores são mantidos pelo período mínimo exigido por lei para fins de auditoria.</p>
+  </div>
+
+  <div class="card">
+    <h2>7. Seus Direitos (LGPD)</h2>
+    <p>Em conformidade com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018), você tem direito a:</p>
+    <ul>
+      <li>Acessar seus dados pessoais armazenados.</li>
+      <li>Corrigir dados incompletos, inexatos ou desatualizados.</li>
+      <li>Solicitar a exclusão dos seus dados.</li>
+      <li>Revogar o consentimento de uso dos seus dados.</li>
+      <li>Solicitar a portabilidade dos seus dados.</li>
+      <li>Ser informado sobre o compartilhamento dos seus dados.</li>
+    </ul>
+    <p>Para exercer seus direitos, entre em contato pelo e-mail abaixo.</p>
+  </div>
+
+  <div class="card">
+    <h2>8. Notificações Push</h2>
+    <p>Com sua permissão, enviamos notificações push para informá-lo sobre o status dos pedidos, promoções e alertas importantes. Você pode desativar as notificações a qualquer momento nas configurações do seu dispositivo.</p>
+  </div>
+
+  <div class="card">
+    <h2>9. Menores de Idade</h2>
+    <p>Nossos serviços não são destinados a menores de 18 anos. Não coletamos intencionalmente informações de menores. Caso identifique que um menor forneceu dados sem autorização, entre em contato para que possamos remover as informações.</p>
+  </div>
+
+  <div class="card">
+    <h2>10. Alterações nesta Política</h2>
+    <p>Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos sobre mudanças significativas através do aplicativo ou por e-mail. O uso continuado dos serviços após as alterações constitui aceitação da nova política.</p>
+  </div>
+
+  <div class="contact">
+    <p style="font-size:16px;font-weight:700;color:#fff;margin-bottom:8px">📬 Entre em contato</p>
+    <p>Dúvidas sobre privacidade ou solicitações relacionadas aos seus dados:</p>
+    <p><a href="mailto:fly.pharma.pe@gmail.com">fly.pharma.pe@gmail.com</a></p>
+    <p style="margin-top:12px;font-size:12px">FlyPharma · Recife, Pernambuco, Brasil</p>
+  </div>
+</div>
+
+<footer>
+  © 2026 FlyPharma. Todos os direitos reservados.
+</footer>
+
+</body>
+</html>
