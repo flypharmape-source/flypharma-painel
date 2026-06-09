@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--t:#C0392B;--td:#8B1A1A;--tl:#FDECEA;--n:#1E2D3D;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
+:root{--t:#C0392B;--p:var(--t);--td:#8B1A1A;--tl:#FDECEA;--n:#1E2D3D;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
 body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:var(--tx)}
 #lp{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#C0392B;position:fixed;inset:0;z-index:1000}
 #lp.hide{display:none}
@@ -32,12 +32,12 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .sb-lt span{color:var(--t)}
 .sb-role{margin:10px 14px;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:700;text-align:center}
 .sb-role.adm{background:rgba(245,166,35,.2);color:var(--a)}
-.sb-role.frm{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-role.frm{background:rgba(192,57,43,.15);color:var(--t)}
 .sb-sec{padding:10px 12px 4px}
 .sb-lbl{font-size:10px;font-weight:600;letter-spacing:1.4px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:0 10px;margin-bottom:4px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;font-weight:500;user-select:none;transition:all .15s}
 .sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.sb-item.on{background:rgba(62,207,191,.15);color:var(--t)}
+.sb-item.on{background:rgba(192,57,43,.15);color:var(--t)}
 .sb-item svg{width:17px;height:17px;flex-shrink:0}
 .sb-bdg{margin-left:auto;background:var(--r);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
 .sb-bot{margin-top:auto;padding:14px;flex-shrink:0}
@@ -79,12 +79,12 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .oid{font-family:'Nunito';font-weight:700;font-size:12.5px;color:var(--n)}
 .b{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:20px;font-size:11.5px;font-weight:600}
 .b::before{content:'';width:5px;height:5px;border-radius:50%}
-.novo::before{background:var(--t)}.novo{background:rgba(62,207,191,.12);color:var(--td)}
+.novo::before{background:var(--t)}.novo{background:rgba(192,57,43,.12);color:var(--td)}
 .prep::before{background:var(--a)}.prep{background:rgba(245,166,35,.12);color:#C98A10}
 .entr::before{background:var(--n)}.entr{background:rgba(30,45,61,.10);color:var(--n)}
 .cok::before{background:var(--g)}.cok{background:rgba(34,201,122,.12);color:#18A065}
 .can::before{background:var(--r)}.can{background:rgba(240,69,90,.10);color:#D03348}
-.aberta::before{background:var(--t)}.aberta{background:rgba(62,207,191,.12);color:var(--td)}
+.aberta::before{background:var(--t)}.aberta{background:rgba(192,57,43,.12);color:var(--td)}
 .fechada::before{background:var(--t3)}.fechada{background:rgba(154,170,187,.15);color:var(--t3)}
 .ativo::before{background:var(--g)}.ativo{background:rgba(34,201,122,.12);color:#18A065}
 .inativo::before{background:var(--r)}.inativo{background:rgba(240,69,90,.10);color:#D03348}
@@ -134,7 +134,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .dpin{position:absolute;width:10px;height:10px;border-radius:50%;border:2px solid;transform:translate(-50%,-50%)}
 .ch2{padding:12px 18px 4px;display:flex;align-items:flex-end;gap:5px;height:76px}
 .bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%}
-.bar{width:100%;border-radius:4px 4px 0 0;background:rgba(62,207,191,.3);transition:height .7s cubic-bezier(.34,1.56,.64,1)}
+.bar{width:100%;border-radius:4px 4px 0 0;background:rgba(192,57,43,.3);transition:height .7s cubic-bezier(.34,1.56,.64,1)}
 .bar.td{background:var(--t)}
 .bL{font-size:9.5px;color:var(--t3)}
 .spin{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite}
@@ -509,7 +509,7 @@ function loadPeds() {
         } catch(e) {}
         // Flash na tela
         var flash = document.createElement('div');
-        flash.style.cssText = 'position:fixed;inset:0;background:rgba(62,207,191,0.25);z-index:9999;pointer-events:none;animation:fadeFlash 0.8s ease-out forwards';
+        flash.style.cssText = 'position:fixed;inset:0;background:rgba(192,57,43,0.25);z-index:9999;pointer-events:none;animation:fadeFlash 0.8s ease-out forwards';
         if (!document.getElementById('flash-style')) {
           var style = document.createElement('style');
           style.id = 'flash-style';
@@ -2403,7 +2403,7 @@ function renderCham() {
     if (c.status !== 'resolvido') {
       h += '<button class="btn btn-g" style="font-size:11px;padding:5px 10px" onclick="atualizarChamado(\'' + c.id + '\',\'resolvido\')">&#10003; Resolver</button>';
     }
-    h += '<button class="btn" style="font-size:11px;padding:5px 10px;margin-left:4px;background:rgba(62,207,191,.12);color:var(--p);border:1px solid rgba(62,207,191,.3)" data-cid="' + c.id + '" data-pnum="' + (c.pedido_numero||0) + '" data-fnome="' + (c.farmacia_nome||'').replace(/"/g,"") + '" data-motivo="' + (c.motivo||'') + '" onclick="var b=this;abrirChat(b.dataset.cid,b.dataset.pnum,b.dataset.fnome,b.dataset.motivo)">Chat</button>';
+    h += '<button class="btn" style="font-size:11px;padding:5px 10px;margin-left:4px;background:rgba(192,57,43,.12);color:var(--p);border:1px solid rgba(192,57,43,.3)" data-cid="' + c.id + '" data-pnum="' + (c.pedido_numero||0) + '" data-fnome="' + (c.farmacia_nome||'').replace(/"/g,"") + '" data-motivo="' + (c.motivo||'') + '" onclick="var b=this;abrirChat(b.dataset.cid,b.dataset.pnum,b.dataset.fnome,b.dataset.motivo)">Chat</button>';
     h += '</td>';
     h += '</tr>';
   });
