@@ -8,7 +8,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--t:#C0392B;--p:var(--t);--td:#8B1A1A;--tl:#FDECEA;--n:#1E2D3D;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
+:root{--t:#C0392B;--p:var(--t);--td:#8B1A1A;--tl:#FDECEA;--n:#1E2D3D;--sb:#6E1813;--bg:#F5F7F9;--w:#fff;--br:#E3E8EE;--tx:#1A2532;--t2:#5A6A7E;--t3:#9AAABB;--g:#22C97A;--a:#F5A623;--r:#F0455A;--sw:230px;--hh:62px}
 body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:var(--tx)}
 #lp{display:flex;align-items:center;justify-content:center;min-height:100vh;background:#C0392B;position:fixed;inset:0;z-index:1000}
 #lp.hide{display:none}
@@ -26,18 +26,18 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .ldemo{margin-top:18px;padding:12px 14px;background:var(--bg);border-radius:10px;font-size:12px;color:var(--t2);line-height:1.8}
 .ldemo b{display:block;margin-bottom:2px;font-size:12px;color:var(--tx)}
 .app{display:flex;min-height:100vh}
-.sb{width:var(--sw);background:var(--n);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;overflow-y:auto}
+.sb{width:var(--sw);background:var(--sb);position:fixed;top:0;left:0;bottom:0;z-index:100;display:flex;flex-direction:column;overflow-y:auto}
 .sb-logo{height:var(--hh);display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid rgba(255,255,255,.08);flex-shrink:0}
 .sb-lt{font-family:'Nunito';font-weight:800;font-size:18px;color:#fff}
-.sb-lt span{color:var(--t)}
+.sb-lt span{color:#F6B0A6}
 .sb-role{margin:10px 14px;padding:6px 12px;border-radius:10px;font-size:11px;font-weight:700;text-align:center}
 .sb-role.adm{background:rgba(245,166,35,.2);color:var(--a)}
-.sb-role.frm{background:rgba(192,57,43,.15);color:var(--t)}
+.sb-role.frm{background:rgba(255,255,255,.18);color:#fff}
 .sb-sec{padding:10px 12px 4px}
 .sb-lbl{font-size:10px;font-weight:600;letter-spacing:1.4px;color:rgba(255,255,255,.3);text-transform:uppercase;padding:0 10px;margin-bottom:4px}
 .sb-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;color:rgba(255,255,255,.55);cursor:pointer;font-size:13px;font-weight:500;user-select:none;transition:all .15s}
 .sb-item:hover{background:rgba(255,255,255,.07);color:rgba(255,255,255,.9)}
-.sb-item.on{background:rgba(192,57,43,.15);color:var(--t)}
+.sb-item.on{background:rgba(255,255,255,.16);color:#fff}
 .sb-item svg{width:17px;height:17px;flex-shrink:0}
 .sb-bdg{margin-left:auto;background:var(--r);color:#fff;font-size:10px;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 5px}
 .sb-bot{margin-top:auto;padding:14px;flex-shrink:0}
@@ -444,6 +444,8 @@ function loadProds() {
           preco: p.preco || p.price || 0,
           promo: p.preco_promocional || p.preco_promocao || p.promo || null,
           ctrl: p.controlado || p.ctrl || false,
+          tarja: p.tarja || (p.controlado ? 'preta' : (p.exige_receita ? 'vermelha' : 'sem_tarja')),
+          lista344: p.lista_portaria_344 || p.lista344 || '',
           uni: p.unidade || p.uni || 'un',
           desc: p.descricao || p.desc || '',
           emoji: p.emoji || '💊',
@@ -1937,7 +1939,9 @@ function buildMBody(type, id) {
     var unis = ['un','cx','fr','mg','ml'];
     for (var j=0;j<unis.length;j++) h += '<option' + (p.uni===unis[j]?' selected':'') + '>' + unis[j] + '</option>';
     h += '</select></div></div>';
-    h += '<div class="fr" id="mp-ctrl-wrap"' + (farmTipo==='petshop' ? ' style="display:none"' : '') + '><div class="fc3"><label>Controlado?</label><select id="mp-ctrl"><option value="false"' + (!p.ctrl?' selected':'') + '>Não</option><option value="true"' + (p.ctrl?' selected':'') + '>Sim — exige receita</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
+    var tarjaSel = p.tarja || 'sem_tarja';
+    h += '<div class="fr" id="mp-ctrl-wrap"' + (farmTipo==='petshop' ? ' style="display:none"' : '') + '><div class="fc3"><label>Tarja / Receita</label><select id="mp-tarja"><option value="sem_tarja"' + (tarjaSel==='sem_tarja'?' selected':'') + '>Sem tarja — venda livre</option><option value="vermelha"' + (tarjaSel==='vermelha'?' selected':'') + '>Tarja vermelha — exige receita</option><option value="preta"' + (tarjaSel==='preta'?' selected':'') + '>Tarja preta — controlado (Port. 344)</option></select></div><div class="fc3"><label>Qtd. em estoque</label><input id="mp-qtd" type="number" value="' + (p.qtd||50) + '"></div></div>';
+    h += '<div class="fr" id="mp-lista-wrap"' + (farmTipo==='petshop' ? ' style="display:none"' : '') + '><div class="fc3 full"><label>Lista Portaria 344 (só p/ tarja preta — opcional)</label><input id="mp-lista344" value="' + (p.lista344||'') + '" placeholder="Ex: B1, A3, C1..."></div></div>';
     h += '<div class="fr"><div class="fc3 full"><label>Descrição</label><textarea id="mp-desc" placeholder="Descrição do produto...">' + (p.desc||'') + '</textarea></div></div>';
     // ── FOTO DO PRODUTO ──────────────────────────────────────────
     var fotoAtual = p.imagem_url || p.foto_url || '';
@@ -2118,7 +2122,7 @@ function saveModal() {
       nome: pNome, laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
       farmacia_id: mpFarm,
       preco: Number(pPreco), preco_promocional: Number(gv('mp-promo'))||null,
-      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      tarja: gv('mp-tarja'), lista_portaria_344: gv('mp-lista344')||null, unidade: gv('mp-uni'),
       descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
     };
     var fotoB64New = document.getElementById('mp-foto-b64') ? document.getElementById('mp-foto-b64').value : '';
@@ -2143,7 +2147,7 @@ function saveModal() {
       nome: gv('mp-nome'), laboratorio: gv('mp-lab'), categoria_id: gv('mp-cat') || null,
       farmacia_id: gv('mp-farm') || (CU && CU.farmacia_id),
       preco: Number(gv('mp-preco')), preco_promocional: Number(gv('mp-promo'))||null,
-      controlado: gv('mp-ctrl')==='true', unidade: gv('mp-uni'),
+      tarja: gv('mp-tarja'), lista_portaria_344: gv('mp-lista344')||null, unidade: gv('mp-uni'),
       descricao: gv('mp-desc'), estoque: Number(gv('mp-qtd'))||0
     };
     var fotoB64Edit = document.getElementById('mp-foto-b64') ? document.getElementById('mp-foto-b64').value : '';
