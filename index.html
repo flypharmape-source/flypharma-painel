@@ -878,6 +878,8 @@ function fmtDetalhesAud(d) {
   if (d.motivo)     partes.push('motivo: ' + d.motivo);
   if (d.paciente)   partes.push('paciente: ' + d.paciente);
   if (d.prescritor) partes.push('prescritor: ' + d.prescritor);
+  if (d.crf)        partes.push('CRF: ' + d.crf + (d.crf_uf ? '/' + d.crf_uf : ''));
+  if (d.crf_expedicao) partes.push('expedição: ' + d.crf_expedicao);
   if (d.de !== undefined || d.para !== undefined) partes.push((d.de != null ? d.de : '?') + ' → ' + (d.para != null ? d.para : '?'));
   if (d.campos && d.campos.length) partes.push('campos: ' + d.campos.join(', '));
   return partes.length ? partes.join(' · ') : JSON.stringify(d);
@@ -2105,6 +2107,11 @@ function buildMBody(type, id) {
     for (var ri=0;ri<roles.length;ri++) h += '<option value="' + roles[ri] + '"' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri].charAt(0).toUpperCase()+roles[ri].slice(1) + '</option>';
     h += '</select></div></div>';
     h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + ((u.role==='farmacia'||u.role==='farmaceutico')?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
+    h += '<div id="mu-crf-wrap" style="' + (u.role==='farmaceutico'?'':'display:none') + '">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;margin:6px 0 4px">Dados do conselho (CRF)</div>';
+    h += '<div class="fr"><div class="fc3"><label>Nº do conselho (CRF) *</label><input id="mu-crf" value="' + (u.crf||'') + '" placeholder="Ex.: CRF-PE 12345"></div><div class="fc3"><label>UF do conselho</label><input id="mu-crfuf" value="' + (u.crf_uf||'') + '" placeholder="PE" maxlength="2"></div></div>';
+    h += '<div class="fr"><div class="fc3"><label>Data de expedição *</label><input id="mu-crfexp" type="date" value="' + (u.crf_expedicao?String(u.crf_expedicao).slice(0,10):'') + '"></div><div class="fc3"><label>CPF</label><input id="mu-cpf" value="' + (u.cpf||'') + '" placeholder="000.000.000-00"></div></div>';
+    h += '</div>';
     if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
     if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="off"></div></div>';
   } else if (type === 'est-edit') {
@@ -2305,7 +2312,13 @@ function saveModal() {
     var uNome=gv('mu-nome'), uEmail=gv('mu-email'), uSenha=gv('mu-senha'), uRole=gv('mu-role');
     if (!uNome||!uEmail||!uSenha) { showToast('e','Obrigatório','Nome, e-mail e senha são obrigatórios'); btn.textContent='Salvar'; return; }
     var uFarm = gv('mu-farm') || null;
-    apiFetch('/auth/register', {method:'POST', body: JSON.stringify({nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel'),farmacia_id:uFarm})})
+    var uPayload = {nome:uNome,email:uEmail,senha:uSenha,role:uRole,telefone:gv('mu-tel'),farmacia_id:uFarm};
+    if (uRole === 'farmaceutico') {
+      uPayload.crf = gv('mu-crf'); uPayload.crf_uf = gv('mu-crfuf'); uPayload.crf_expedicao = gv('mu-crfexp') || null; uPayload.cpf = gv('mu-cpf');
+      if (!uPayload.crf || !uPayload.crf_expedicao) { showToast('e','Dados do conselho','Informe o CRF e a data de expedição do farmacêutico.'); btn.textContent='Salvar'; return; }
+      if (!uFarm) { showToast('e','Farmácia','Vincule o farmacêutico a uma farmácia.'); btn.textContent='Salvar'; return; }
+    }
+    apiFetch('/usuarios', {method:'POST', body: JSON.stringify(uPayload)})
     .then(function(res) {
       if (res.ok) {
         closeModal(); showToast('s','Usuário criado!', uNome + ' — ' + uRole);
@@ -2318,6 +2331,7 @@ function saveModal() {
 
   } else if (type === 'usr-edit') {
     var ue = {nome:gv('mu-nome'), email:gv('mu-email'), role:gv('mu-role'), telefone:gv('mu-tel'), farmacia_id:gv('mu-farm')||null};
+    if (gv('mu-role') === 'farmaceutico') { ue.crf=gv('mu-crf'); ue.crf_uf=gv('mu-crfuf'); ue.crf_expedicao=gv('mu-crfexp')||null; ue.cpf=gv('mu-cpf'); }
     var novaSenhaEdit = gv('mu-nova-senha');
     if (novaSenhaEdit) {
       if (novaSenhaEdit.length < 6) { showToast('e','Senha fraca','A senha deve ter pelo menos 6 caracteres.'); btn.textContent='Salvar'; return; }
@@ -2954,6 +2968,8 @@ function setMsg(el, type, text) {
 function toggleFarmSelect(role) {
   var wrap = document.getElementById('mu-farm-wrap');
   if (wrap) wrap.style.display = (role === 'farmacia' || role === 'farmaceutico') ? '' : 'none';
+  var crfWrap = document.getElementById('mu-crf-wrap');
+  if (crfWrap) crfWrap.style.display = (role === 'farmaceutico') ? '' : 'none';
 }
 
 // ── ESQUECI MINHA SENHA ───────────────────────────────────────
