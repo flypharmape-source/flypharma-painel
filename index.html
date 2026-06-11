@@ -599,7 +599,7 @@ function doLogin() {
     body: JSON.stringify({email: email, senha: senha})
   }).then(function(r) { return r.json().then(function(d) { return {ok: r.ok, data: d}; }); })
   .then(function(res) {
-    if (res.ok && res.data.user && (res.data.user.role === 'admin' || res.data.user.role === 'farmacia')) {
+    if (res.ok && res.data.user && (res.data.user.role === 'admin' || res.data.user.role === 'farmacia' || res.data.user.role === 'farmaceutico')) {
       AT = res.data.access || res.data.token || res.data.accessToken || null;
       CU = res.data.user;
       if (AT) localStorage.setItem('fly_at', AT);
@@ -647,7 +647,7 @@ window.addEventListener('load', function() {
     var d = res.data;
     // Normaliza: suporta {role} direto ou {user: {role}}
     var user = (d && d.role) ? d : (d && d.user ? d.user : null);
-    if (user && (user.role === 'admin' || user.role === 'farmacia')) {
+    if (user && (user.role === 'admin' || user.role === 'farmacia' || user.role === 'farmaceutico')) {
       CU = user;
       AT = AT || res.data.access || res.data.token || AT;
       localStorage.setItem('fly_cu', JSON.stringify(CU));
@@ -701,7 +701,6 @@ var NAV_FRM = [
   {g:'Operações', items:[
     {id:'ped',lbl:'Pedidos',bdg:true},
     {id:'cham',lbl:'Chamados',bdg:true},
-    {id:'recv',lbl:'Validação de receitas',bdg:true},
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
@@ -713,11 +712,16 @@ var NAV_MANIP = [
   {g:'Operações', items:[
     {id:'ped',lbl:'Pedidos',bdg:true},
     {id:'cham',lbl:'Chamados',bdg:true},
-    {id:'recv',lbl:'Validação de receitas',bdg:true},
     {id:'est',lbl:'Estoque'},
     {id:'prod',lbl:'Produtos'},
     {id:'rel',lbl:'Relatórios'},
     {id:'manip',lbl:'Manipulados',bdg:true},
+  ]},
+  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+];
+var NAV_FARMAC = [
+  {g:'Operações', items:[
+    {id:'recv',lbl:'Validação de receitas',bdg:true},
   ]},
   {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
 ];
@@ -762,7 +766,7 @@ function startApp(novoLogin) {
   var roleEmoji = isAdm ? '👑' : (myfarmRole.tipo === 'petshop' ? '🐾' : myfarmRole.tipo === 'manipulado' ? '🧪' : '🏥');
   var roleLabel = isAdm ? 'Admin Mestre' : (myfarmRole.nome || CU.nome);
   document.getElementById('sb-role').textContent = roleEmoji + ' ' + roleLabel;
-  var nav = isAdm ? NAV_ADM : (myfarmRole.tipo === 'manipulado' ? NAV_MANIP : NAV_FRM);
+  var nav = isAdm ? NAV_ADM : (CU.role === 'farmaceutico' ? NAV_FARMAC : (myfarmRole.tipo === 'manipulado' ? NAV_MANIP : NAV_FRM));
   var html = '';
   for (var i = 0; i < nav.length; i++) {
     html += '<div class="sb-sec"><div class="sb-lbl">' + nav[i].g + '</div>';
@@ -1891,11 +1895,13 @@ function carregarReceitasPedido(pedidoId) {
       h2 += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">';
       h2 += '<span style="font-size:12px;font-weight:700;color:' + cor + ';background:' + cor + '18;padding:3px 10px;border-radius:20px">' + lbl + '</span>';
       h2 += '</div>';
-      if (r.status === 'pendente' || r.status === 'em_analise') {
+      if ((CU && CU.role === 'admin') && (r.status === 'pendente' || r.status === 'em_analise')) {
         h2 += '<div style="display:flex;gap:8px">';
         h2 += '<button class="btn btn-p" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'aprovada\')">✅ Aprovar</button>';
         h2 += '<button class="btn btn-d" style="padding:5px 12px;font-size:12px" onclick="analisarReceita(\'' + r.id + '\',\'reprovada\')">❌ Reprovar</button>';
         h2 += '</div>';
+      } else if (r.status === 'pendente' || r.status === 'em_analise') {
+        h2 += '<div style="font-size:11px;color:var(--t2)">Aguardando validação do farmacêutico</div>';
       } else if (r.observacao) {
         h2 += '<div style="font-size:11px;color:var(--t2)">Obs: ' + r.observacao + '</div>';
       }
@@ -2095,10 +2101,10 @@ function buildMBody(type, id) {
     FARMS.forEach(function(f){ farmOptsU += '<option value="' + f.id + '"' + (u.farmacia_id===f.id?' selected':'') + '>' + f.nome + '</option>'; });
     h += '<div class="fr"><div class="fc3"><label>Nome completo *</label><input id="mu-nome" value="' + (u.nome||'') + '" placeholder="Nome do usuário"></div><div class="fc3"><label>Telefone</label><input id="mu-tel" value="' + (u.tel||u.telefone||'') + '" placeholder="(81) 9 9999-9999"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>E-mail *</label><input id="mu-email" type="email" value="' + (u.email||'') + '" placeholder="email@exemplo.com"></div><div class="fc3"><label>Perfil *</label><select id="mu-role" onchange="toggleFarmSelect(this.value)">';
-    var roles = ['cliente','farmacia','entregador','admin'];
+    var roles = ['cliente','farmacia','farmaceutico','entregador','admin'];
     for (var ri=0;ri<roles.length;ri++) h += '<option value="' + roles[ri] + '"' + (u.role===roles[ri]?' selected':'') + '>' + roles[ri].charAt(0).toUpperCase()+roles[ri].slice(1) + '</option>';
     h += '</select></div></div>';
-    h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + (u.role==='farmacia'?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
+    h += '<div class="fr"><div class="fc3" id="mu-farm-wrap" style="' + ((u.role==='farmacia'||u.role==='farmaceutico')?'':'display:none') + '"><label>Farmácia vinculada</label><select id="mu-farm">' + farmOptsU + '</select></div></div>';
     if (type === 'usr-new') h += '<div class="fr"><div class="fc3 full"><label>Senha *</label><input id="mu-senha" type="password" placeholder="••••••••"></div></div>';
     if (type === 'usr-edit') h += '<div class="fr"><div class="fc3 full"><label>Nova senha <span style="color:var(--t3);font-weight:400">(deixe em branco para não alterar)</span></label><input id="mu-nova-senha" type="password" placeholder="••••••••" autocomplete="off"></div></div>';
   } else if (type === 'est-edit') {
@@ -2947,7 +2953,7 @@ function setMsg(el, type, text) {
 // ── TOGGLE CAMPO FARMÁCIA NO MODAL USUÁRIO ──────────────────
 function toggleFarmSelect(role) {
   var wrap = document.getElementById('mu-farm-wrap');
-  if (wrap) wrap.style.display = role === 'farmacia' ? '' : 'none';
+  if (wrap) wrap.style.display = (role === 'farmacia' || role === 'farmaceutico') ? '' : 'none';
 }
 
 // ── ESQUECI MINHA SENHA ───────────────────────────────────────
