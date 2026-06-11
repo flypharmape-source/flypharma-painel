@@ -478,6 +478,9 @@ function loadPeds() {
           cli: p.cliente_nome || p.cliente || p.cli || '',
           itens: p.quantidade_itens || p.itens || 0,
           total: p.total || p.valor_total || 0,
+          data: dt || '',
+          subtotal: Number(p.subtotal != null ? p.subtotal : Math.max(0, (Number(p.total||p.valor_total||0)) - Number(p.taxa_entrega||0))),
+          taxa_entrega: Number(p.taxa_entrega||0),
           status: p.status || 'pendente',
           metodo: p.metodo_pagamento || p.metodo || (p.pagamentos && p.pagamentos[0] && p.pagamentos[0].metodo) || (p.pagamento && p.pagamento.metodo) || '—',
           hora: hora,
@@ -925,11 +928,13 @@ function renderDash() {
     : (myFarmIdDash ? PEDS.filter(function(p){ var fn=(FARMS.find(function(f){return f.id===myFarmIdDash;})||{}).nome||''; return p.farmacia_id===myFarmIdDash||p.farm===fn; }) : PEDS);
   var PRODS_DASH = myFarmIdDash ? PRODS.filter(function(p){ return p.farmacia_id===myFarmIdDash; }) : PRODS;
   var pedsHoje = PEDS_DASH.filter(function(p) {
-    var d = new Date(p.created_at || p.hora || 0); d.setHours(0,0,0,0);
+    if (!p.data) return false;
+    var d = new Date(p.data); if (isNaN(d.getTime())) return false; d.setHours(0,0,0,0);
     return d.getTime() === hoje.getTime();
   });
-  // fallback: se nenhum pedido tiver data, usa todos
-  if (pedsHoje.length === 0) pedsHoje = PEDS_DASH;
+  // fallback só se NENHUM pedido tiver data válida (dados antigos sem created_at)
+  var algumComData = PEDS_DASH.some(function(p){ return p.data && !isNaN(new Date(p.data).getTime()); });
+  if (pedsHoje.length === 0 && !algumComData) pedsHoje = PEDS_DASH;
 
   var fatHoje = pedsHoje.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
   var fatTotal = PEDS_DASH.reduce(function(acc, p) { return acc + (Number(p.total) || 0); }, 0);
@@ -942,6 +947,11 @@ function renderDash() {
   var entregues = PEDS_DASH.filter(function(p){ return p.status === 'entregue'; });
   var tempoMedio = entregues.length > 0 ? Math.round(18 + Math.random() * 5) : '--'; // placeholder até ter timestamps reais
 
+  // A receber hoje (farmácia): líquido sobre os produtos, menos a comissão da plataforma.
+  // A taxa de entrega não entra (vai para o entregador). Pedidos cancelados não contam.
+  var minhaTaxaPlat = myFarmIdDash ? Number((function(){ var mf = FARMS.find(function(f){return f.id===myFarmIdDash;}) || {}; return mf.taxa_plataforma != null ? mf.taxa_plataforma : 10; })()) : 10;
+  var aReceberHoje = pedsHoje.filter(function(p){ return p.status !== 'cancelado'; }).reduce(function(acc, p){ return acc + (Number(p.subtotal)||0) * (1 - minhaTaxaPlat/100); }, 0);
+
   // Stats
   h += '<div class="sg">';
   if (isAdm) {
@@ -952,7 +962,7 @@ function renderDash() {
   } else {
     h += statCard('t', NAV_ICS.ped, pedsHoje.length.toString(), 'Pedidos hoje', PEDS.length + ' no total', 'up');
     h += statCard('g', NAV_ICS.farm, fmtR(fatHoje), 'Faturamento hoje', fmtR(fatTotal) + ' total', 'up');
-    h += statCard('a', NAV_ICS.cfg, tempoMedio + ' min', 'Tempo médio entrega', entregues.length + ' entregues', 'up');
+    h += statCard('a', NAV_ICS.farm, fmtR(aReceberHoje), 'A receber hoje', 'líquido · comissão ' + minhaTaxaPlat + '%', 'up');
     h += statCard('r', NAV_ICS.prod, estoquesCriticos.length.toString(), 'Estoque crítico', estoquesCriticos.length > 0 ? estoquesCriticos[0].nome || 'Ver itens' : 'OK', estoquesCriticos.length > 0 ? 'dn' : 'up');
   }
   h += '</div>';
@@ -1498,11 +1508,14 @@ function renderRel() {
 
 function carregarRelatorio() {
   var dias = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
+  var corte = new Date(); corte.setHours(0,0,0,0); corte.setDate(corte.getDate() - (dias - 1));
   var isAdm = CU && CU.role === 'admin';
   var farmId = CU && CU.farmacia_id;
   // Admin filtra pelo select; farmácia filtra automaticamente pelos seus pedidos
   var relFarmSel = isAdm ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmId;
   var pedsFiltrados = PEDS.filter(function(p) {
+    // filtro de período (Últimos N dias)
+    if (p.data) { var dp = new Date(p.data); if (!isNaN(dp.getTime()) && dp < corte) return false; }
     if (relFarmSel) {
       var farmNome = (FARMS.find(function(f){return f.id===relFarmSel;})||{}).nome || '';
       return p.farmacia_id === relFarmSel || p.farm === farmNome;
@@ -1517,11 +1530,14 @@ function carregarRelatorio() {
   var entregues = pedsFiltrados.filter(function(p) { return p.status === 'entregue'; }).length;
   var cancelados = pedsFiltrados.filter(function(p) { return p.status === 'cancelado'; }).length;
   var taxaCanc = total > 0 ? ((cancelados / total) * 100).toFixed(1) : '0.0';
+  // Líquido a receber (farmácia): produtos menos comissão da plataforma, sem cancelados
+  var minhaTaxaRel = (!isAdm && farmId) ? Number((function(){ var mf = FARMS.find(function(f){return f.id===farmId;}) || {}; return mf.taxa_plataforma != null ? mf.taxa_plataforma : 10; })()) : 10;
+  var liquidoRel = pedsFiltrados.filter(function(p){ return p.status !== 'cancelado'; }).reduce(function(acc, p){ return acc + (Number(p.subtotal)||0) * (1 - minhaTaxaRel/100); }, 0);
 
   var stats = document.getElementById('rel-stats');
   if (stats) stats.innerHTML =
-    statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', entregues + ' entregues', 'up') +
-    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'todos os períodos', 'up') +
+    statCard('g', NAV_ICS.prod, fmtR(fat), 'Faturamento total', (isAdm ? entregues + ' entregues' : 'a receber ' + fmtR(liquidoRel)), 'up') +
+    statCard('t', NAV_ICS.ped, total, 'Total de pedidos', 'últimos ' + dias + ' dias', 'up') +
     statCard('a', NAV_ICS.usr, entregues, 'Pedidos entregues', Math.round(entregues/Math.max(total,1)*100) + '%', 'up') +
     statCard('r', NAV_ICS.cfg, taxaCanc + '%', 'Taxa cancelamento', cancelados + ' cancelados', cancelados > 0 ? 'dn' : 'up');
 
@@ -1590,16 +1606,20 @@ function carregarRelatorio() {
 function exportarRelatorioCSV() {
   var isAdmCsv = CU && CU.role === 'admin';
   var farmIdCsv = CU && CU.farmacia_id;
+  var diasCsv = document.getElementById('rel-periodo') ? Number(document.getElementById('rel-periodo').value) : 30;
+  var corteCsv = new Date(); corteCsv.setHours(0,0,0,0); corteCsv.setDate(corteCsv.getDate() - (diasCsv - 1));
   var relFarmSelCsv = isAdmCsv ? (document.getElementById('rel-farm') ? document.getElementById('rel-farm').value : '') : farmIdCsv;
   var pedsCsv = PEDS.filter(function(p) {
+    if (p.data) { var dpc = new Date(p.data); if (!isNaN(dpc.getTime()) && dpc < corteCsv) return false; }
     if (relFarmSelCsv) { var fn = (FARMS.find(function(f){return f.id===relFarmSelCsv;})||{}).nome||''; return p.farmacia_id===relFarmSelCsv||p.farm===fn; }
     if (!isAdmCsv && farmIdCsv) { var fn2=(FARMS.find(function(f){return f.id===farmIdCsv;})||{}).nome||''; return p.farmacia_id===farmIdCsv||p.farm===fn2; }
     return true;
   });
-  var rows = [['ID','Cliente','Farmácia','Total','Método','Status','Hora']];
+  var rows = [['ID','Data','Cliente','Farmácia','Total','Método','Status','Hora']];
   pedsCsv.forEach(function(p) {
     rows.push([
       '#' + p.num,
+      p.data ? new Date(p.data).toLocaleDateString('pt-BR') : '—',
       p.cli || '—',
       p.farm || '—',
       'R$' + Number(p.total||0).toFixed(2),
