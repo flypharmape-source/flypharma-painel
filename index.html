@@ -2255,7 +2255,19 @@ function renderEntregadores() {
     reprovado: '<span class="b" style="background:#fee;color:#c00">❌ Reprovado</span>',
   };
 
-  var h2 = '<div class="fb">';
+  // Total a repassar na semana (soma de TODOS os entregadores, não só os filtrados)
+  var totalRepasse = ENTREGADORES.reduce(function(s,e){ return s + (Number(e.ganhos_semana)||0); }, 0);
+  var totalEntregasSemana = ENTREGADORES.reduce(function(s,e){ return s + (Number(e.entregas_semana)||0); }, 0);
+
+  var h2 = '';
+  if (totalRepasse > 0 || totalEntregasSemana > 0) {
+    h2 += '<div style="background:linear-gradient(135deg,#18A065,#22C97A);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;color:#fff;box-shadow:0 6px 20px rgba(34,201,122,.25)">';
+    h2 += '<div><div style="font-size:12px;font-weight:600;opacity:.9;text-transform:uppercase;letter-spacing:.5px">Total a repassar esta semana</div>';
+    h2 += '<div style="font-size:28px;font-weight:800;margin-top:2px">R$ '+totalRepasse.toFixed(2).replace('.',',')+'</div></div>';
+    h2 += '<div style="text-align:right"><div style="font-size:22px;font-weight:800">'+totalEntregasSemana+'</div><div style="font-size:11px;opacity:.9">entregas · desde segunda</div></div>';
+    h2 += '</div>';
+  }
+  h2 += '<div class="fb">';
   var filtros2 = ['pendente','aprovado','reprovado','todos'];
   var labels2 = {pendente:'Pendentes ('+ENTREGADORES.filter(function(e){return e.status_entregador==='pendente';}).length+')',aprovado:'Aprovados',reprovado:'Reprovados',todos:'Todos ('+ENTREGADORES.length+')'};
   filtros2.forEach(function(f) {
