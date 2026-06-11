@@ -856,8 +856,8 @@ function renderAud() {
 function fmtAcaoAud(a) {
   var cores = {
     USUARIO_ROLE_ALTERADA:'#8B1A1A', SENHA_RESETADA:'#8B1A1A',
-    FARMACIA_EXCLUIDA:'var(--r)', PRODUTO_EXCLUIDO:'var(--r)',
-    COMISSAO_ALTERADA:'var(--a)', FARMACIA_CRIADA:'var(--g)'
+    FARMACIA_EXCLUIDA:'var(--r)', PRODUTO_EXCLUIDO:'var(--r)', RECEITA_REPROVADA:'var(--r)',
+    COMISSAO_ALTERADA:'var(--a)', FARMACIA_CRIADA:'var(--g)', RECEITA_APROVADA:'var(--g)'
   };
   var cor = cores[a] || 'var(--t2)';
   return '<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700;color:#fff;background:' + cor + '">' + (a || '—') + '</span>';
@@ -871,6 +871,9 @@ function fmtDetalhesAud(d) {
   if (d.farmacia) partes.push(d.farmacia);
   if (d.produto)  partes.push(d.produto);
   if (d.email)    partes.push(d.email);
+  if (d.motivo)     partes.push('motivo: ' + d.motivo);
+  if (d.paciente)   partes.push('paciente: ' + d.paciente);
+  if (d.prescritor) partes.push('prescritor: ' + d.prescritor);
   if (d.de !== undefined || d.para !== undefined) partes.push((d.de != null ? d.de : '?') + ' → ' + (d.para != null ? d.para : '?'));
   if (d.campos && d.campos.length) partes.push('campos: ' + d.campos.join(', '));
   return partes.length ? partes.join(' · ') : JSON.stringify(d);
