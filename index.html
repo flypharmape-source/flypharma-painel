@@ -340,6 +340,7 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
     <div id="page-usr"  class="page"></div>
     <div id="page-rel"  class="page"></div>
     <div id="page-cfg"  class="page"></div>
+    <div id="page-aud"  class="page"></div>
     <div id="page-cham" class="page"></div>
     <div id="page-recv" class="page"></div>
   </div>
@@ -693,7 +694,7 @@ var NAV_ADM = [
     {id:'manip',lbl:'Manipulados',bdg:true},
     {id:'entr',lbl:'Entregadores',bdg:true},
   ]},
-  {g:'Sistema', items:[{id:'cfg',lbl:'Configurações'}]},
+  {g:'Sistema', items:[{id:'aud',lbl:'Auditoria'},{id:'cfg',lbl:'Configurações'}]},
 ];
 var NAV_FRM = [
   {g:'Visão geral', items:[{id:'dash',lbl:'Dashboard'}]},
@@ -731,6 +732,7 @@ var NAV_ICS = {
   cfg:'<circle cx="10" cy="10" r="3"/><path d="M10 2v2M10 16v2M2 10h2M16 10h2"/>',
   cham:'<path d="M4 4h12a2 2 0 012 2v8a2 2 0 01-2 2H6l-4 3V6a2 2 0 012-2z"/>',
   recv:'<path d="M6 2h6l4 4v12a1 1 0 01-1 1H6a1 1 0 01-1-1V3a1 1 0 011-1z"/><path d="M8 12l2 2 4-4"/>',
+  aud:'<path d="M10 2l7 3v5c0 4-3 7-7 8-4-1-7-4-7-8V5l7-3z"/><path d="M7 10l2 2 4-4"/>',
   manip:'<path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2v-4M9 21H5a2 2 0 01-2-2v-4m0 0h18"/>',
   entr:'<path d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>',
 };
@@ -827,6 +829,78 @@ function renderPage(id) {
   else if (id === 'manip') renderManip();
   else if (id === 'entr')  renderEntregadores();
   else if (id === 'recv')  renderRecv();
+  else if (id === 'aud')   renderAud();
+}
+
+// ── AUDITORIA (admin) ─────────────────────────────────────────
+var AUD = [];
+var _audFiltro = '';
+function renderAud() {
+  var el = document.getElementById('page-aud');
+  el.innerHTML =
+    '<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">' +
+      '<div style="font-family:\'Nunito\';font-weight:800;font-size:18px;color:var(--n)">🛡️ Auditoria</div>' +
+      '<select id="aud-ent" onchange="_audFiltro=this.value;carregarAuditoria()" style="margin-left:auto;padding:7px 12px;border:1.5px solid var(--br);border-radius:8px;font-size:13px;color:var(--n);background:var(--w)">' +
+        '<option value="">Todas as entidades</option>' +
+        '<option value="usuario">Usuários</option>' +
+        '<option value="farmacia">Farmácias</option>' +
+        '<option value="produto">Produtos</option>' +
+        '<option value="receita">Receitas</option>' +
+      '</select>' +
+      '<button onclick="carregarAuditoria()" style="padding:7px 12px;font-size:13px;border:1.5px solid var(--br);border-radius:8px;background:var(--w);color:var(--t2);cursor:pointer">↻ Atualizar</button>' +
+    '</div>' +
+    '<div class="card" id="aud-list"><div style="padding:16px;color:var(--t3);font-size:13px">Carregando...</div></div>';
+  carregarAuditoria();
+}
+
+function fmtAcaoAud(a) {
+  var cores = {
+    USUARIO_ROLE_ALTERADA:'#8B1A1A', SENHA_RESETADA:'#8B1A1A',
+    FARMACIA_EXCLUIDA:'var(--r)', PRODUTO_EXCLUIDO:'var(--r)',
+    COMISSAO_ALTERADA:'var(--a)', FARMACIA_CRIADA:'var(--g)'
+  };
+  var cor = cores[a] || 'var(--t2)';
+  return '<span style="display:inline-block;padding:2px 8px;border-radius:6px;font-size:10.5px;font-weight:700;color:#fff;background:' + cor + '">' + (a || '—') + '</span>';
+}
+
+function fmtDetalhesAud(d) {
+  if (!d) return '<span style="color:var(--t3)">—</span>';
+  try { if (typeof d === 'string') d = JSON.parse(d); } catch (e) { return String(d); }
+  var partes = [];
+  if (d.usuario)  partes.push(d.usuario);
+  if (d.farmacia) partes.push(d.farmacia);
+  if (d.produto)  partes.push(d.produto);
+  if (d.email)    partes.push(d.email);
+  if (d.de !== undefined || d.para !== undefined) partes.push((d.de != null ? d.de : '?') + ' → ' + (d.para != null ? d.para : '?'));
+  if (d.campos && d.campos.length) partes.push('campos: ' + d.campos.join(', '));
+  return partes.length ? partes.join(' · ') : JSON.stringify(d);
+}
+
+function carregarAuditoria() {
+  var q = _audFiltro ? ('/auditoria?entidade=' + encodeURIComponent(_audFiltro)) : '/auditoria';
+  apiFetch(q).then(function(res) {
+    AUD = (res.ok && Array.isArray(res.data)) ? res.data : [];
+    var box = document.getElementById('aud-list');
+    if (!box) return;
+    if (!AUD.length) {
+      box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--t3);font-size:13px">Nenhum registro de auditoria ainda.</div>';
+      return;
+    }
+    var h = '<table class="tbl"><thead><tr><th>Data/Hora</th><th>Usuário</th><th>Ação</th><th>Detalhes</th><th>IP</th></tr></thead><tbody>';
+    AUD.forEach(function(l) {
+      var dt = l.created_at ? new Date(l.created_at).toLocaleString('pt-BR') : '—';
+      var quem = (l.usuario_nome || '—') + (l.usuario_role ? ' <span style="color:var(--t3);font-size:11px">(' + l.usuario_role + ')</span>' : '');
+      h += '<tr>' +
+        '<td style="white-space:nowrap;font-size:12px">' + dt + '</td>' +
+        '<td style="font-size:12px">' + quem + '</td>' +
+        '<td>' + fmtAcaoAud(l.acao) + '</td>' +
+        '<td style="font-size:12px;color:var(--t2)">' + fmtDetalhesAud(l.detalhes) + '</td>' +
+        '<td style="font-size:11px;color:var(--t3)">' + (l.ip || '—') + '</td>' +
+        '</tr>';
+    });
+    h += '</tbody></table>';
+    box.innerHTML = h;
+  });
 }
 
 // ── VALIDAÇÃO DE RECEITAS (farmacêutico) ──────────────────────
