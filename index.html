@@ -419,7 +419,10 @@ function loadFarms() {
           pedido_minimo: f.pedido_minimo || 0,
           logo_url: f.logo_url || null,
           horarios: f.horarios || [],
-          user_id: f.user_id || null
+          user_id: f.user_id || null,
+          taxa_plataforma: (f.taxa_plataforma != null ? f.taxa_plataforma : 10),
+          repasse_semana: Number(f.repasse_semana) || 0,
+          comissao_semana: Number(f.comissao_semana) || 0
         };
       });
     }
@@ -1056,7 +1059,20 @@ function statCard(cls, ic, val, lbl, delta, dir) {
 // FARMÁCIAS
 function renderFarm() {
   var el = document.getElementById('page-farm');
-  var h = '<div class="fb">';
+  var isAdm = CU && CU.role === 'admin';
+  var h = '';
+  if (isAdm) {
+    var totalRepasseFarm = FARMS.reduce(function(s,f){ return s + (Number(f.repasse_semana)||0); }, 0);
+    var totalComissaoFarm = FARMS.reduce(function(s,f){ return s + (Number(f.comissao_semana)||0); }, 0);
+    if (totalRepasseFarm > 0 || totalComissaoFarm > 0) {
+      h += '<div style="background:linear-gradient(135deg,#18A065,#22C97A);border-radius:14px;padding:18px 22px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;color:#fff;box-shadow:0 6px 20px rgba(34,201,122,.25)">';
+      h += '<div><div style="font-size:12px;font-weight:600;opacity:.9;text-transform:uppercase;letter-spacing:.5px">Total a repassar às farmácias (semana)</div>';
+      h += '<div style="font-size:28px;font-weight:800;margin-top:2px">' + fmtR(totalRepasseFarm) + '</div></div>';
+      h += '<div style="text-align:right"><div style="font-size:13px;opacity:.9">Comissão da plataforma</div><div style="font-size:18px;font-weight:800">' + fmtR(totalComissaoFarm) + '</div></div>';
+      h += '</div>';
+    }
+  }
+  h += '<div class="fb">';
   h += '<div class="sb2"><svg width="14" height="14" viewBox="0 0 20 20" fill="none" stroke="var(--t3)" stroke-width="1.6"><circle cx="9" cy="9" r="6"/><path d="M13.5 13.5L17 17"/></svg><input type="text" placeholder="Buscar farmácia..." oninput="filterFarm(this.value)"></div>';
   h += '<div class="fc on" onclick="filterFarmStatus(\'all\',this)">Todas (' + FARMS.length + ')</div>';
   var atv = FARMS.filter(function(f){return f.ativo;}).length;
@@ -1087,7 +1103,13 @@ function farmCard(f) {
     '<div><div class="fstv">' + f.pedidos + '</div><div class="fstl">Pedidos</div></div>' +
     '<div><div class="fstv">' + fmtR(f.fat).replace('R$','') + '</div><div class="fstl">Fat.</div></div>' +
     '<div><div class="fstv">4.8\u2605</div><div class="fstl">Aval.</div></div>' +
-    '</div></div>' +
+    '</div>' +
+    (isAdm ? ('<div style="background:rgba(34,201,122,.12);border:1px solid rgba(34,201,122,.25);border-radius:8px;padding:8px 10px;margin-top:10px;display:flex;align-items:center;justify-content:space-between">' +
+      '<div><div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase">Repasse semana</div>' +
+      '<div style="font-size:16px;font-weight:800;color:#18A065">' + fmtR(f.repasse_semana||0) + '</div></div>' +
+      '<div style="text-align:right;font-size:10px;color:var(--t3)">comissão ' + (f.taxa_plataforma!=null?f.taxa_plataforma:10) + '%<br>' + fmtR(f.comissao_semana||0) + '</div>' +
+      '</div>') : '') +
+    '</div>' +
     '<div class="fft">' +
     '<button class="btn btn-s" style="flex:1;min-width:calc(50% - 4px);justify-content:center;font-size:12px" onclick="filtrarProdsPorFarmacia(\'' + f.id + '\')">📦 Produtos</button>' +
     '<button class="btn btn-o" style="flex:1;min-width:calc(50% - 4px);justify-content:center;font-size:12px" onclick="openModal(\'farm-edit\',\'' + f.id + '\')">\u270F\uFE0F Editar</button>' +
@@ -1884,6 +1906,9 @@ function buildMBody(type, id) {
     h += '</div></div>';
     h += '<div class="fr"><div class="fc3"><label>Taxa entrega (R$)</label><input id="mf-taxa" type="number" step="0.01" value="' + (f.taxa_entrega||'6.90') + '"></div><div class="fc3"><label>Raio entrega (km)</label><input id="mf-raio" type="number" value="' + (f.raio_entrega_km||'5') + '"></div></div>';
     h += '<div class="fr"><div class="fc3"><label>Pedido mínimo (R$)</label><input id="mf-pmin" type="number" step="0.01" value="' + (f.pedido_minimo||'0') + '"></div><div class="fc3"><label>Status manual</label><select id="mf-aberta"><option value="false">Fechada</option><option value="true"' + (f.aberta?' selected':'') + '>Aberta</option></select></div></div>';
+    if (CU && CU.role === 'admin') {
+      h += '<div class="fr"><div class="fc3"><label>Comissão da plataforma (%)</label><input id="mf-taxaplat" type="number" step="0.5" value="' + (f.taxa_plataforma!=null?f.taxa_plataforma:10) + '" placeholder="10"></div><div class="fc3"><label>&nbsp;</label><div style="font-size:11px;color:var(--t3);padding-top:10px;line-height:1.4">Incide só sobre os produtos. Define o repasse desta farmácia.</div></div></div>';
+    }
     h += '<div style="margin-top:14px;border-top:1px solid var(--br);padding-top:14px">';
     h += '<div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:.6px">🕐 Horários de funcionamento</div>';
     h += '<div style="font-size:11px;color:var(--t3);margin-bottom:10px">A farmácia abrirá/fechará automaticamente conforme os horários abaixo.</div>';
@@ -2059,6 +2084,7 @@ function saveModal() {
       raio_entrega_km: Number(gv('mf-raio'))||5,
       pedido_minimo: Number(gv('mf-pmin'))||0,
       aberta: gv('mf-aberta') === 'true',
+      taxa_plataforma: parseFloat(gv('mf-taxaplat'))||10,
     };
     apiFetch('/farmacias', {method:'POST', body: JSON.stringify(payload)})
     .then(function(res) {
@@ -2083,6 +2109,7 @@ function saveModal() {
       pedido_minimo: Number(gv('mf-pmin'))||0,
       aberta: gv('mf-aberta') === 'true',
     };
+    if (document.getElementById('mf-taxaplat')) { var _tp = parseFloat(gv('mf-taxaplat')); if (!isNaN(_tp)) fe.taxa_plataforma = _tp; }
     var horariosEdit = [];
     for (var hde=0;hde<7;hde++) {
       horariosEdit.push({
