@@ -97,8 +97,8 @@ body{font-family:'Inter',sans-serif;font-size:14px;background:var(--bg);color:va
 .fg2{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;max-width:100%}
 .fcard{background:var(--w);border:1.5px solid var(--br);border-radius:14px;overflow:hidden;transition:all .15s}
 .fcard:hover{border-color:var(--t);box-shadow:0 2px 12px rgba(30,45,61,.09)}
-.ftop{height:80px;background:linear-gradient(135deg,var(--n),#253647);display:flex;align-items:center;justify-content:center;position:relative}
-.flogo{width:52px;height:52px;border-radius:12px;background:var(--t);display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:22px;color:var(--n)}
+.ftop{height:80px;background:linear-gradient(135deg,var(--t),var(--td));display:flex;align-items:center;justify-content:center;position:relative}
+.flogo{width:52px;height:52px;border-radius:12px;background:#fff;display:flex;align-items:center;justify-content:center;font-family:'Nunito';font-weight:800;font-size:22px;color:var(--t)}
 .fbody{padding:14px}
 .fn{font-family:'Nunito';font-weight:700;font-size:15px;color:var(--n);margin-bottom:2px}
 .fc2{font-size:12px;color:var(--t2);margin-bottom:10px}
@@ -1087,6 +1087,7 @@ function renderFarm() {
 
 function farmCard(f) {
   var isAdm = CU && CU.role === 'admin';
+  var vendasSemana = (Number(f.repasse_semana)||0) + (Number(f.comissao_semana)||0);
   var logoHtml = f.logo_url
     ? '<img src="' + f.logo_url + '" style="width:72px;height:72px;border-radius:14px;object-fit:cover;border:2px solid rgba(255,255,255,.2);box-shadow:0 2px 8px rgba(0,0,0,.25)" onerror="this.style.display=\'none\';this.nextSibling.style.display=\'flex\'">'
       + '<div class="flogo" style="display:none">' + f.nome[0] + '</div>'
@@ -1104,10 +1105,13 @@ function farmCard(f) {
     '<div><div class="fstv">' + fmtR(f.fat).replace('R$','') + '</div><div class="fstl">Fat.</div></div>' +
     '<div><div class="fstv">4.8\u2605</div><div class="fstl">Aval.</div></div>' +
     '</div>' +
-    (isAdm ? ('<div style="background:rgba(34,201,122,.12);border:1px solid rgba(34,201,122,.25);border-radius:8px;padding:8px 10px;margin-top:10px;display:flex;align-items:center;justify-content:space-between">' +
+    (isAdm ? ('<div style="background:rgba(34,201,122,.12);border:1px solid rgba(34,201,122,.25);border-radius:8px;padding:8px 10px;margin-top:10px">' +
+      '<div style="display:flex;align-items:center;justify-content:space-between">' +
       '<div><div style="font-size:10px;color:var(--t3);font-weight:600;text-transform:uppercase">Repasse semana</div>' +
       '<div style="font-size:16px;font-weight:800;color:#18A065">' + fmtR(f.repasse_semana||0) + '</div></div>' +
       '<div style="text-align:right;font-size:10px;color:var(--t3)">comissão ' + (f.taxa_plataforma!=null?f.taxa_plataforma:10) + '%<br>' + fmtR(f.comissao_semana||0) + '</div>' +
+      '</div>' +
+      '<div style="font-size:10px;color:var(--t3);margin-top:6px;border-top:1px dashed rgba(34,201,122,.3);padding-top:5px">Vendas ' + fmtR(vendasSemana) + ' − comissão ' + fmtR(f.comissao_semana||0) + ' = repasse</div>' +
       '</div>') : '') +
     '</div>' +
     '<div class="fft">' +
