@@ -3057,6 +3057,15 @@ goto = function(id) {
 <script>
 var _chatId = null, _chatSocket = null;
 
+// O servidor recusa o socket sem sessão válida (NAO_AUTENTICADO): avisa em vez de falhar em silêncio.
+var _avisouSessao = false;
+function avisarSocketSemSessao(err) {
+  if (!err || !err.data || err.data.codigo !== 'NAO_AUTENTICADO' || _avisouSessao) return;
+  _avisouSessao = true;
+  showToast('w', 'Atenção', 'Sua sessão expirou. Entre de novo.');
+  setTimeout(function() { _avisouSessao = false; }, 60000);
+}
+
 function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   _chatId = chamadoId;
   document.getElementById('chat-titulo').textContent = 'Chat · Pedido #' + pedNum;
@@ -3069,7 +3078,11 @@ function abrirChat(chamadoId, pedNum, farmNome, motivo) {
   });
 
   if (_chatSocket) { _chatSocket.disconnect(); }
-  _chatSocket = io('https://web-production-b66cd.up.railway.app', { transports: ['websocket','polling'] });
+  _chatSocket = io('https://web-production-b66cd.up.railway.app', {
+    transports: ['websocket','polling'],
+    auth: { token: (typeof AT !== 'undefined' && AT) ? AT : localStorage.getItem('fly_at') }
+  });
+  _chatSocket.on('connect_error', avisarSocketSemSessao);
   _chatSocket.emit('join_chamado', chamadoId);
   _chatSocket.on('nova_mensagem', function(msg) {
     appendMsgChat(msg);
@@ -3267,8 +3280,10 @@ function mostrarRastreamentoPublico(pedidoId) {
     reconnection: true,
     reconnectionAttempts: 20,
     reconnectionDelay: 3000,
+    auth: { token: token }
   });
 
+  _mainSocket.on('connect_error', avisarSocketSemSessao);
   _mainSocket.on('connect', function() {
     // Entra na sala da farmácia para receber eventos
     var farmId = typeof CU !== 'undefined' && CU && CU.farmacia_id ? CU.farmacia_id : null;
