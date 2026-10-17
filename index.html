@@ -394,18 +394,23 @@ function apiFetch(path, opts) {
 // A API não devolve mais a imagem da Receita na lista: devolve só o arquivo_id. Cada abertura pede um link de 15 minutos a
 // GET /arquivos/:id/link, que confere quem pode ver e grava a auditoria. A aba é aberta ANTES da chamada (senão o bloqueador de pop-up barra).
 function abrirReceita(arquivoId) {
+  if (abrirReceita.ocupado) return; // clique duplo abriria duas abas e gravaria duas auditorias
   var aba = window.open('', '_blank');
+  if (!aba) { alert('O navegador bloqueou a nova aba. Libere os pop-ups deste site e clique de novo em "Ver receita".'); return; }
+  abrirReceita.ocupado = true;
+  try { aba.document.title = 'Abrindo receita…'; aba.document.body.textContent = 'Abrindo a receita…'; } catch (e) { /* aba ainda sem documento */ }
+  var fechar = function(msg) { try { aba.close(); } catch (e) { /* já fechada */ } if (msg) alert(msg); };
   apiFetch('/arquivos/' + encodeURIComponent(arquivoId) + '/link').then(function(res) {
-    if (res.ok && res.data && res.data.url) {
-      if (aba) { aba.location.href = res.data.url; } else { window.location.href = res.data.url; }
+    if (res.ok && res.data && /^https?:\/\//.test(res.data.url || '')) {
+      aba.opener = null; // a página do armazenamento não pode mexer neste painel
+      aba.location.href = res.data.url;
       return;
     }
-    if (aba) aba.close();
-    alert(res.status === 403 || res.status === 404 ? 'Você não tem acesso a esta receita.' : 'Não foi possível abrir a receita agora. Tente de novo.');
-  }).catch(function() {
-    if (aba) aba.close();
-    alert('Não foi possível abrir a receita agora. Tente de novo.');
-  });
+    if (res.status === 403 || res.status === 404) return fechar('Você não tem acesso a esta receita.');
+    fechar('Não foi possível abrir a receita agora (o registro de acesso ou o armazenamento está indisponível). Tente de novo em instantes.');
+  }).catch(function(e) {
+    fechar(e && e.message === 'Sessão expirada' ? '' : 'Não foi possível abrir a receita agora. Tente de novo.');
+  }).then(function() { abrirReceita.ocupado = false; });
 }
 
 // ── CARREGAR DADOS DA API ─────────────────────────────────────
@@ -951,7 +956,7 @@ function renderRecv() {
   var h = '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:16px">';
   for (var i = 0; i < RECV.length; i++) {
     var r = RECV[i];
-    var img = r.imagem_url || '';
+    var img = r.arquivo_id ? '' : (r.imagem_url || '');
     var src = (img.indexOf('http') === 0 || img.indexOf('data:') === 0) ? img : (img ? ('data:image/jpeg;base64,' + img) : '');
     var ped = r.pedido_numero ? ('Pedido #' + r.pedido_numero) : 'Sem pedido vinculado';
     var cli = r.cliente_nome || '—';
@@ -960,7 +965,7 @@ function renderRecv() {
     h += src
       ? '<img src="' + src + '" style="width:100%;height:200px;object-fit:cover;cursor:zoom-in" onclick="window.open(this.src)">'
       : (r.arquivo_id
-        ? '<div class="empty" style="height:200px;flex-direction:column;gap:10px"><div style="font-size:34px">📋</div><button class="btn btn-p" onclick="abrirReceita(\'' + r.arquivo_id + '\')">Ver receita</button></div>'
+        ? '<div class="empty" style="height:200px;flex-direction:column;gap:10px"><div style="font-size:34px">📋</div><button class="btn btn-p" onclick="abrirReceita(\'' + String(r.arquivo_id).replace(/[^\w-]/g, '') + '\')">Ver receita</button></div>'
         : '<div class="empty" style="height:200px">Sem imagem</div>');
     h += '<div style="padding:14px">';
     h += '<div style="font-family:Nunito;font-weight:700;font-size:15px;color:var(--n)">' + ped + '</div>';
@@ -1912,10 +1917,10 @@ function carregarReceitasPedido(pedidoId) {
       var cor = statusCor[r.status] || 'var(--t3)';
       var lbl = statusLabel[r.status] || r.status;
       h2 += '<div style="padding:12px;display:flex;gap:12px;align-items:flex-start">';
-      if (r.imagem_url) {
+      if (!r.arquivo_id && r.imagem_url) {
         h2 += '<img src="' + r.imagem_url + '" style="width:80px;height:100px;object-fit:cover;border-radius:8px;border:1.5px solid var(--br);cursor:zoom-in;transition:opacity .15s" onmouseover="this.style.opacity=\'.8\'" onmouseout="this.style.opacity=\'1\'" onclick="openLightbox(\'' + r.imagem_url + '\')" title="Clique para ampliar">';
       } else if (r.arquivo_id) {
-        h2 += '<button class="btn btn-p" style="width:80px;height:100px;white-space:normal;font-size:12px" onclick="abrirReceita(\'' + r.arquivo_id + '\')" title="Abre a receita em uma nova aba (link de 15 minutos)">📋 Ver receita</button>';
+        h2 += '<button class="btn btn-p" style="width:80px;height:100px;white-space:normal;font-size:12px" onclick="abrirReceita(\'' + String(r.arquivo_id).replace(/[^\w-]/g, '') + '\')" title="Abre a receita em uma nova aba (link de 15 minutos)">📋 Ver receita</button>';
       } else {
         h2 += '<div class="empty" style="width:80px;height:100px;font-size:11px">Sem imagem</div>';
       }
